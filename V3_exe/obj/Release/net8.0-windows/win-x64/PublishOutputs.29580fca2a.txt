@@ -1,0 +1,2 @@
+E:\mytodo\bin\Release\net8.0-windows\win-x64\publish\MyTodo.pdb
+E:\mytodo\bin\Release\net8.0-windows\win-x64\publish\MyTodo.exe
