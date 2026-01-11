@@ -1,0 +1,2 @@
+E:\Mymomentum\V3_exe\dist\MyTodo.pdb
+E:\Mymomentum\V3_exe\dist\MyTodo.exe

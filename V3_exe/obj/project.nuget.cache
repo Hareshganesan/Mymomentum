@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "ZPL+lBy5Sl4=",
+  "dgSpecHash": "Br+XHvVfc1o=",
   "success": true,
-  "projectFilePath": "E:\\mytodo\\MyTodo.csproj",
+  "projectFilePath": "E:\\Mymomentum\\V3_exe\\MyTodo.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\hares\\.nuget\\packages\\microsoft.net.illink.tasks\\8.0.22\\microsoft.net.illink.tasks.8.0.22.nupkg.sha512",
     "C:\\Users\\hares\\.nuget\\packages\\microsoft.netcore.app.runtime.win-x64\\8.0.22\\microsoft.netcore.app.runtime.win-x64.8.0.22.nupkg.sha512",
