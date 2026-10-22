@@ -1,112 +1,167 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    
+
     <!-- ============================================== -->
-    <!-- PREMIUM BLACK & GOLD THEME                     -->
+    <!-- PREMIUM DUAL THEME - BLACK & GOLD + LIGHT     -->
     <!-- ============================================== -->
-    
+
+    <!-- DARK MODE COLORS -->
     <!-- Background Colors - Deep Black -->
     <Color x:Key="DarkBackground">#FF0A0A0F</Color>
     <Color x:Key="DarkSurface">#FF121218</Color>
     <Color x:Key="DarkCard">#FF1A1A22</Color>
     <Color x:Key="DarkCardHover">#FF222230</Color>
     <Color x:Key="DarkBorder">#FF2A2A35</Color>
-    
-    <!-- Gold Accent Colors -->
+
+    <!-- Dark Mode Text Colors -->
+    <Color x:Key="DarkTextPrimary">#FFFFFFFF</Color>
+    <Color x:Key="DarkTextSecondary">#FFB0B0B8</Color>
+    <Color x:Key="DarkTextMuted">#FF606068</Color>
+
+    <!-- LIGHT MODE COLORS -->
+    <!-- Background Colors - Soft Whites & Creams -->
+    <Color x:Key="LightBackground">#FFFDFBF7</Color>        <!-- Warm off-white -->
+    <Color x:Key="LightSurface">#FFFAF8F4</Color>           <!-- Cream surface -->
+    <Color x:Key="LightCard">#FFFFFFFF</Color>              <!-- Pure white cards -->
+    <Color x:Key="LightCardHover">#FFF5F3EF</Color>         <!-- Subtle hover -->
+    <Color x:Key="LightBorder">#FFE8E5E0</Color>            <!-- Soft border -->
+
+    <!-- Light Mode Text Colors -->
+    <Color x:Key="LightTextPrimary">#FF1A1A1A</Color>       <!-- Almost black -->
+    <Color x:Key="LightTextSecondary">#FF5A5A5A</Color>     <!-- Medium gray -->
+    <Color x:Key="LightTextMuted">#FF9A9A9A</Color>         <!-- Light gray -->
+
+    <!-- Gold Accent Colors (shared between modes) -->
     <Color x:Key="GoldPrimary">#FFD4AF37</Color>
     <Color x:Key="GoldLight">#FFFFD700</Color>
     <Color x:Key="GoldDark">#FFB8860B</Color>
     <Color x:Key="GoldMuted">#FF8B7355</Color>
-    
-    <!-- Status Colors -->
+    <Color x:Key="TextGold">#FFD4AF37</Color>
+
+    <!-- Status Colors (shared) -->
     <Color x:Key="StatusGreen">#FF4ADE80</Color>
     <Color x:Key="StatusYellow">#FFFBBF24</Color>
     <Color x:Key="StatusRed">#FFEF4444</Color>
-    
-    <!-- Text Colors -->
-    <Color x:Key="TextPrimary">#FFFFFFFF</Color>
-    <Color x:Key="TextSecondary">#FFB0B0B8</Color>
-    <Color x:Key="TextMuted">#FF606068</Color>
-    <Color x:Key="TextGold">#FFD4AF37</Color>
-    
-    <!-- Brushes -->
+
+    <!-- Dynamic Brushes (will be updated by code) -->
     <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource DarkBackground}"/>
     <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource DarkSurface}"/>
     <SolidColorBrush x:Key="CardBrush" Color="{StaticResource DarkCard}"/>
     <SolidColorBrush x:Key="CardHoverBrush" Color="{StaticResource DarkCardHover}"/>
     <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource DarkBorder}"/>
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource DarkTextPrimary}"/>
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource DarkTextSecondary}"/>
+    <SolidColorBrush x:Key="TextMutedBrush" Color="{StaticResource DarkTextMuted}"/>
+
+    <!-- Accent Brushes (constant) -->
     <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource GoldPrimary}"/>
     <SolidColorBrush x:Key="AccentSecondaryBrush" Color="{StaticResource GoldLight}"/>
-    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimary}"/>
-    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondary}"/>
-    <SolidColorBrush x:Key="TextMutedBrush" Color="{StaticResource TextMuted}"/>
     <SolidColorBrush x:Key="TextGoldBrush" Color="{StaticResource TextGold}"/>
     <SolidColorBrush x:Key="GreenBrush" Color="{StaticResource StatusGreen}"/>
     <SolidColorBrush x:Key="YellowBrush" Color="{StaticResource StatusYellow}"/>
     <SolidColorBrush x:Key="RedBrush" Color="{StaticResource StatusRed}"/>
-    
+
     <!-- Additional UI Brushes -->
     <SolidColorBrush x:Key="DarkBackgroundBrush" Color="{StaticResource DarkBackground}"/>
     <SolidColorBrush x:Key="GoldBorderBrush" Color="#30D4AF37"/>
     <SolidColorBrush x:Key="GoldMutedBrush" Color="{StaticResource GoldMuted}"/>
-    
+
     <!-- Premium Gold Gradient -->
     <LinearGradientBrush x:Key="GoldGradient" StartPoint="0,0" EndPoint="1,1">
         <GradientStop Color="#FFD4AF37" Offset="0"/>
         <GradientStop Color="#FFFFD700" Offset="0.5"/>
         <GradientStop Color="#FFB8860B" Offset="1"/>
     </LinearGradientBrush>
-    
+
     <LinearGradientBrush x:Key="GoldGradientHorizontal" StartPoint="0,0" EndPoint="1,0">
         <GradientStop Color="#FFB8860B" Offset="0"/>
         <GradientStop Color="#FFD4AF37" Offset="0.3"/>
         <GradientStop Color="#FFFFD700" Offset="0.6"/>
         <GradientStop Color="#FFD4AF37" Offset="1"/>
     </LinearGradientBrush>
-    
-    <!-- Glass Effect -->
+
+    <!-- Glass Effect (Dark Mode) -->
     <LinearGradientBrush x:Key="GlassBrush" StartPoint="0,0" EndPoint="0,1">
         <GradientStop Color="#15FFFFFF" Offset="0"/>
         <GradientStop Color="#08FFFFFF" Offset="1"/>
     </LinearGradientBrush>
-    
+
     <LinearGradientBrush x:Key="GlassBorderBrush" StartPoint="0,0" EndPoint="0,1">
         <GradientStop Color="#25FFFFFF" Offset="0"/>
         <GradientStop Color="#08FFFFFF" Offset="1"/>
     </LinearGradientBrush>
-    
-    <!-- Card Shadow -->
-    <DropShadowEffect x:Key="CardShadow" 
-                      BlurRadius="25" 
-                      ShadowDepth="0" 
+
+    <!-- Glass Effect (Light Mode) -->
+    <LinearGradientBrush x:Key="LightGlassBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#20FFFFFF" Offset="0"/>
+        <GradientStop Color="#10FFFFFF" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="LightGlassBorderBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#35E8E5E0" Offset="0"/>
+        <GradientStop Color="#15E8E5E0" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- Card Shadow (Dynamic) -->
+    <DropShadowEffect x:Key="CardShadow"
+                      BlurRadius="25"
+                      ShadowDepth="0"
                       Direction="270"
-                      Color="#000000" 
+                      Color="#000000"
                       Opacity="0.6"/>
-    
-    <DropShadowEffect x:Key="CardShadowHover" 
-                      BlurRadius="35" 
-                      ShadowDepth="0" 
+
+    <DropShadowEffect x:Key="CardShadowHover"
+                      BlurRadius="35"
+                      ShadowDepth="0"
                       Direction="270"
-                      Color="#000000" 
+                      Color="#000000"
                       Opacity="0.7"/>
-    
+
+    <!-- Light Mode Shadows -->
+    <DropShadowEffect x:Key="LightCardShadow"
+                      BlurRadius="20"
+                      ShadowDepth="2"
+                      Direction="270"
+                      Color="#000000"
+                      Opacity="0.08"/>
+
+    <DropShadowEffect x:Key="LightCardShadowHover"
+                      BlurRadius="30"
+                      ShadowDepth="4"
+                      Direction="270"
+                      Color="#000000"
+                      Opacity="0.12"/>
+
     <!-- Gold Glow Effects -->
-    <DropShadowEffect x:Key="GoldGlow" 
-                      BlurRadius="20" 
-                      ShadowDepth="0" 
-                      Color="{StaticResource GoldPrimary}" 
+    <DropShadowEffect x:Key="GoldGlow"
+                      BlurRadius="20"
+                      ShadowDepth="0"
+                      Color="{StaticResource GoldPrimary}"
                       Opacity="0.5"/>
-    
-    <DropShadowEffect x:Key="GoldGlowStrong" 
-                      BlurRadius="30" 
-                      ShadowDepth="0" 
-                      Color="{StaticResource GoldLight}" 
+
+    <DropShadowEffect x:Key="GoldGlowStrong"
+                      BlurRadius="30"
+                      ShadowDepth="0"
+                      Color="{StaticResource GoldLight}"
                       Opacity="0.6"/>
-    
-    <DropShadowEffect x:Key="GreenGlow" 
-                      BlurRadius="15" 
-                      ShadowDepth="0" 
-                      Color="{StaticResource StatusGreen}" 
+
+    <DropShadowEffect x:Key="GreenGlow"
+                      BlurRadius="15"
+                      ShadowDepth="0"
+                      Color="{StaticResource StatusGreen}"
                       Opacity="0.5"/>
+
+    <!-- Light Mode Glow Effects (softer) -->
+    <DropShadowEffect x:Key="LightGoldGlow"
+                      BlurRadius="15"
+                      ShadowDepth="0"
+                      Color="{StaticResource GoldPrimary}"
+                      Opacity="0.3"/>
+
+    <DropShadowEffect x:Key="LightGoldGlowStrong"
+                      BlurRadius="25"
+                      ShadowDepth="0"
+                      Color="{StaticResource GoldDark}"
+                      Opacity="0.35"/>
 
 </ResourceDictionary>
