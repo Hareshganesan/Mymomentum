@@ -16,15 +16,15 @@
         <vm:MainViewModel/>
     </Window.DataContext>
 
-    <!-- Main Outer Window Border -->
+    <!-- Main Outer Window Border (Frosted Glass Acrylic Effect) -->
     <Border x:Name="MainBorder"
-            Background="#E6080810" 
+            Background="#E2080912" 
             CornerRadius="20"
             Margin="8"
-            BorderBrush="{StaticResource GoldBorderBrush}"
-            BorderThickness="1">
+            BorderBrush="{StaticResource UltraGlassBorderBrush}"
+            BorderThickness="1.2">
         <Border.Effect>
-            <DropShadowEffect BlurRadius="50" ShadowDepth="0" Color="#000000" Opacity="0.95"/>
+            <DropShadowEffect BlurRadius="60" ShadowDepth="0" Color="#000000" Opacity="0.95"/>
         </Border.Effect>
         
         <Grid>
@@ -32,9 +32,9 @@
             <Border CornerRadius="20" ClipToBounds="True">
                 <Border.Background>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                        <GradientStop Color="#25080812" Offset="0"/>
-                        <GradientStop Color="#350A0A16" Offset="0.5"/>
-                        <GradientStop Color="#20080810" Offset="1"/>
+                        <GradientStop Color="#280C0E1A" Offset="0"/>
+                        <GradientStop Color="#38101428" Offset="0.5"/>
+                        <GradientStop Color="#200A0B16" Offset="1"/>
                     </LinearGradientBrush>
                 </Border.Background>
             </Border>
@@ -42,20 +42,47 @@
             <!-- Particle Background Canvas -->
             <Canvas x:Name="ParticleCanvas" IsHitTestVisible="False" ClipToBounds="True"/>
 
-            <!-- Ambient Luxury Glow Orbs -->
+            <!-- Ambient Luxury Frosted Glass Glow Orbs (Mesh Light) -->
             <Canvas IsHitTestVisible="False" ClipToBounds="True">
-                <Ellipse Width="600" Height="600" Canvas.Left="-220" Canvas.Top="-220" Opacity="0.025">
+                <!-- Top-Left Radiant Gold Ambient Glow -->
+                <Ellipse Width="540" Height="540" Canvas.Left="-180" Canvas.Top="-160" Opacity="0.13">
                     <Ellipse.Fill>
                         <RadialGradientBrush>
                             <GradientStop Color="#FFD4AF37" Offset="0"/>
+                            <GradientStop Color="#60D4AF37" Offset="0.5"/>
                             <GradientStop Color="Transparent" Offset="1"/>
                         </RadialGradientBrush>
                     </Ellipse.Fill>
                 </Ellipse>
-                <Ellipse Width="550" Height="550" Canvas.Right="-150" Canvas.Bottom="-120" Opacity="0.02">
+
+                <!-- Top-Right Deep Violet / Indigo Ambient Glow -->
+                <Ellipse Width="580" Height="580" Canvas.Right="-160" Canvas.Top="-120" Opacity="0.12">
                     <Ellipse.Fill>
                         <RadialGradientBrush>
-                            <GradientStop Color="#FFFFD700" Offset="0"/>
+                            <GradientStop Color="#FF7C3AED" Offset="0"/>
+                            <GradientStop Color="#406366F1" Offset="0.55"/>
+                            <GradientStop Color="Transparent" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Ellipse.Fill>
+                </Ellipse>
+
+                <!-- Bottom-Center Electric Cyan Ambient Glow -->
+                <Ellipse Width="520" Height="520" Canvas.Left="350" Canvas.Bottom="-180" Opacity="0.10">
+                    <Ellipse.Fill>
+                        <RadialGradientBrush>
+                            <GradientStop Color="#FF0284C7" Offset="0"/>
+                            <GradientStop Color="#4038BDF8" Offset="0.55"/>
+                            <GradientStop Color="Transparent" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Ellipse.Fill>
+                </Ellipse>
+
+                <!-- Bottom-Right Warm Amber Ambient Glow -->
+                <Ellipse Width="480" Height="480" Canvas.Right="-120" Canvas.Bottom="-140" Opacity="0.11">
+                    <Ellipse.Fill>
+                        <RadialGradientBrush>
+                            <GradientStop Color="#FFD97706" Offset="0"/>
+                            <GradientStop Color="#50F59E0B" Offset="0.5"/>
                             <GradientStop Color="Transparent" Offset="1"/>
                         </RadialGradientBrush>
                     </Ellipse.Fill>
@@ -89,12 +116,12 @@
                 <Border Grid.Column="0" 
                         CornerRadius="20,0,0,20"
                         BorderThickness="0,0,1,0"
-                        BorderBrush="#18D4AF37">
+                        BorderBrush="{StaticResource GlassBorderSubtle}">
                     <Border.Background>
                         <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                            <GradientStop Color="#14D4AF37" Offset="0"/>
-                            <GradientStop Color="#08D4AF37" Offset="0.5"/>
-                            <GradientStop Color="#04D4AF37" Offset="1"/>
+                            <GradientStop Color="#24111328" Offset="0"/>
+                            <GradientStop Color="#140B0E1B" Offset="0.5"/>
+                            <GradientStop Color="#1A0F1324" Offset="1"/>
                         </LinearGradientBrush>
                     </Border.Background>
                     
@@ -562,21 +589,14 @@
                             </Grid>
                         </Border>
 
-                        <!-- Momentum & Daily Tasks Progress Banner -->
-                        <Border Grid.Row="2" Margin="0,0,0,16" CornerRadius="16" Padding="20,16">
-                            <Border.Background>
-                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                    <GradientStop Color="#18D4AF37" Offset="0"/>
-                                    <GradientStop Color="#0AD4AF37" Offset="1"/>
-                                </LinearGradientBrush>
-                            </Border.Background>
-                            <Border.BorderBrush>
-                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                    <GradientStop Color="#40D4AF37" Offset="0"/>
-                                    <GradientStop Color="#18D4AF37" Offset="1"/>
-                                </LinearGradientBrush>
-                            </Border.BorderBrush>
-                            <Border.BorderThickness>1</Border.BorderThickness>
+                        <!-- Momentum & Daily Tasks Progress Banner (Frosted Glass) -->
+                        <Border Grid.Row="2" Margin="0,0,0,16" CornerRadius="16" Padding="20,16"
+                                Background="{StaticResource GoldGlassCardBrush}"
+                                BorderBrush="{StaticResource UltraGlassBorderBrush}"
+                                BorderThickness="1">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="25" ShadowDepth="0" Color="#D4AF37" Opacity="0.14"/>
+                            </Border.Effect>
                             
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -609,10 +629,15 @@
                             </Grid>
                         </Border>
 
-                        <!-- Spaced Repetition Due Today Deck -->
-                        <Border Grid.Row="3" Margin="0,0,0,16" CornerRadius="14" Padding="16,14"
-                                Background="#10D4AF37" BorderBrush="#25D4AF37" BorderThickness="1"
+                        <!-- Spaced Repetition Due Today Deck (Frosted Cyan Glass) -->
+                        <Border Grid.Row="3" Margin="0,0,0,16" CornerRadius="16" Padding="18,14"
+                                Background="{StaticResource GlassSurfaceBrush}"
+                                BorderBrush="{StaticResource CyanGlassBorderBrush}"
+                                BorderThickness="1"
                                 Visibility="{Binding DueReviewCount, Converter={StaticResource CountToVisibility}}">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="20" ShadowDepth="0" Color="#0284C7" Opacity="0.15"/>
+                            </Border.Effect>
                             <StackPanel>
                                 <Grid Margin="0,0,0,10">
                                     <StackPanel Orientation="Horizontal">
@@ -628,8 +653,10 @@
                                 <ItemsControl ItemsSource="{Binding DueReviewProblems}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Border Margin="0,0,0,8" Padding="12,10" CornerRadius="10"
-                                                    Background="#0ED4AF37" BorderBrush="#20D4AF37" BorderThickness="1">
+                                            <Border Margin="0,0,0,8" Padding="14,10" CornerRadius="12"
+                                                    Background="{StaticResource GoldGlassCardBrush}"
+                                                    BorderBrush="{StaticResource GlassBorderSubtle}"
+                                                    BorderThickness="1">
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="Auto"/>
@@ -709,7 +736,13 @@
                                     <ItemsControl ItemsSource="{Binding TodayTasks}">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <Border Margin="0,0,0,8" CornerRadius="12" Padding="14,12" Background="#0CD4AF37" BorderBrush="#18D4AF37" BorderThickness="1">
+                                                <Border Margin="0,0,0,8" CornerRadius="14" Padding="14,12"
+                                                        Background="{StaticResource GlassSurfaceBrush}"
+                                                        BorderBrush="{StaticResource GlassBorderSubtle}"
+                                                        BorderThickness="1">
+                                                    <Border.Effect>
+                                                        <DropShadowEffect BlurRadius="12" ShadowDepth="1" Direction="270" Color="#000000" Opacity="0.35"/>
+                                                    </Border.Effect>
                                                     <Grid>
                                                         <Grid.ColumnDefinitions>
                                                             <ColumnDefinition Width="Auto"/>
@@ -779,6 +812,7 @@
                     <Grid Visibility="{Binding IsDsaVaultPage, Converter={StaticResource BoolToVisibility}}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/> <!-- Title & Stats Summary -->
+                            <RowDefinition Height="Auto"/> <!-- Safe LeetCode Live Sync Bar -->
                             <RowDefinition Height="Auto"/> <!-- Search & Filter Controls -->
                             <RowDefinition Height="*"/>    <!-- Problem List -->
                         </Grid.RowDefinitions>
@@ -792,7 +826,7 @@
 
                             <!-- Stats Pills -->
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                <Border Margin="0,0,8,0" Padding="12,6" CornerRadius="8" Background="#154ADE80" BorderBrush="#404ADE80" BorderThickness="1">
+                                <Border Margin="0,0,8,0" Padding="12,6" CornerRadius="8" Background="#184ADE80" BorderBrush="#404ADE80" BorderThickness="1">
                                     <TextBlock FontSize="11" Foreground="#4ADE80">
                                         <Run Text="Solved: "/>
                                         <Run Text="{Binding TotalDsaSolved, Mode=OneWay}" FontWeight="Bold"/>
@@ -800,13 +834,13 @@
                                         <Run Text="{Binding TotalDsaCount, Mode=OneWay}"/>
                                     </TextBlock>
                                 </Border>
-                                <Border Margin="0,0,8,0" Padding="10,6" CornerRadius="8" Background="#15FBBF24" BorderBrush="#40FBBF24" BorderThickness="1">
+                                <Border Margin="0,0,8,0" Padding="10,6" CornerRadius="8" Background="#18FBBF24" BorderBrush="#40FBBF24" BorderThickness="1">
                                     <TextBlock FontSize="11" Foreground="#FBBF24">
                                         <Run Text="Med: "/>
                                         <Run Text="{Binding MediumDsaSolved, Mode=OneWay}" FontWeight="Bold"/>
                                     </TextBlock>
                                 </Border>
-                                <Border Padding="10,6" CornerRadius="8" Background="#15EF4444" BorderBrush="#40EF4444" BorderThickness="1">
+                                <Border Padding="10,6" CornerRadius="8" Background="#18EF4444" BorderBrush="#40EF4444" BorderThickness="1">
                                     <TextBlock FontSize="11" Foreground="#EF4444">
                                         <Run Text="Hard: "/>
                                         <Run Text="{Binding HardDsaSolved, Mode=OneWay}" FontWeight="Bold"/>
@@ -815,8 +849,112 @@
                             </StackPanel>
                         </Grid>
 
-                        <!-- Filter & Search Controls -->
-                        <Border Grid.Row="1" Margin="0,0,0,16" Padding="14,12" CornerRadius="12" Background="#0ED4AF37" BorderBrush="#20D4AF37" BorderThickness="1">
+                        <!-- ============================================== -->
+                        <!-- LEETCODE SAFE CONNECTION & REAL-TIME SYNC BAR  -->
+                        <!-- ============================================== -->
+                        <Border Grid.Row="1" Margin="0,0,0,16" CornerRadius="16" Padding="18,14"
+                                Background="{StaticResource GoldGlassCardBrush}"
+                                BorderBrush="{StaticResource CyanGlassBorderBrush}"
+                                BorderThickness="1">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="25" ShadowDepth="0" Color="#0284C7" Opacity="0.18"/>
+                            </Border.Effect>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Top Row: Icon, Title, Security Badge & Profile Quick Glance -->
+                                <Grid Grid.Row="0" Margin="0,0,0,12">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Border Width="32" Height="32" CornerRadius="8" Background="#25FFA116" BorderBrush="#FFA116" BorderThickness="1" Margin="0,0,12,0">
+                                            <TextBlock Text="⚡" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="LeetCode Live Sync" FontSize="15" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                                <!-- Security Badge -->
+                                                <Border Margin="10,0,0,0" Padding="8,2" CornerRadius="10" Background="#184ADE80" BorderBrush="#404ADE80" BorderThickness="1">
+                                                    <TextBlock Text="🔒 100% Safe • Zero Passwords (Public GraphQL API)" FontSize="10" FontWeight="SemiBold" Foreground="#4ADE80"/>
+                                                </Border>
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding LeetCodeStatusMessage}" FontSize="11" Foreground="{StaticResource GoldMutedBrush}" Margin="0,3,0,0" TextWrapping="Wrap"/>
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <!-- Connected Live Stats Badges (Right aligned) -->
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                Visibility="{Binding IsLeetCodeConnected, Converter={StaticResource BoolToVisibility}}">
+                                        <Border Margin="0,0,6,0" Padding="10,4" CornerRadius="8" Background="#1838BDF8" BorderBrush="#4038BDF8" BorderThickness="1">
+                                            <TextBlock FontSize="11" Foreground="#38BDF8">
+                                                <Run Text="@"/>
+                                                <Run Text="{Binding LeetCodeUsername}" FontWeight="Bold"/>
+                                            </TextBlock>
+                                        </Border>
+                                        <Border Margin="0,0,6,0" Padding="10,4" CornerRadius="8" Background="#184ADE80" BorderBrush="#404ADE80" BorderThickness="1">
+                                            <TextBlock FontSize="11" Foreground="#4ADE80">
+                                                <Run Text="Solved: "/>
+                                                <Run Text="{Binding LeetCodeTotalSolved}" FontWeight="Bold"/>
+                                            </TextBlock>
+                                        </Border>
+                                        <Border Margin="0,0,6,0" Padding="10,4" CornerRadius="8" Background="#18FBBF24" BorderBrush="#40FBBF24" BorderThickness="1">
+                                            <TextBlock FontSize="11" Foreground="#FBBF24">
+                                                <Run Text="Rank: #"/>
+                                                <Run Text="{Binding LeetCodeRanking, StringFormat={}{0:N0}}" FontWeight="Bold"/>
+                                            </TextBlock>
+                                        </Border>
+                                        <Button Style="{StaticResource SecondaryButton}" Padding="10,4" FontSize="11"
+                                                Command="{Binding ClearLeetCodeCommand}" Content="Disconnect" ToolTip="Disconnect current profile"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Bottom Row: Inputs & Action -->
+                                <Grid Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="280"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Username Input -->
+                                    <TextBox Grid.Column="0" Style="{StaticResource PremiumTextBox}" FontSize="12" Padding="12,7"
+                                             Text="{Binding LeetCodeUsername, UpdateSourceTrigger=PropertyChanged}"
+                                             ToolTip="Enter your public LeetCode username (e.g. tourist, neetcode, or your own handle)">
+                                        <TextBox.InputBindings>
+                                            <KeyBinding Key="Return" Command="{Binding SyncLeetCodeCommand}"/>
+                                        </TextBox.InputBindings>
+                                    </TextBox>
+
+                                    <!-- Sync Button -->
+                                    <Button Grid.Column="1" Style="{StaticResource GoldButton}" Margin="10,0,0,0" Padding="18,7" FontSize="12"
+                                            Command="{Binding SyncLeetCodeCommand}"
+                                            IsEnabled="{Binding IsLeetCodeSyncing, Converter={StaticResource InverseBool}}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding LeetCodeSyncButtonText}" FontWeight="Bold"/>
+                                        </StackPanel>
+                                    </Button>
+
+                                    <!-- Sync Explanation / Info -->
+                                    <TextBlock Grid.Column="2" Margin="14,0,0,0" VerticalAlignment="Center" FontSize="11" Foreground="{StaticResource TextMutedBrush}">
+                                        <Run Text="Solved problems in SDE Sheet are auto-marked as "/>
+                                        <Run Text="Solved ✓" Foreground="#4ADE80" FontWeight="SemiBold"/>
+                                        <Run Text=" &amp; scheduled for revision."/>
+                                    </TextBlock>
+
+                                    <!-- Last Synced Timestamp -->
+                                    <TextBlock Grid.Column="3" Text="{Binding LeetCodeLastSyncedDisplay}" FontSize="11"
+                                               Foreground="{StaticResource GoldMutedBrush}" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <!-- Filter & Search Controls (Frosted Glass Container) -->
+                        <Border Grid.Row="2" Margin="0,0,0,16" Padding="14,12" CornerRadius="14"
+                                Background="{StaticResource GlassSurfaceBrush}"
+                                BorderBrush="{StaticResource GlassBorderSubtle}"
+                                BorderThickness="1">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="220"/>
@@ -879,12 +1017,17 @@
                         </Border>
 
                         <!-- Problem List with Scroll -->
-                        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                        <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto">
                             <ItemsControl ItemsSource="{Binding FilteredDsaProblems}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Margin="0,0,0,10" CornerRadius="12" Padding="14"
-                                                Background="#0AD4AF37" BorderBrush="#1AD4AF37" BorderThickness="1">
+                                        <Border Margin="0,0,0,10" CornerRadius="14" Padding="14"
+                                                Background="{StaticResource GlassSurfaceBrush}"
+                                                BorderBrush="{StaticResource GlassBorderSubtle}"
+                                                BorderThickness="1">
+                                            <Border.Effect>
+                                                <DropShadowEffect BlurRadius="16" ShadowDepth="2" Direction="270" Color="#000000" Opacity="0.4"/>
+                                            </Border.Effect>
                                             <StackPanel>
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
@@ -1628,8 +1771,14 @@
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
 
-                                    <!-- Overall Readiness -->
-                                    <Border Grid.Column="0" Margin="0,0,10,0" Padding="16" CornerRadius="14" Background="#10D4AF37" BorderBrush="#25D4AF37" BorderThickness="1">
+                                    <!-- Overall Readiness (Frosted Gold Glass) -->
+                                    <Border Grid.Column="0" Margin="0,0,10,0" Padding="18" CornerRadius="16"
+                                            Background="{StaticResource GlassSurfaceBrush}"
+                                            BorderBrush="{StaticResource GoldGlassBorderBrush}"
+                                            BorderThickness="1">
+                                        <Border.Effect>
+                                            <DropShadowEffect BlurRadius="20" ShadowDepth="0" Color="#D4AF37" Opacity="0.2"/>
+                                        </Border.Effect>
                                         <StackPanel>
                                             <TextBlock Text="👑 SDE Readiness" FontSize="11" Foreground="{StaticResource GoldMutedBrush}"/>
                                             <TextBlock FontSize="26" FontWeight="Bold" Foreground="{StaticResource GoldGradient}" Margin="0,4,0,2">
@@ -1640,8 +1789,14 @@
                                         </StackPanel>
                                     </Border>
 
-                                    <!-- DSA Mastery -->
-                                    <Border Grid.Column="1" Margin="0,0,10,0" Padding="16" CornerRadius="14" Background="#104ADE80" BorderBrush="#254ADE80" BorderThickness="1">
+                                    <!-- DSA Mastery (Frosted Emerald Glass) -->
+                                    <Border Grid.Column="1" Margin="0,0,10,0" Padding="18" CornerRadius="16"
+                                            Background="{StaticResource GlassSurfaceBrush}"
+                                            BorderBrush="{StaticResource GlassBorderSubtle}"
+                                            BorderThickness="1">
+                                        <Border.Effect>
+                                            <DropShadowEffect BlurRadius="20" ShadowDepth="0" Color="#4ADE80" Opacity="0.15"/>
+                                        </Border.Effect>
                                         <StackPanel>
                                             <TextBlock Text="🧩 DSA Solved" FontSize="11" Foreground="{StaticResource GoldMutedBrush}"/>
                                             <TextBlock FontSize="26" FontWeight="Bold" Foreground="#4ADE80" Margin="0,4,0,2">
@@ -1653,8 +1808,14 @@
                                         </StackPanel>
                                     </Border>
 
-                                    <!-- Core CS -->
-                                    <Border Grid.Column="2" Margin="0,0,10,0" Padding="16" CornerRadius="14" Background="#1038BDF8" BorderBrush="#2538BDF8" BorderThickness="1">
+                                    <!-- Core CS (Frosted Electric Cyan Glass) -->
+                                    <Border Grid.Column="2" Margin="0,0,10,0" Padding="18" CornerRadius="16"
+                                            Background="{StaticResource GlassSurfaceBrush}"
+                                            BorderBrush="{StaticResource CyanGlassBorderBrush}"
+                                            BorderThickness="1">
+                                        <Border.Effect>
+                                            <DropShadowEffect BlurRadius="20" ShadowDepth="0" Color="#0284C7" Opacity="0.18"/>
+                                        </Border.Effect>
                                         <StackPanel>
                                             <TextBlock Text="📚 Core CS Mastered" FontSize="11" Foreground="{StaticResource GoldMutedBrush}"/>
                                             <TextBlock FontSize="26" FontWeight="Bold" Foreground="#38BDF8" Margin="0,4,0,2">
@@ -1666,8 +1827,14 @@
                                         </StackPanel>
                                     </Border>
 
-                                    <!-- Mock Sessions -->
-                                    <Border Grid.Column="3" Padding="16" CornerRadius="14" Background="#10A78BFA" BorderBrush="#25A78BFA" BorderThickness="1">
+                                    <!-- Mock Sessions (Frosted Indigo Glass) -->
+                                    <Border Grid.Column="3" Padding="18" CornerRadius="16"
+                                            Background="{StaticResource GlassSurfaceBrush}"
+                                            BorderBrush="{StaticResource GlassBorderSubtle}"
+                                            BorderThickness="1">
+                                        <Border.Effect>
+                                            <DropShadowEffect BlurRadius="20" ShadowDepth="0" Color="#7C3AED" Opacity="0.18"/>
+                                        </Border.Effect>
                                         <StackPanel>
                                             <TextBlock Text="⏱️ Mock OAs Completed" FontSize="11" Foreground="{StaticResource GoldMutedBrush}"/>
                                             <TextBlock Text="{Binding MockHistory.Count}" FontSize="26" FontWeight="Bold" Foreground="#A78BFA" Margin="0,4,0,2"/>
@@ -1676,8 +1843,14 @@
                                     </Border>
                                 </Grid>
 
-                                <!-- Activity Heatmap Card -->
-                                <Border Margin="0,0,0,20" Padding="20" CornerRadius="16" Background="#0ED4AF37" BorderBrush="#25D4AF37" BorderThickness="1">
+                                <!-- Activity Heatmap Card (Frosted Glass Acrylic) -->
+                                <Border Margin="0,0,0,20" Padding="22,18" CornerRadius="18"
+                                        Background="{StaticResource GoldGlassCardBrush}"
+                                        BorderBrush="{StaticResource UltraGlassBorderBrush}"
+                                        BorderThickness="1">
+                                    <Border.Effect>
+                                        <DropShadowEffect BlurRadius="24" ShadowDepth="0" Color="#D4AF37" Opacity="0.14"/>
+                                    </Border.Effect>
                                     <StackPanel>
                                         <Grid Margin="0,0,0,14">
                                             <StackPanel Orientation="Horizontal">
@@ -1788,9 +1961,66 @@
                     <!-- PAGE 10: ⚙ SETTINGS (Settings)             -->
                     <!-- ========================================== -->
                     <ScrollViewer Visibility="{Binding IsSettingsPage, Converter={StaticResource BoolToVisibility}}" VerticalScrollBarVisibility="Auto">
-                        <StackPanel MaxWidth="600" HorizontalAlignment="Center" Margin="0,20,0,20">
+                        <StackPanel MaxWidth="620" HorizontalAlignment="Center" Margin="0,20,0,20">
                             <TextBlock Text="Settings &amp; Workspace Preferences" FontSize="22" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,20"/>
-                            <Border Padding="18" CornerRadius="14" Background="#0CD4AF37" BorderBrush="#20D4AF37" BorderThickness="1" Margin="0,0,0,14">
+                            
+                            <!-- LeetCode Safe Sync Settings Card (Frosted Glass) -->
+                            <Border Padding="20" CornerRadius="16"
+                                    Background="{StaticResource GlassSurfaceBrush}"
+                                    BorderBrush="{StaticResource CyanGlassBorderBrush}"
+                                    BorderThickness="1" Margin="0,0,0,16">
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="20" ShadowDepth="0" Color="#0284C7" Opacity="0.18"/>
+                                </Border.Effect>
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,12">
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <Border Width="28" Height="28" CornerRadius="6" Background="#25FFA116" BorderBrush="#FFA116" BorderThickness="1" Margin="0,0,10,0">
+                                                <TextBlock Text="⚡" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <StackPanel>
+                                                <TextBlock Text="LeetCode Safe Auto-Sync" FontSize="15" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                                <TextBlock Text="Read-only public API synchronization (zero passwords needed)" FontSize="11" Foreground="{StaticResource GoldMutedBrush}"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                        <Border HorizontalAlignment="Right" VerticalAlignment="Center" Padding="8,3" CornerRadius="10" Background="#184ADE80" BorderBrush="#404ADE80" BorderThickness="1">
+                                            <TextBlock Text="🔒 100% Secure" FontSize="10" FontWeight="SemiBold" Foreground="#4ADE80"/>
+                                        </Border>
+                                    </Grid>
+
+                                    <!-- Handle Input Field -->
+                                    <TextBlock Text="LeetCode Handle / Username:" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4"/>
+                                    <Grid Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBox Style="{StaticResource PremiumTextBox}" FontSize="12" Padding="12,7"
+                                                 Text="{Binding LeetCodeUsername, UpdateSourceTrigger=PropertyChanged}"
+                                                 ToolTip="Enter your LeetCode username">
+                                            <TextBox.InputBindings>
+                                                <KeyBinding Key="Return" Command="{Binding SyncLeetCodeCommand}"/>
+                                            </TextBox.InputBindings>
+                                        </TextBox>
+                                        <Button Grid.Column="1" Style="{StaticResource GoldButton}" Margin="10,0,0,0" Padding="18,7" FontSize="12"
+                                                Command="{Binding SyncLeetCodeCommand}"
+                                                IsEnabled="{Binding IsLeetCodeSyncing, Converter={StaticResource InverseBool}}"
+                                                Content="{Binding LeetCodeSyncButtonText}"/>
+                                    </Grid>
+
+                                    <!-- Status message -->
+                                    <Border Padding="10,8" CornerRadius="8" Background="#12D4AF37" BorderBrush="#20D4AF37" BorderThickness="1">
+                                        <Grid>
+                                            <TextBlock Text="{Binding LeetCodeStatusMessage}" FontSize="11" Foreground="{StaticResource GoldGradient}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                                            <Button HorizontalAlignment="Right" Style="{StaticResource SecondaryButton}" Padding="8,3" FontSize="10"
+                                                    Command="{Binding ClearLeetCodeCommand}" Content="Disconnect"
+                                                    Visibility="{Binding IsLeetCodeConnected, Converter={StaticResource BoolToVisibility}}"/>
+                                        </Grid>
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Padding="18" CornerRadius="14" Background="{StaticResource GlassSurfaceBrush}" BorderBrush="{StaticResource GlassBorderSubtle}" BorderThickness="1" Margin="0,0,0,14">
                                 <Grid>
                                     <StackPanel>
                                         <TextBlock Text="Full Screen Mode" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
@@ -1800,7 +2030,7 @@
                                 </Grid>
                             </Border>
 
-                            <Border Padding="18" CornerRadius="14" Background="#0CD4AF37" BorderBrush="#20D4AF37" BorderThickness="1" Margin="0,0,0,14">
+                            <Border Padding="18" CornerRadius="14" Background="{StaticResource GlassSurfaceBrush}" BorderBrush="{StaticResource GlassBorderSubtle}" BorderThickness="1" Margin="0,0,0,14">
                                 <Grid>
                                     <StackPanel>
                                         <TextBlock Text="Dark / Luxury Gold Theme" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
@@ -1810,7 +2040,7 @@
                                 </Grid>
                             </Border>
 
-                            <Border Padding="18" CornerRadius="14" Background="#0CD4AF37" BorderBrush="#20D4AF37" BorderThickness="1">
+                            <Border Padding="18" CornerRadius="14" Background="{StaticResource GlassSurfaceBrush}" BorderBrush="{StaticResource GlassBorderSubtle}" BorderThickness="1">
                                 <StackPanel>
                                     <TextBlock Text="About Momentum" FontSize="14" FontWeight="Bold" Foreground="{StaticResource GoldGradient}"/>
                                     <TextBlock Text="Version 4.0 (Placement Edition)" FontSize="11" Foreground="{StaticResource GoldMutedBrush}" Margin="0,2,0,8"/>
@@ -1829,21 +2059,27 @@
                         Width="360"
                         CornerRadius="0,20,20,0"
                         BorderThickness="1,0,0,0"
-                        BorderBrush="#18D4AF37"
+                        BorderBrush="{StaticResource GlassBorderSubtle}"
                         Visibility="{Binding ShowRightPanel, Converter={StaticResource BoolToVisibility}}">
                     <Border.Background>
                         <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                            <GradientStop Color="#08D4AF37" Offset="0"/>
-                            <GradientStop Color="#04D4AF37" Offset="1"/>
+                            <GradientStop Color="#22111326" Offset="0"/>
+                            <GradientStop Color="#140B0E1B" Offset="0.5"/>
+                            <GradientStop Color="#1A0F1324" Offset="1"/>
                         </LinearGradientBrush>
                     </Border.Background>
 
                     <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="20,18,20,18">
                         <StackPanel>
-                            <!-- Daily Highlight Card -->
-                            <Border CornerRadius="14" Padding="16" Margin="0,0,0,16"
-                                    Background="#18D4AF37" BorderBrush="#40D4AF37" BorderThickness="1"
+                            <!-- Daily Highlight Card (Frosted Gold Glass) -->
+                            <Border CornerRadius="16" Padding="18,16" Margin="0,0,0,16"
+                                    Background="{StaticResource GoldGlassCardBrush}"
+                                    BorderBrush="{StaticResource UltraGlassBorderBrush}"
+                                    BorderThickness="1"
                                     Visibility="{Binding HasDailyHighlight, Converter={StaticResource BoolToVisibility}}">
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="22" ShadowDepth="0" Color="#D4AF37" Opacity="0.18"/>
+                                </Border.Effect>
                                 <StackPanel>
                                     <TextBlock Text="🌟 Daily Highlight" FontSize="11" FontWeight="Bold" Foreground="{StaticResource GoldGradient}" Margin="0,0,0,6"/>
                                     <TextBlock Text="{Binding DailyHighlightTitle}" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap"/>
@@ -1853,9 +2089,12 @@
                                 </StackPanel>
                             </Border>
 
-                            <!-- Quick Add Task -->
+                            <!-- Quick Add Task (Frosted Glass) -->
                             <TextBlock Text="✏️ Quick Add Target" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,10"/>
-                            <Border CornerRadius="14" Padding="14" Margin="0,0,0,18" Background="#0CD4AF37" BorderBrush="#18D4AF37" BorderThickness="1">
+                            <Border CornerRadius="16" Padding="16" Margin="0,0,0,18"
+                                    Background="{StaticResource GlassSurfaceBrush}"
+                                    BorderBrush="{StaticResource GlassBorderSubtle}"
+                                    BorderThickness="1">
                                 <StackPanel>
                                     <TextBox Style="{StaticResource PremiumTextBox}" FontSize="12" Text="{Binding NewTaskTitle, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10">
                                         <TextBox.InputBindings>
@@ -1883,7 +2122,10 @@
                             <!-- Placement Goals & Milestones -->
                             <TextBlock Text="🎯 Placement Milestones" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,10"/>
                             
-                            <Border CornerRadius="14" Padding="12" Margin="0,0,0,12" Background="#0CD4AF37" BorderBrush="#18D4AF37" BorderThickness="1">
+                            <Border CornerRadius="16" Padding="14,12" Margin="0,0,0,12"
+                                    Background="{StaticResource GlassSurfaceBrush}"
+                                    BorderBrush="{StaticResource GlassBorderSubtle}"
+                                    BorderThickness="1">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>

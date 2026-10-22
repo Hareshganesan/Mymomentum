@@ -2,21 +2,21 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     
     <!-- ============================================== -->
-    <!-- PREMIUM BLACK & GOLD THEME                     -->
+    <!-- PREMIUM BLACK, GOLD & FROSTED GLASS THEME      -->
     <!-- ============================================== -->
     
-    <!-- Background Colors - Deep Black -->
-    <Color x:Key="DarkBackground">#FF0A0A0F</Color>
-    <Color x:Key="DarkSurface">#FF121218</Color>
-    <Color x:Key="DarkCard">#FF1A1A22</Color>
-    <Color x:Key="DarkCardHover">#FF222230</Color>
-    <Color x:Key="DarkBorder">#FF2A2A35</Color>
+    <!-- Background Colors - Deep Space Black -->
+    <Color x:Key="DarkBackground">#FF07070D</Color>
+    <Color x:Key="DarkSurface">#FF0E0E16</Color>
+    <Color x:Key="DarkCard">#FF14141E</Color>
+    <Color x:Key="DarkCardHover">#FF1E1E2C</Color>
+    <Color x:Key="DarkBorder">#FF282838</Color>
     
     <!-- Gold Accent Colors -->
     <Color x:Key="GoldPrimary">#FFD4AF37</Color>
     <Color x:Key="GoldLight">#FFFFD700</Color>
     <Color x:Key="GoldDark">#FFB8860B</Color>
-    <Color x:Key="GoldMuted">#FF8B7355</Color>
+    <Color x:Key="GoldMuted">#FF9E8765</Color>
     
     <!-- Status Colors -->
     <Color x:Key="StatusGreen">#FF4ADE80</Color>
@@ -25,8 +25,8 @@
     
     <!-- Text Colors -->
     <Color x:Key="TextPrimary">#FFFFFFFF</Color>
-    <Color x:Key="TextSecondary">#FFB0B0B8</Color>
-    <Color x:Key="TextMuted">#FF606068</Color>
+    <Color x:Key="TextSecondary">#FFB4B4C0</Color>
+    <Color x:Key="TextMuted">#FF6E6E7C</Color>
     <Color x:Key="TextGold">#FFD4AF37</Color>
     
     <!-- Brushes -->
@@ -64,18 +64,65 @@
         <GradientStop Color="#FFD4AF37" Offset="1"/>
     </LinearGradientBrush>
     
-    <!-- Glass Effect -->
-    <LinearGradientBrush x:Key="GlassBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#15FFFFFF" Offset="0"/>
-        <GradientStop Color="#08FFFFFF" Offset="1"/>
+    <!-- Advanced Frosted Glass Effects -->
+    <LinearGradientBrush x:Key="GlassBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#18FFFFFF" Offset="0"/>
+        <GradientStop Color="#0AFFFFFF" Offset="0.5"/>
+        <GradientStop Color="#05FFFFFF" Offset="1"/>
     </LinearGradientBrush>
     
-    <LinearGradientBrush x:Key="GlassBorderBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#25FFFFFF" Offset="0"/>
-        <GradientStop Color="#08FFFFFF" Offset="1"/>
+    <LinearGradientBrush x:Key="GlassBorderBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#40FFFFFF" Offset="0"/>
+        <GradientStop Color="#15FFFFFF" Offset="0.5"/>
+        <GradientStop Color="#25D4AF37" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="GoldGlassCardBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#281A1A2E" Offset="0"/>
+        <GradientStop Color="#18111220" Offset="0.5"/>
+        <GradientStop Color="#22151828" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="GlassSurfaceBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#24141628" Offset="0"/>
+        <GradientStop Color="#160E101D" Offset="0.5"/>
+        <GradientStop Color="#1E121526" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="GlassCardShineBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#3520233E" Offset="0"/>
+        <GradientStop Color="#1C121524" Offset="0.6"/>
+        <GradientStop Color="#26171B30" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="GoldGlassBorderBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#65D4AF37" Offset="0"/>
+        <GradientStop Color="#30FFFFFF" Offset="0.35"/>
+        <GradientStop Color="#20D4AF37" Offset="0.75"/>
+        <GradientStop Color="#40D4AF37" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="CyanGlassBorderBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#6538BDF8" Offset="0"/>
+        <GradientStop Color="#30FFFFFF" Offset="0.35"/>
+        <GradientStop Color="#2038BDF8" Offset="0.75"/>
+        <GradientStop Color="#450284C7" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="UltraGlassBorderBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#65D4AF37" Offset="0"/>
+        <GradientStop Color="#35FFFFFF" Offset="0.3"/>
+        <GradientStop Color="#18D4AF37" Offset="0.65"/>
+        <GradientStop Color="#5038BDF8" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="GlassBorderSubtle" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#35FFFFFF" Offset="0"/>
+        <GradientStop Color="#15FFFFFF" Offset="0.5"/>
+        <GradientStop Color="#25D4AF37" Offset="1"/>
     </LinearGradientBrush>
     
-    <!-- Card Shadow -->
+    <!-- Card Shadows & Glows -->
     <DropShadowEffect x:Key="CardShadow" 
                       BlurRadius="25" 
                       ShadowDepth="0" 

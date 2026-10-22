@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Threading;
 using MyTodo.Models;
@@ -122,6 +123,19 @@ namespace MyTodo.ViewModels
         private string _mockTimeComplexity = "O(n)";
         private string _mockSpaceComplexity = "O(1)";
         private int _mockElapsedSeconds;
+
+        // LeetCode Sync Fields
+        private string _leetCodeUsername = string.Empty;
+        private string _leetCodeSessionCookie = string.Empty;
+        private bool _isLeetCodeConnected;
+        private bool _isLeetCodeSyncing;
+        private string _leetCodeStatusMessage = "Connect your LeetCode handle to sync solved problems automatically.";
+        private int _leetCodeTotalSolved;
+        private int _leetCodeEasySolved;
+        private int _leetCodeMediumSolved;
+        private int _leetCodeHardSolved;
+        private int _leetCodeRanking;
+        private DateTime? _leetCodeLastSyncedAt;
 
         #endregion
 
@@ -748,6 +762,99 @@ namespace MyTodo.ViewModels
 
         #endregion
 
+        #region LeetCode Properties
+
+        public string LeetCodeUsername
+        {
+            get => _leetCodeUsername;
+            set { _leetCodeUsername = value; OnPropertyChanged(); }
+        }
+
+        public string LeetCodeSessionCookie
+        {
+            get => _leetCodeSessionCookie;
+            set { _leetCodeSessionCookie = value; OnPropertyChanged(); }
+        }
+
+        public bool IsLeetCodeConnected
+        {
+            get => _isLeetCodeConnected;
+            set
+            {
+                _isLeetCodeConnected = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(LeetCodeStatusBadgeText));
+            }
+        }
+
+        public bool IsLeetCodeSyncing
+        {
+            get => _isLeetCodeSyncing;
+            set
+            {
+                _isLeetCodeSyncing = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(LeetCodeSyncButtonText));
+            }
+        }
+
+        public string LeetCodeSyncButtonText => IsLeetCodeSyncing ? "Syncing..." : "Sync LeetCode ⚡";
+
+        public string LeetCodeStatusMessage
+        {
+            get => _leetCodeStatusMessage;
+            set { _leetCodeStatusMessage = value; OnPropertyChanged(); }
+        }
+
+        public int LeetCodeTotalSolved
+        {
+            get => _leetCodeTotalSolved;
+            set { _leetCodeTotalSolved = value; OnPropertyChanged(); }
+        }
+
+        public int LeetCodeEasySolved
+        {
+            get => _leetCodeEasySolved;
+            set { _leetCodeEasySolved = value; OnPropertyChanged(); }
+        }
+
+        public int LeetCodeMediumSolved
+        {
+            get => _leetCodeMediumSolved;
+            set { _leetCodeMediumSolved = value; OnPropertyChanged(); }
+        }
+
+        public int LeetCodeHardSolved
+        {
+            get => _leetCodeHardSolved;
+            set { _leetCodeHardSolved = value; OnPropertyChanged(); }
+        }
+
+        public int LeetCodeRanking
+        {
+            get => _leetCodeRanking;
+            set { _leetCodeRanking = value; OnPropertyChanged(); }
+        }
+
+        public DateTime? LeetCodeLastSyncedAt
+        {
+            get => _leetCodeLastSyncedAt;
+            set
+            {
+                _leetCodeLastSyncedAt = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(LeetCodeLastSyncedDisplay));
+            }
+        }
+
+        public string LeetCodeLastSyncedDisplay => LeetCodeLastSyncedAt.HasValue
+            ? $"Last synced: {LeetCodeLastSyncedAt.Value:MMM dd, HH:mm}"
+            : "Never synced";
+
+        public string LeetCodeStatusBadgeText => IsLeetCodeConnected ? "Connected" : "Disconnected";
+
+        #endregion
+
         #region Commands Declarations
 
         // Navigation Commands
@@ -820,6 +927,10 @@ namespace MyTodo.ViewModels
 
         // Behavioral Commands
         public ICommand ToggleBehavioralExpandCommand { get; private set; } = null!;
+
+        // LeetCode Commands
+        public ICommand SyncLeetCodeCommand { get; private set; } = null!;
+        public ICommand ClearLeetCodeCommand { get; private set; } = null!;
 
         #endregion
 
@@ -1067,6 +1178,10 @@ namespace MyTodo.ViewModels
             {
                 if (q != null) q.IsExpanded = !q.IsExpanded;
             });
+
+            // LeetCode Commands
+            SyncLeetCodeCommand = new RelayCommand(async () => await SyncLeetCodeAsync());
+            ClearLeetCodeCommand = new RelayCommand(ClearLeetCodeProfile);
         }
 
         public class DsaReviewParam
@@ -1342,6 +1457,125 @@ namespace MyTodo.ViewModels
 
             ApplyDsaFilter();
             RecalculateReadinessScore();
+            SaveData();
+        }
+
+        #endregion
+
+        #region LeetCode Sync Logic
+
+        public async Task SyncLeetCodeAsync()
+        {
+            if (string.IsNullOrWhiteSpace(LeetCodeUsername))
+            {
+                LeetCodeStatusMessage = "Please enter your LeetCode handle (e.g. 'tourist', 'neetcode', or your profile username).";
+                return;
+            }
+
+            IsLeetCodeSyncing = true;
+            LeetCodeStatusMessage = $"Connecting safely to LeetCode for @{LeetCodeUsername.Trim()}...";
+
+            try
+            {
+                LeetCodeProfileResult result;
+                if (!string.IsNullOrWhiteSpace(LeetCodeSessionCookie))
+                {
+                    result = await LeetCodeSyncService.FetchFullHistoryWithSessionAsync(LeetCodeSessionCookie.Trim(), LeetCodeUsername.Trim());
+                }
+                else
+                {
+                    result = await LeetCodeSyncService.FetchPublicProfileAsync(LeetCodeUsername.Trim());
+                }
+
+                if (result.IsSuccess)
+                {
+                    IsLeetCodeConnected = true;
+                    LeetCodeTotalSolved = result.TotalSolved;
+                    LeetCodeEasySolved = result.EasySolved;
+                    LeetCodeMediumSolved = result.MediumSolved;
+                    LeetCodeHardSolved = result.HardSolved;
+                    LeetCodeRanking = result.Ranking;
+                    LeetCodeLastSyncedAt = DateTime.Now;
+
+                    // Match against DsaProblems
+                    int newlySolvedCount = 0;
+                    foreach (var problem in DsaProblems)
+                    {
+                        if (problem.Status != ProblemStatus.Solved)
+                        {
+                            bool isMatch = false;
+
+                            // 1. Direct match by problem title (ignoring case)
+                            if (result.SolvedTitles.Any(t => string.Equals(t, problem.Title, StringComparison.OrdinalIgnoreCase)))
+                            {
+                                isMatch = true;
+                            }
+                            // 2. Match by slug inside LeetCodeUrl if present
+                            else if (!string.IsNullOrWhiteSpace(problem.LeetCodeUrl))
+                            {
+                                var urlLower = problem.LeetCodeUrl.ToLower();
+                                if (result.SolvedSlugs.Any(slug => !string.IsNullOrEmpty(slug) && urlLower.Contains(slug)))
+                                {
+                                    isMatch = true;
+                                }
+                            }
+
+                            if (isMatch)
+                            {
+                                problem.Status = ProblemStatus.Solved;
+                                if (problem.LastSolvedDate == null)
+                                {
+                                    problem.RecordReview(4);
+                                }
+                                newlySolvedCount++;
+                            }
+                        }
+                    }
+
+                    RecordDailyActivity(30);
+                    if (newlySolvedCount > 0)
+                    {
+                        TriggerConfetti();
+                        LeetCodeStatusMessage = $"Synced! Connected as @{LeetCodeUsername}. Found {newlySolvedCount} newly solved problems from your profile! 🚀";
+                    }
+                    else
+                    {
+                        LeetCodeStatusMessage = $"Connected as @{LeetCodeUsername} • {LeetCodeTotalSolved} solved on LeetCode • Rank #{LeetCodeRanking:N0} • Sheet is up to date!";
+                    }
+
+                    ApplyDsaFilter();
+                    UpdateDueReviewProblems();
+                    RecalculateReadinessScore();
+                    UpdateBadges();
+                    SaveData();
+                }
+                else
+                {
+                    LeetCodeStatusMessage = $"Connection failed: {result.ErrorMessage}";
+                }
+            }
+            catch (Exception ex)
+            {
+                LeetCodeStatusMessage = $"Sync error: {ex.Message}";
+            }
+            finally
+            {
+                IsLeetCodeSyncing = false;
+            }
+        }
+
+        public void ClearLeetCodeProfile()
+        {
+            LeetCodeUsername = string.Empty;
+            LeetCodeSessionCookie = string.Empty;
+            IsLeetCodeConnected = false;
+            LeetCodeTotalSolved = 0;
+            LeetCodeEasySolved = 0;
+            LeetCodeMediumSolved = 0;
+            LeetCodeHardSolved = 0;
+            LeetCodeRanking = 0;
+            LeetCodeLastSyncedAt = null;
+            LeetCodeStatusMessage = "LeetCode profile disconnected. Enter your username anytime to sync.";
             SaveData();
         }
 
@@ -1727,6 +1961,20 @@ namespace MyTodo.ViewModels
             {
                 DailyHighlight = Tasks.FirstOrDefault(t => t.Id == data.DailyHighlightTaskId);
             }
+
+            LeetCodeUsername = data.LeetCodeUsername ?? string.Empty;
+            LeetCodeSessionCookie = data.LeetCodeSessionCookie ?? string.Empty;
+            LeetCodeTotalSolved = data.LeetCodeTotalSolved;
+            LeetCodeEasySolved = data.LeetCodeEasySolved;
+            LeetCodeMediumSolved = data.LeetCodeMediumSolved;
+            LeetCodeHardSolved = data.LeetCodeHardSolved;
+            LeetCodeRanking = data.LeetCodeRanking;
+            LeetCodeLastSyncedAt = data.LeetCodeLastSyncedAt;
+            IsLeetCodeConnected = !string.IsNullOrWhiteSpace(data.LeetCodeUsername) && data.LeetCodeTotalSolved > 0;
+            if (IsLeetCodeConnected)
+            {
+                LeetCodeStatusMessage = $"Connected as @{LeetCodeUsername} • {LeetCodeTotalSolved} solved • Rank #{LeetCodeRanking:N0}";
+            }
         }
 
         public void SaveData()
@@ -1749,7 +1997,15 @@ namespace MyTodo.ViewModels
                 CoreCsQuestions = CoreCsQuestions.ToList(),
                 CompanyApplications = CompanyApplications.ToList(),
                 BehavioralQuestions = BehavioralQuestions.ToList(),
-                MockHistory = MockHistory.ToList()
+                MockHistory = MockHistory.ToList(),
+                LeetCodeUsername = LeetCodeUsername,
+                LeetCodeSessionCookie = LeetCodeSessionCookie,
+                LeetCodeTotalSolved = LeetCodeTotalSolved,
+                LeetCodeEasySolved = LeetCodeEasySolved,
+                LeetCodeMediumSolved = LeetCodeMediumSolved,
+                LeetCodeHardSolved = LeetCodeHardSolved,
+                LeetCodeRanking = LeetCodeRanking,
+                LeetCodeLastSyncedAt = LeetCodeLastSyncedAt
             };
 
             JsonStorageService.Save(data);

@@ -43,5 +43,15 @@ namespace MyTodo.Models
         public int TotalMockSessions { get; set; }
         public int TotalCoreCsMastered { get; set; }
         public DateTime? LastActivityDate { get; set; }
+
+        // ===== LeetCode Integration =====
+        public string? LeetCodeUsername { get; set; }
+        public string? LeetCodeSessionCookie { get; set; }
+        public int LeetCodeTotalSolved { get; set; }
+        public int LeetCodeEasySolved { get; set; }
+        public int LeetCodeMediumSolved { get; set; }
+        public int LeetCodeHardSolved { get; set; }
+        public int LeetCodeRanking { get; set; }
+        public DateTime? LeetCodeLastSyncedAt { get; set; }
     }
 }
