@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\mytodo\\MyTodo.csproj",
+      "projectUniqueName": "E:\\MyMomentum_Stable\\Mymomentum\\V3\\MyTodo.csproj",
       "projectName": "MyTodo",
-      "projectPath": "E:\\mytodo\\MyTodo.csproj",
+      "projectPath": "E:\\MyMomentum_Stable\\Mymomentum\\V3\\MyTodo.csproj",
       "packagesPath": "C:\\Users\\hares\\.nuget\\packages\\",
-      "outputPath": "E:\\mytodo\\obj\\",
+      "outputPath": "E:\\MyMomentum_Stable\\Mymomentum\\V3\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\hares\\AppData\\Roaming\\NuGet\\NuGet.Config"

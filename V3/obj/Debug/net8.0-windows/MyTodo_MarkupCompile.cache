@@ -4,15 +4,15 @@
 winexe
 C#
 .cs
-E:\mytodo\obj\Debug\net8.0-windows\
+E:\MyMomentum_Stable\Mymomentum\V3\obj\Debug\net8.0-windows\
 MyTodo
 none
 false
 TRACE;DEBUG;NET;NET8_0;NETCOREAPP
-E:\mytodo\App.xaml
+E:\MyMomentum_Stable\Mymomentum\V3\App.xaml
 4899919807
 
-14-1358018677
+21-259199325
 198338916705
 Resources\Animations.xaml;Resources\Styles.xaml;Resources\Themes.xaml;Views\MainWindow.xaml;
 

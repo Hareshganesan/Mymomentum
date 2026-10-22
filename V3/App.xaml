@@ -20,6 +20,9 @@
             <converters:ProgressWidthConverter x:Key="ProgressWidthConverter"/>
             <converters:BoolToVisibilityInverseConverter x:Key="BoolToVisibilityInverse"/>
             <converters:StringToVisibilityConverter x:Key="StringToVisibility"/>
+            <converters:HexToBrushConverter x:Key="HexToBrush"/>
+            <converters:CountToVisibilityConverter x:Key="CountToVisibility"/>
+            <converters:ZeroToVisibilityConverter x:Key="ZeroToVisibility"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

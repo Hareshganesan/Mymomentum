@@ -4,7 +4,9 @@ using System.Collections.Generic;
 namespace MyTodo.Models
 {
     /// <summary>
-    /// Container for all app data, used for JSON serialization.
+    /// Container for all app data, including tasks, goals, streaks,
+    /// DSA problems, Core CS flashcards, and placement drives.
+    /// Used for JSON serialization.
     /// </summary>
     public class AppData
     {
@@ -17,36 +19,29 @@ namespace MyTodo.Models
         public bool IsDarkMode { get; set; } = true;
         
         /// <summary>
-        /// Weekly completion data - stores completion percentage for each day
-        /// Key: Date string (yyyy-MM-dd), Value: completion percentage
+        /// Daily completion history (key = yyyy-MM-dd, value = completion score or activity count)
         /// </summary>
         public Dictionary<string, double> DailyCompletionHistory { get; set; } = new();
 
         // ===== Streak Protection =====
-        
-        /// <summary>
-        /// If true, streak is paused (user missed a day but can still save it)
-        /// </summary>
         public bool StreakPaused { get; set; }
-
-        /// <summary>
-        /// The streak value that was saved when paused
-        /// </summary>
         public int PausedStreakValue { get; set; }
 
         // ===== Daily Reflections =====
-        
-        /// <summary>
-        /// Dictionary of daily morning/evening reflections (key = yyyy-MM-dd)
-        /// </summary>
         public Dictionary<string, DailyReflection> Reflections { get; set; } = new();
 
         // ===== Daily Highlight =====
-        
-        /// <summary>
-        /// ID of today's highlighted task ("One Thing")
-        /// </summary>
         public string? DailyHighlightTaskId { get; set; }
+
+        // ===== DSA & Placement Vault =====
+        public List<DsaProblem> DsaProblems { get; set; } = new();
+        public List<CoreCsTopic> CoreCsQuestions { get; set; } = new();
+        public List<CompanyApplication> CompanyApplications { get; set; } = new();
+        public List<BehavioralQuestion> BehavioralQuestions { get; set; } = new();
+        public List<MockSession> MockHistory { get; set; } = new();
+
+        public int TotalMockSessions { get; set; }
+        public int TotalCoreCsMastered { get; set; }
+        public DateTime? LastActivityDate { get; set; }
     }
 }
-

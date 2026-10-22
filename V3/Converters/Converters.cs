@@ -193,4 +193,68 @@ namespace MyTodo.Converters
             throw new NotImplementedException();
         }
     }
+
+    /// <summary>
+    /// Converts a hex color string (like "#4ADE80") into a SolidColorBrush
+    /// </summary>
+    public class HexToBrushConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is string hex && !string.IsNullOrWhiteSpace(hex))
+            {
+                try
+                {
+                    var color = (Color)ColorConverter.ConvertFromString(hex);
+                    return new SolidColorBrush(color);
+                }
+                catch
+                {
+                    // Fallback to gold
+                }
+            }
+            return new SolidColorBrush(Color.FromRgb(212, 175, 55));
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// Converts integer count > 0 to Visible, 0 to Collapsed
+    /// </summary>
+    public class CountToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is int count && count > 0)
+                return Visibility.Visible;
+            return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// Converts integer count == 0 to Visible, > 0 to Collapsed
+    /// </summary>
+    public class ZeroToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is int count && count == 0)
+                return Visibility.Visible;
+            return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

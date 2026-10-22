@@ -9,14 +9,15 @@ namespace MyTodo.Services
     /// <summary>
     /// Handles JSON file save/load for persistent storage.
     /// Data is stored in the user's AppData folder.
+    /// Automatically ensures default curated placement data is populated.
     /// </summary>
     public static class JsonStorageService
     {
         private static readonly string DataFolder = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "MyTodo");
+            "MyMomentumPlacement");
 
-        private static readonly string DataFile = Path.Combine(DataFolder, "data.json");
+        private static readonly string DataFile = Path.Combine(DataFolder, "placement_data.json");
 
         private static readonly JsonSerializerOptions JsonOptions = new()
         {
@@ -32,7 +33,6 @@ namespace MyTodo.Services
         {
             try
             {
-                // Ensure directory exists
                 if (!Directory.Exists(DataFolder))
                     Directory.CreateDirectory(DataFolder);
 
@@ -46,16 +46,18 @@ namespace MyTodo.Services
         }
 
         /// <summary>
-        /// Loads app data from JSON file, returns new AppData if file doesn't exist
+        /// Loads app data from JSON file, returns populated AppData if file doesn't exist
         /// </summary>
         public static AppData Load()
         {
+            AppData? data = null;
+
             try
             {
                 if (File.Exists(DataFile))
                 {
                     var json = File.ReadAllText(DataFile);
-                    return JsonSerializer.Deserialize<AppData>(json, JsonOptions) ?? new AppData();
+                    data = JsonSerializer.Deserialize<AppData>(json, JsonOptions);
                 }
             }
             catch (Exception ex)
@@ -63,7 +65,35 @@ namespace MyTodo.Services
                 System.Diagnostics.Debug.WriteLine($"Error loading data: {ex.Message}");
             }
 
-            return new AppData();
+            data ??= new AppData();
+
+            // Populate curated data if empty
+            if (data.DsaProblems == null || data.DsaProblems.Count == 0)
+            {
+                data.DsaProblems = SeedDataService.GetCuratedDsaSheet();
+            }
+
+            if (data.CoreCsQuestions == null || data.CoreCsQuestions.Count == 0)
+            {
+                data.CoreCsQuestions = SeedDataService.GetCuratedCoreCsQuestions();
+            }
+
+            if (data.CompanyApplications == null || data.CompanyApplications.Count == 0)
+            {
+                data.CompanyApplications = SeedDataService.GetCuratedSampleApplications();
+            }
+
+            if (data.BehavioralQuestions == null || data.BehavioralQuestions.Count == 0)
+            {
+                data.BehavioralQuestions = SeedDataService.GetCuratedBehavioralQuestions();
+            }
+
+            if (data.Tasks == null || data.Tasks.Count == 0)
+            {
+                data.Tasks = SeedDataService.GetCuratedDailyTasks();
+            }
+
+            return data;
         }
 
         /// <summary>

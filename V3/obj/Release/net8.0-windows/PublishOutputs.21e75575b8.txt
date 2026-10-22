@@ -1,0 +1,5 @@
+E:\MyMomentum_Stable\Mymomentum\V3_exe\MyTodo.exe
+E:\MyMomentum_Stable\Mymomentum\V3_exe\MyTodo.dll
+E:\MyMomentum_Stable\Mymomentum\V3_exe\MyTodo.deps.json
+E:\MyMomentum_Stable\Mymomentum\V3_exe\MyTodo.runtimeconfig.json
+E:\MyMomentum_Stable\Mymomentum\V3_exe\MyTodo.pdb
