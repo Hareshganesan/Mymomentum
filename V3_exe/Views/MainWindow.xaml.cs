@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -116,6 +116,7 @@ namespace MyTodo.Views
 
         private void ApplyTheme(bool isDark)
         {
+            // Update MainBorder background
             var mainBorder = this.FindName("MainBorder") as System.Windows.Controls.Border;
             if (mainBorder != null)
             {
@@ -125,9 +126,59 @@ namespace MyTodo.Views
                 }
                 else
                 {
-                    // Light mode - very transparent white
-                    mainBorder.Background = new SolidColorBrush(Color.FromArgb(0x50, 0xFF, 0xFF, 0xFF));
+                    // Light mode - soft warm white with transparency
+                    mainBorder.Background = new SolidColorBrush(Color.FromArgb(0x70, 0xFD, 0xFB, 0xF7));
                 }
+            }
+
+            // Update application resource brushes dynamically
+            try
+            {
+                var resources = Application.Current.Resources;
+                
+                if (isDark)
+                {
+                    // Dark Mode Colors
+                    UpdateBrush(resources, "BackgroundBrush", Color.FromRgb(0x0A, 0x0A, 0x0F));
+                    UpdateBrush(resources, "SurfaceBrush", Color.FromRgb(0x12, 0x12, 0x18));
+                    UpdateBrush(resources, "CardBrush", Color.FromRgb(0x1A, 0x1A, 0x22));
+                    UpdateBrush(resources, "CardHoverBrush", Color.FromRgb(0x22, 0x22, 0x30));
+                    UpdateBrush(resources, "BorderBrush", Color.FromRgb(0x2A, 0x2A, 0x35));
+                    UpdateBrush(resources, "TextPrimaryBrush", Color.FromRgb(0xFF, 0xFF, 0xFF));
+                    UpdateBrush(resources, "TextSecondaryBrush", Color.FromRgb(0xB0, 0xB0, 0xB8));
+                    UpdateBrush(resources, "TextMutedBrush", Color.FromRgb(0x60, 0x60, 0x68));
+                }
+                else
+                {
+                    // Light Mode Colors  
+                    UpdateBrush(resources, "BackgroundBrush", Color.FromRgb(0xFD, 0xFB, 0xF7)); // Warm off-white
+                    UpdateBrush(resources, "SurfaceBrush", Color.FromRgb(0xFA, 0xF8, 0xF4));     // Cream surface
+                    UpdateBrush(resources, "CardBrush", Color.FromRgb(0xFF, 0xFF, 0xFF));        // Pure white
+                    UpdateBrush(resources, "CardHoverBrush", Color.FromRgb(0xF5, 0xF3, 0xEF));   // Subtle hover
+                    UpdateBrush(resources, "BorderBrush", Color.FromRgb(0xE8, 0xE5, 0xE0));      // Soft border
+                    UpdateBrush(resources, "TextPrimaryBrush", Color.FromRgb(0x1A, 0x1A, 0x1A)); // Almost black
+                    UpdateBrush(resources, "TextSecondaryBrush", Color.FromRgb(0x5A, 0x5A, 0x5A)); // Medium gray
+                    UpdateBrush(resources, "TextMutedBrush", Color.FromRgb(0x9A, 0x9A, 0x9A));   // Light gray
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error applying theme: {ex.Message}");
+            }
+        }
+
+        private void UpdateBrush(ResourceDictionary resources, string key, Color color)
+        {
+            if (resources.Contains(key) && resources[key] is SolidColorBrush brush)
+            {
+                // Animate color transition for smooth theme change
+                var colorAnimation = new ColorAnimation
+                {
+                    To = color,
+                    Duration = TimeSpan.FromMilliseconds(300),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
+                };
+                brush.BeginAnimation(SolidColorBrush.ColorProperty, colorAnimation);
             }
         }
 
