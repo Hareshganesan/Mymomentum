@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
@@ -7,54 +6,28 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using System.Windows.Threading;
 using MyTodo.ViewModels;
 
 namespace MyTodo.Views
 {
     /// <summary>
-    /// Main window with custom title bar, animations, and confetti effects.
+    /// Main window with custom title bar and celebration confetti effects.
+    /// Optimized for 60+ FPS hardware accelerated rendering.
     /// </summary>
     public partial class MainWindow : Window
     {
-        // Win32 API for blur effect
-        [DllImport("user32.dll")]
-        private static extern int SetWindowCompositionAttribute(IntPtr hwnd, ref WindowCompositionAttributeData data);
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct WindowCompositionAttributeData
-        {
-            public int Attribute;
-            public IntPtr Data;
-            public int SizeOfData;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct AccentPolicy
-        {
-            public int AccentState;
-            public int AccentFlags;
-            public int GradientColor;
-            public int AnimationId;
-        }
-
-        private const int WCA_ACCENT_POLICY = 19;
-        private const int ACCENT_ENABLE_BLURBEHIND = 3;
-
         private readonly Random _random = new();
         private readonly Color[] _confettiColors = new[]
         {
-            Color.FromRgb(212, 175, 55),   // Gold Primary
-            Color.FromRgb(255, 215, 0),    // Gold Light
-            Color.FromRgb(184, 134, 11),   // Gold Dark
-            Color.FromRgb(255, 255, 255),  // White sparkle
-            Color.FromRgb(74, 222, 128),   // Green success
-            Color.FromRgb(212, 175, 55),   // More gold!
+            Color.FromRgb(255, 255, 255),   // Pure Crisp White
+            Color.FromRgb(226, 232, 240),   // Silver Smoke
+            Color.FromRgb(203, 213, 225),   // Platinum
+            Color.FromRgb(241, 245, 249),   // Diamond White
+            Color.FromRgb(148, 163, 184),   // Slate Silver
+            Color.FromRgb(255, 255, 255)    // Pure White
         };
 
         private WindowState _previousWindowState;
-        private DispatcherTimer? _particleTimer;
-        private readonly List<Ellipse> _particles = new();
 
         public MainWindow()
         {
@@ -73,62 +46,137 @@ namespace MyTodo.Views
                     {
                         ToggleFullScreen(vm.IsFullScreen);
                     }
-                    else if (e.PropertyName == nameof(MainViewModel.IsDarkMode))
-                    {
-                        ApplyTheme(vm.IsDarkMode);
-                    }
                 };
             }
-
-            // Start animated background
-            Loaded += (s, e) =>
-            {
-                StartBackgroundAnimation();
-                EnableBlur();
-            };
         }
 
-        #region Blur Effect
-
-        private void EnableBlur()
+        protected override void OnSourceInitialized(EventArgs e)
         {
-            var windowHelper = new WindowInteropHelper(this);
-            var accent = new AccentPolicy
-            {
-                AccentState = ACCENT_ENABLE_BLURBEHIND,
-                GradientColor = unchecked((int)0x30000000) // Very transparent overlay for better visibility
-            };
-
-            var accentStructSize = Marshal.SizeOf(accent);
-            var accentPtr = Marshal.AllocHGlobal(accentStructSize);
-            Marshal.StructureToPtr(accent, accentPtr, false);
-
-            var data = new WindowCompositionAttributeData
-            {
-                Attribute = WCA_ACCENT_POLICY,
-                SizeOfData = accentStructSize,
-                Data = accentPtr
-            };
-
-            SetWindowCompositionAttribute(windowHelper.Handle, ref data);
-            Marshal.FreeHGlobal(accentPtr);
+            base.OnSourceInitialized(e);
+            ApplyWindowsAcrylicFrostedGlass();
         }
 
-        private void ApplyTheme(bool isDark)
+        #region Windows 11 DWM Frosted Acrylic Glass
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct MARGINS
         {
-            var mainBorder = this.FindName("MainBorder") as System.Windows.Controls.Border;
-            if (mainBorder != null)
+            public int cxLeftWidth;
+            public int cxRightWidth;
+            public int cyTopHeight;
+            public int cyBottomHeight;
+        }
+
+        [DllImport("dwmapi.dll")]
+        private static extern int DwmExtendFrameIntoClientArea(IntPtr hWnd, ref MARGINS pMarInset);
+
+        [DllImport("dwmapi.dll")]
+        private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
+
+        private const int DWMWA_USE_IMMERSIVE_DARK_MODE = 20;
+        private const int DWMWA_WINDOW_CORNER_PREFERENCE = 33;
+        private const int DWMWA_SYSTEMBACKDROP_TYPE = 38;
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct WindowCompositionAttributeData
+        {
+            public WindowCompositionAttribute Attribute;
+            public IntPtr Data;
+            public int SizeOfData;
+        }
+
+        private enum WindowCompositionAttribute
+        {
+            WCA_ACCENT_POLICY = 19
+        }
+
+        private enum AccentState
+        {
+            ACCENT_DISABLED = 0,
+            ACCENT_ENABLE_GRADIENT = 1,
+            ACCENT_ENABLE_TRANSPARENTGRADIENT = 2,
+            ACCENT_ENABLE_BLURBEHIND = 3,
+            ACCENT_ENABLE_ACRYLICBLURBEHIND = 4,
+            ACCENT_INVALID_STATE = 5
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct AccentPolicy
+        {
+            public AccentState AccentState;
+            public int AccentFlags;
+            public int GradientColor;
+            public int AnimationId;
+        }
+
+        [DllImport("user32.dll")]
+        private static extern int SetWindowCompositionAttribute(IntPtr hwnd, ref WindowCompositionAttributeData data);
+
+        private void ApplyWindowsAcrylicFrostedGlass()
+        {
+            try
             {
-                if (isDark)
+                var handle = new WindowInteropHelper(this).Handle;
+                if (handle == IntPtr.Zero) return;
+
+                // Extend DWM frame into client area (-1 = entire window)
+                var margins = new MARGINS { cxLeftWidth = -1, cxRightWidth = -1, cyTopHeight = -1, cyBottomHeight = -1 };
+                DwmExtendFrameIntoClientArea(handle, ref margins);
+
+                // Make WPF HwndSource CompositionTarget transparent so DWM glass shines through
+                var source = HwndSource.FromHwnd(handle);
+                if (source?.CompositionTarget != null)
                 {
-                    mainBorder.Background = new SolidColorBrush(Color.FromArgb(0x40, 0x08, 0x08, 0x10));
+                    source.CompositionTarget.BackgroundColor = Colors.Transparent;
                 }
-                else
+
+                // Enable Windows 11 Immersive Dark Mode
+                int darkMode = 1;
+                DwmSetWindowAttribute(handle, DWMWA_USE_IMMERSIVE_DARK_MODE, ref darkMode, sizeof(int));
+
+                // Enable Windows 11 Native Acrylic Frosted Glass (DWMSBT_TRANSIENTWINDOW = 3)
+                int backdropType = 3; 
+                int hr = DwmSetWindowAttribute(handle, DWMWA_SYSTEMBACKDROP_TYPE, ref backdropType, sizeof(int));
+
+                // Native Windows 11 Rounded Corners (DWMWCP_ROUND = 2)
+                int cornerPreference = 2;
+                DwmSetWindowAttribute(handle, DWMWA_WINDOW_CORNER_PREFERENCE, ref cornerPreference, sizeof(int));
+
+                // Fallback for Windows 10
+                if (hr != 0)
                 {
-                    // Light mode - very transparent white
-                    mainBorder.Background = new SolidColorBrush(Color.FromArgb(0x50, 0xFF, 0xFF, 0xFF));
+                    EnableWindows10Acrylic(handle);
                 }
             }
+            catch { }
+        }
+
+        private void EnableWindows10Acrylic(IntPtr handle)
+        {
+            try
+            {
+                var accent = new AccentPolicy
+                {
+                    AccentState = AccentState.ACCENT_ENABLE_ACRYLICBLURBEHIND,
+                    AccentFlags = 2,
+                    GradientColor = unchecked((int)0x990A0F1D)
+                };
+
+                var accentStructSize = Marshal.SizeOf(accent);
+                var accentPtr = Marshal.AllocHGlobal(accentStructSize);
+                Marshal.StructureToPtr(accent, accentPtr, false);
+
+                var data = new WindowCompositionAttributeData
+                {
+                    Attribute = WindowCompositionAttribute.WCA_ACCENT_POLICY,
+                    Data = accentPtr,
+                    SizeOfData = accentStructSize
+                };
+
+                SetWindowCompositionAttribute(handle, ref data);
+                Marshal.FreeHGlobal(accentPtr);
+            }
+            catch { }
         }
 
         #endregion
@@ -136,18 +184,22 @@ namespace MyTodo.Views
         #region Window Controls
 
         /// <summary>
-        /// Allows dragging the window by clicking anywhere on it
+        /// Allows dragging the window by clicking anywhere on background/title
         /// </summary>
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ButtonState == MouseButtonState.Pressed)
             {
-                DragMove();
+                try
+                {
+                    DragMove();
+                }
+                catch { }
             }
         }
 
         /// <summary>
-        /// Minimize window with animation
+        /// Minimize window
         /// </summary>
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
@@ -166,10 +218,26 @@ namespace MyTodo.Views
         }
 
         /// <summary>
-        /// Close window - saves data via ViewModel
+        /// Ensure all data is saved whenever the window closes
+        /// </summary>
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            if (DataContext is MainViewModel vm)
+            {
+                vm.SaveData();
+            }
+            base.OnClosing(e);
+        }
+
+        /// <summary>
+        /// Close window
         /// </summary>
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
+            if (DataContext is MainViewModel vm)
+            {
+                vm.SaveData();
+            }
             Close();
         }
 
@@ -198,117 +266,18 @@ namespace MyTodo.Views
 
         #endregion
 
-        #region Animated Background
-
-        /// <summary>
-        /// Starts the animated particle background
-        /// </summary>
-        private void StartBackgroundAnimation()
-        {
-            // Create initial particles
-            CreateBackgroundParticles();
-
-            // Timer to animate particles
-            _particleTimer = new DispatcherTimer
-            {
-                Interval = TimeSpan.FromMilliseconds(50)
-            };
-            _particleTimer.Tick += AnimateParticles;
-            _particleTimer.Start();
-        }
-
-        /// <summary>
-        /// Creates floating gold particles for ambient effect
-        /// </summary>
-        private void CreateBackgroundParticles()
-        {
-            if (ParticleCanvas == null) return;
-
-            ParticleCanvas.Children.Clear();
-            _particles.Clear();
-
-            for (int i = 0; i < 15; i++)
-            {
-                var particle = new Ellipse
-                {
-                    Width = _random.Next(4, 12),
-                    Height = _random.Next(4, 12),
-                    Opacity = _random.NextDouble() * 0.15 + 0.05,
-                    Tag = new ParticleData
-                    {
-                        SpeedX = (_random.NextDouble() - 0.5) * 0.8,
-                        SpeedY = (_random.NextDouble() - 0.5) * 0.5,
-                        X = _random.NextDouble() * ActualWidth,
-                        Y = _random.NextDouble() * ActualHeight
-                    }
-                };
-
-                particle.Fill = new RadialGradientBrush
-                {
-                    GradientStops = new GradientStopCollection
-                    {
-                        new GradientStop(Color.FromArgb(180, 212, 175, 55), 0),
-                        new GradientStop(Color.FromArgb(0, 212, 175, 55), 1)
-                    }
-                };
-
-                var data = (ParticleData)particle.Tag;
-                System.Windows.Controls.Canvas.SetLeft(particle, data.X);
-                System.Windows.Controls.Canvas.SetTop(particle, data.Y);
-
-                ParticleCanvas.Children.Add(particle);
-                _particles.Add(particle);
-            }
-        }
-
-        /// <summary>
-        /// Animates particles floating around
-        /// </summary>
-        private void AnimateParticles(object? sender, EventArgs e)
-        {
-            if (ParticleCanvas == null || ActualWidth == 0) return;
-
-            foreach (var particle in _particles)
-            {
-                if (particle.Tag is ParticleData data)
-                {
-                    // Update position
-                    data.X += data.SpeedX;
-                    data.Y += data.SpeedY;
-
-                    // Wrap around edges
-                    if (data.X < -20) data.X = ActualWidth + 10;
-                    if (data.X > ActualWidth + 20) data.X = -10;
-                    if (data.Y < -20) data.Y = ActualHeight + 10;
-                    if (data.Y > ActualHeight + 20) data.Y = -10;
-
-                    System.Windows.Controls.Canvas.SetLeft(particle, data.X);
-                    System.Windows.Controls.Canvas.SetTop(particle, data.Y);
-                }
-            }
-        }
-
-        private class ParticleData
-        {
-            public double SpeedX { get; set; }
-            public double SpeedY { get; set; }
-            public double X { get; set; }
-            public double Y { get; set; }
-        }
-
-        #endregion
-
         #region Confetti Animation
 
         /// <summary>
-        /// Creates a fun confetti celebration effect
+        /// Creates a celebration confetti burst
         /// </summary>
         private void ShowConfettiAnimation()
         {
+            if (ConfettiCanvas == null) return;
             ConfettiCanvas.Children.Clear();
 
-            // Create 50 confetti pieces
-            for (int i = 0; i < 50; i++)
+            // 40 confetti pieces for optimal rendering speed
+            for (int i = 0; i < 40; i++)
             {
                 var confetti = CreateConfettiPiece();
                 ConfettiCanvas.Children.Add(confetti);
@@ -316,21 +285,17 @@ namespace MyTodo.Views
             }
         }
 
-        /// <summary>
-        /// Creates a single confetti piece (rectangle or ellipse)
-        /// </summary>
         private Shape CreateConfettiPiece()
         {
             Shape shape;
-            
             if (_random.Next(2) == 0)
             {
                 shape = new Rectangle
                 {
-                    Width = _random.Next(8, 15),
-                    Height = _random.Next(8, 15),
-                    RadiusX = 2,
-                    RadiusY = 2
+                    Width = _random.Next(8, 14),
+                    Height = _random.Next(8, 14),
+                    RadiusX = 3,
+                    RadiusY = 3
                 };
             }
             else
@@ -342,8 +307,10 @@ namespace MyTodo.Views
                 };
             }
 
-            shape.Fill = new SolidColorBrush(_confettiColors[_random.Next(_confettiColors.Length)]);
-            shape.Opacity = 0.9;
+            var brush = new SolidColorBrush(_confettiColors[_random.Next(_confettiColors.Length)]);
+            brush.Freeze();
+            shape.Fill = brush;
+            shape.Opacity = 0.95;
             shape.RenderTransformOrigin = new Point(0.5, 0.5);
             shape.RenderTransform = new TransformGroup
             {
@@ -357,25 +324,20 @@ namespace MyTodo.Views
             return shape;
         }
 
-        /// <summary>
-        /// Animates a confetti piece falling with rotation
-        /// </summary>
         private void AnimateConfetti(Shape confetti, int index)
         {
-            var startX = _random.Next(0, (int)ActualWidth);
-            var startY = -50;
-            var endY = ActualHeight + 50;
-            var horizontalDrift = _random.Next(-100, 100);
-            var duration = TimeSpan.FromSeconds(_random.NextDouble() * 1.5 + 1.5);
-            var delay = TimeSpan.FromMilliseconds(index * 30);
+            var startX = _random.Next(0, Math.Max(100, (int)ActualWidth));
+            var startY = -40;
+            var endY = ActualHeight + 40;
+            var horizontalDrift = _random.Next(-80, 80);
+            var duration = TimeSpan.FromSeconds(_random.NextDouble() * 1.2 + 1.2);
+            var delay = TimeSpan.FromMilliseconds(index * 25);
 
-            // Set initial position
             System.Windows.Controls.Canvas.SetLeft(confetti, startX);
             System.Windows.Controls.Canvas.SetTop(confetti, startY);
 
             var storyboard = new Storyboard();
 
-            // Vertical drop animation
             var dropAnimation = new DoubleAnimation
             {
                 From = startY,
@@ -388,7 +350,6 @@ namespace MyTodo.Views
             Storyboard.SetTargetProperty(dropAnimation, new PropertyPath("(Canvas.Top)"));
             storyboard.Children.Add(dropAnimation);
 
-            // Horizontal drift animation
             var driftAnimation = new DoubleAnimation
             {
                 From = startX,
@@ -401,7 +362,6 @@ namespace MyTodo.Views
             Storyboard.SetTargetProperty(driftAnimation, new PropertyPath("(Canvas.Left)"));
             storyboard.Children.Add(driftAnimation);
 
-            // Rotation animation
             var rotateAnimation = new DoubleAnimation
             {
                 By = _random.Next(360, 720) * (_random.Next(2) == 0 ? 1 : -1),
@@ -413,10 +373,9 @@ namespace MyTodo.Views
                 new PropertyPath("(UIElement.RenderTransform).(TransformGroup.Children)[0].(RotateTransform.Angle)"));
             storyboard.Children.Add(rotateAnimation);
 
-            // Fade out at end
             var fadeAnimation = new DoubleAnimation
             {
-                From = 0.9,
+                From = 0.95,
                 To = 0,
                 Duration = TimeSpan.FromSeconds(0.3),
                 BeginTime = delay + duration - TimeSpan.FromSeconds(0.3)

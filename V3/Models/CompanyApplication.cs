@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -120,8 +120,8 @@ namespace MyTodo.Models
                 if (!UpcomingEventDate.HasValue) return string.Empty;
                 var days = (UpcomingEventDate.Value.Date - DateTime.Today).Days;
                 if (days < 0) return "Passed";
-                if (days == 0) return "TODAY! 🚀";
-                if (days == 1) return "Tomorrow ⚡";
+                if (days == 0) return "Today";
+                if (days == 1) return "Tomorrow";
                 return $"In {days} days";
             }
         }
@@ -133,21 +133,20 @@ namespace MyTodo.Models
             DriveStage.OnlineAssessment => "Online Assessment (OA)",
             DriveStage.TechnicalRound => "Technical Interview",
             DriveStage.HrRound => "HR / Leadership Round",
-            DriveStage.OfferReceived => "Offer Received 🎉",
+            DriveStage.OfferReceived => "Offer Received",
             DriveStage.Rejected => "Archived",
             _ => Stage.ToString()
         };
-
         public string StageColor => Stage switch
         {
             DriveStage.Wishlist => "#94A3B8",        // Slate
-            DriveStage.Applied => "#38BDF8",         // Sky Blue
-            DriveStage.OnlineAssessment => "#FBBF24",// Amber
-            DriveStage.TechnicalRound => "#A78BFA",  // Purple
-            DriveStage.HrRound => "#EC4899",         // Pink
-            DriveStage.OfferReceived => "#4ADE80",   // Green / Gold
+            DriveStage.Applied => "#CBD5E1",         // Platinum
+            DriveStage.OnlineAssessment => "#E2E8F0",// Silver
+            DriveStage.TechnicalRound => "#FFFFFF",  // Pure White
+            DriveStage.HrRound => "#F1F5F9",         // Ghost White
+            DriveStage.OfferReceived => "#FFFFFF",   // Pure White
             DriveStage.Rejected => "#64748B",        // Dark Slate
-            _ => "#D4AF37"
+            _ => "#E2E8F0"
         };
 
         public bool CanMoveForward => Stage != DriveStage.OfferReceived && Stage != DriveStage.Rejected;

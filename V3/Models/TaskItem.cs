@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -6,13 +6,13 @@ namespace MyTodo.Models
 {
     /// <summary>
     /// Energy levels for tasks - replaces traditional priority
-    /// 🧠 Deep = requires focus, ⚡ Quick = fast wins, 😴 Low = low energy tasks
+    /// Deep = requires focus, Quick = fast wins, Low = low energy tasks
     /// </summary>
     public enum EnergyTag
     {
-        Quick,      // ⚡ Fast wins, low effort
-        Deep,       // 🧠 Requires focus and concentration
-        LowEnergy   // 😴 Can do when tired
+        Quick,      // Fast wins, low effort
+        Deep,       // Requires focus and concentration
+        LowEnergy   // Can do when tired
     }
 
     /// <summary>
@@ -96,7 +96,7 @@ namespace MyTodo.Models
         }
 
         /// <summary>
-        /// Energy tag: Quick ⚡, Deep 🧠, or LowEnergy 😴
+        /// Energy tag: Quick, Deep, or LowEnergy
         /// </summary>
         public EnergyTag EnergyTag
         {
@@ -109,10 +109,10 @@ namespace MyTodo.Models
         /// </summary>
         public string EnergyEmoji => EnergyTag switch
         {
-            EnergyTag.Deep => "🧠",
-            EnergyTag.Quick => "⚡",
-            EnergyTag.LowEnergy => "😴",
-            _ => "⚡"
+            EnergyTag.Deep => "Deep",
+            EnergyTag.Quick => "Quick",
+            EnergyTag.LowEnergy => "Light",
+            _ => "Standard"
         };
 
         /// <summary>

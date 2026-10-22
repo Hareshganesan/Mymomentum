@@ -10,6 +10,7 @@ namespace MyTodo.Models
     /// </summary>
     public class AppData
     {
+        public bool IsInitialized { get; set; } = true;
         public List<TaskItem> Tasks { get; set; } = new();
         public List<Goal> Goals { get; set; } = new();
         public int CurrentStreak { get; set; }

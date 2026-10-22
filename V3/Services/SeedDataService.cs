@@ -559,6 +559,96 @@ namespace MyTodo.Services
                     DetailedExplanation = "• Singleton: Ensures a class has only one instance and provides global access. Must use double-checked locking with thread safety.\n• Factory Method: Defines an interface for creating objects, letting subclasses decide which class to instantiate.\n• Observer: Defines a 1-to-many dependency so when one object changes state, all registered dependents are notified automatically (event-driven architecture, UI listeners, notification systems).",
                     HighYieldKeywords = "Creational vs Behavioral, Thread-Safe Singleton, Loose Coupling, Event Driven",
                     Frequency = "Very High"
+                },
+                new CoreCsTopic
+                {
+                    Subject = CsSubject.OperatingSystems,
+                    Question = "What is Thrashing in OS and how does the Working Set Model resolve it?",
+                    ShortAnswer = "Thrashing occurs when the CPU spends more time swapping pages than executing instructions.",
+                    DetailedExplanation = "• Cause: When total virtual memory working set of active processes exceeds physical RAM capacity, page faults skyrocket.\n• The OS scheduler misinterprets CPU underutilization as a need for higher multiprogramming, admitting more processes and worsening the storm.\n• Solution: Working Set Model (Peter Denning) — OS monitors the pages referenced by a process in the last Δ time units. If physical RAM cannot accommodate a process's entire working set, that process is temporarily suspended from the ready queue.",
+                    HighYieldKeywords = "Thrashing, Page Fault Frequency (PFF), Working Set Model, Degree of Multiprogramming",
+                    Frequency = "High"
+                },
+                new CoreCsTopic
+                {
+                    Subject = CsSubject.OperatingSystems,
+                    Question = "Explain CPU Scheduling: Preemptive vs Non-Preemptive, Round Robin & Starvation.",
+                    ShortAnswer = "Preemptive allows interrupting running processes (Round Robin, SRTF); Non-preemptive runs until completion/I/O (FCFS, SJF).",
+                    DetailedExplanation = "• FCFS: Simple FIFO queue, but suffers from Convoy Effect (short tasks trapped behind long I/O).\n• SJF / SRTF: Mathematically optimal average wait time, but causes Starvation of long bursts without Aging.\n• Round Robin: Time quantum allocated cyclically. Small quantum = high context switch overhead; Large quantum = degrades to FCFS.\n• Multilevel Feedback Queue (MLFQ): Processes move between priority queues based on CPU-burst history, prioritizing interactive tasks automatically.",
+                    HighYieldKeywords = "Time Quantum, Context Switch Overhead, Starvation, Aging, Convoy Effect, MLFQ",
+                    Frequency = "High"
+                },
+                new CoreCsTopic
+                {
+                    Subject = CsSubject.DBMS,
+                    Question = "What are the 4 Transaction Isolation Levels and their Concurrency Read Phenomena?",
+                    ShortAnswer = "Read Uncommitted, Read Committed, Repeatable Read, and Serializable (preventing Dirty, Non-repeatable, and Phantom reads).",
+                    DetailedExplanation = "1. Read Uncommitted: Allows Dirty Reads (reading uncommitted changes of another transaction).\n2. Read Committed: Prevents Dirty Reads, but allows Non-Repeatable Reads (row re-read changes value).\n3. Repeatable Read (MySQL default): Prevents Dirty & Non-Repeatable reads using MVCC snapshots, but historically allowed Phantom Reads (new rows inserted matching range).\n4. Serializable: Strict 2PL or serializable snapshot isolation. Zero anomalies, highest lock contention.",
+                    HighYieldKeywords = "Dirty Read, Non-Repeatable Read, Phantom Read, MVCC, Snapshot Isolation",
+                    Frequency = "Very High"
+                },
+                new CoreCsTopic
+                {
+                    Subject = CsSubject.DBMS,
+                    Question = "Explain the CAP Theorem and PACELC Extension in Distributed Databases.",
+                    ShortAnswer = "In the presence of network Partition (P), choose Consistency (C) or Availability (A). PACELC adds Else Latency (L) vs Consistency (C).",
+                    DetailedExplanation = "• CAP Theorem: A distributed data store can guarantee at most two: Consistency (every read gets the latest write), Availability (every non-failing node returns response), Partition Tolerance (tolerates dropped/delayed network messages). Since network splits are unavoidable, systems choose CP (MongoDB, HBase) or AP (Cassandra, DynamoDB).\n• PACELC: If Partition (P), choose Availability (A) or Consistency (C); Else (E), choose Latency (L) or Consistency (C).",
+                    HighYieldKeywords = "CAP Theorem, Split-Brain, Eventual Consistency, Quorum, PACELC",
+                    Frequency = "High"
+                },
+                new CoreCsTopic
+                {
+                    Subject = CsSubject.ComputerNetworks,
+                    Question = "Explain the OSI 7-Layer Model vs TCP/IP Architecture with Protocols.",
+                    ShortAnswer = "OSI: Physical, Data Link, Network, Transport, Session, Presentation, Application (Please Do Not Throw Sausage Pizza Away).",
+                    DetailedExplanation = "• Layer 7 Application: HTTP, DNS, SMTP, FTP, SSH.\n• Layer 6 Presentation: TLS/SSL encryption, JSON/Protobuf formatting, compression.\n• Layer 5 Session: RPC session management, NetBIOS.\n• Layer 4 Transport: End-to-end transport, port addressing, flow/congestion control (TCP, UDP).\n• Layer 3 Network: Logical IP addressing, routing across subnets (IP, ICMP, BGP, OSPF).\n• Layer 2 Data Link: Physical MAC addressing, Ethernet frames, switches, ARP.\n• Layer 1 Physical: Bits over physical medium (cables, radio waves, optical fiber).",
+                    HighYieldKeywords = "Encapsulation, De-encapsulation, PDU, MAC Address, IP Address, Port Number",
+                    Frequency = "Very High"
+                },
+                new CoreCsTopic
+                {
+                    Subject = CsSubject.ComputerNetworks,
+                    Question = "WebSockets vs Server-Sent Events (SSE) vs Long Polling — When to use which?",
+                    ShortAnswer = "WebSockets for full-duplex bi-directional communication. SSE for server-to-client unidirectional streams. Long polling as legacy fallback.",
+                    DetailedExplanation = "• WebSockets: Full-duplex bidirectional TCP stream initiated via HTTP Upgrade header. Ideal for multiplayer gaming, live collaborative whiteboards, high-frequency chat.\n• SSE (Server-Sent Events): Lightweight unidirectional stream from server to client over standard HTTP. Built-in reconnection and event IDs. Ideal for LLM token streaming, live stock feeds, notification tickers.\n• Long Polling: Client sends request; server holds open until data is ready. High HTTP header overhead.",
+                    HighYieldKeywords = "Full Duplex, Bi-directional, HTTP Upgrade, EventSource, LLM Streaming",
+                    Frequency = "High"
+                },
+                new CoreCsTopic
+                {
+                    Subject = CsSubject.SystemDesignBasics,
+                    Question = "How do Layer 4 vs Layer 7 Load Balancers differ? Explain Consistent Hashing.",
+                    ShortAnswer = "L4 routes at Transport layer (IP/Port). L7 inspects Application data (HTTP headers, cookies, URL paths).",
+                    DetailedExplanation = "• L4 Load Balancer: Fast, ultra-high throughput packet forwarding (TCP SYN/ACK). Does not decrypt TLS or read HTTP headers.\n• L7 Load Balancer: Smart routing based on URLs (e.g. /api -> backend, /static -> CDN), cookies for sticky sessions, TLS termination, and rate limiting (Nginx, Envoy, AWS ALB).\n• Consistent Hashing: Maps servers and cache keys to a hash ring (0 to 2^32-1). When a server node joins or leaves, only k/n keys are remapped instead of reshuffling all keys, preserving cache hits.",
+                    HighYieldKeywords = "L4 vs L7, Nginx, Envoy, Virtual Nodes, Hash Ring, Cache Eviction",
+                    Frequency = "Very High"
+                },
+                new CoreCsTopic
+                {
+                    Subject = CsSubject.SystemDesignBasics,
+                    Question = "Caching Strategies: Cache-Aside vs Write-Through vs Write-Back & Eviction Policies.",
+                    ShortAnswer = "Cache-Aside reads cache first and falls back to DB. Write-Through writes DB and cache synchronously. Write-Back writes cache and flushes async.",
+                    DetailedExplanation = "• Cache-Aside (Lazy Loading): Application reads cache. If miss, reads DB, writes to cache, and returns. Cache only holds requested data.\n• Write-Through: App writes to cache; cache writes synchronously to DB. Ensures high consistency, but adds write latency.\n• Write-Back (Write-Behind): App writes only to cache; cache batches async writes to DB. Ultra-low write latency, but risks data loss on cache node crash.\n• Eviction Policies: LRU (Least Recently Used via Doubly Linked List + HashMap), LFU (Least Frequently Used), FIFO, TTL (Time-To-Live).",
+                    HighYieldKeywords = "Cache Miss, Cache Stampede, Thundering Herd, LRU Cache, Write Latency, Redis",
+                    Frequency = "Very High"
+                },
+                new CoreCsTopic
+                {
+                    Subject = CsSubject.SystemDesignBasics,
+                    Question = "Message Queues: Apache Kafka vs RabbitMQ — Core Architecture Differences?",
+                    ShortAnswer = "Kafka is a distributed append-only commit log (pull-based, partitioned). RabbitMQ is a smart broker / dumb consumer queue (push-based, AMQP).",
+                    DetailedExplanation = "• Apache Kafka: Distributed, partitioned, append-only disk commit log. Consumers pull messages and track offsets. Messages persist after reading. High-throughput (millions msg/sec), event sourcing, stream processing.\n• RabbitMQ: Traditional broker with flexible exchange routing (direct, topic, fanout, headers). Pushes messages to consumers. Messages are acknowledged and deleted from queue. Ideal for complex microservice task routing.",
+                    HighYieldKeywords = "Commit Log, Consumer Offsets, Partitions, AMQP, Acknowledgments, Event Sourcing",
+                    Frequency = "Very High"
+                },
+                new CoreCsTopic
+                {
+                    Subject = CsSubject.SystemDesignBasics,
+                    Question = "API Rate Limiting: Token Bucket vs Leaky Bucket vs Sliding Window Log.",
+                    ShortAnswer = "Token bucket allows controlled traffic bursts; Leaky bucket enforces smooth constant outflow rate; Sliding window prevents edge-boundary spikes.",
+                    DetailedExplanation = "• Token Bucket: Tokens refilled into bucket at constant rate r up to capacity b. Each request consumes 1 token. Allows bursts up to b, then throttles. Standard choice (AWS, Redis, Stripe).\n• Leaky Bucket: Requests enter FIFO buffer and leak out at fixed rate. Smooths out traffic, but drops requests if queue fills.\n• Fixed Window Counter: Resets count per minute (e.g. 100 req/min). Flaw: 100 requests at 0:59 + 100 at 1:01 = 200 requests in 2 seconds.\n• Sliding Window Log: Stores timestamps of requests in Redis Sorted Set (ZSET). Accurately trims expired timestamps.",
+                    HighYieldKeywords = "Token Bucket, Leaky Bucket, Redis ZSET, 429 Too Many Requests, Burst Capacity",
+                    Frequency = "High"
                 }
             };
         }

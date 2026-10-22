@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Shapes;
 
 namespace MyTodo.Controls
 {
     /// <summary>
     /// Custom LeetCode/GitHub-style consistency heatmap control.
-    /// Renders 7 rows (days of week) across weeks with gold gradient intensity.
+    /// High-performance frozen brush rendering with Terminal Emerald &amp; Cyan cyber gradient.
     /// </summary>
     public class ActivityHeatmap : UserControl
     {
@@ -32,6 +31,31 @@ namespace MyTodo.Controls
         }
 
         private readonly Grid _containerGrid = new();
+
+        // Cached frozen brushes for 60+ FPS zero-overhead rendering
+        private static readonly SolidColorBrush FutureDateBrush;
+        private static readonly SolidColorBrush EmptyDayBrush;
+        private static readonly SolidColorBrush Level1Brush; // Light Emerald
+        private static readonly SolidColorBrush Level2Brush; // Medium Emerald
+        private static readonly SolidColorBrush Level3Brush; // Cyber Cyan / High Momentum
+
+        static ActivityHeatmap()
+        {
+            FutureDateBrush = new SolidColorBrush(Color.FromArgb(15, 148, 163, 184)); // Dim slate
+            FutureDateBrush.Freeze();
+
+            EmptyDayBrush = new SolidColorBrush(Color.FromArgb(20, 255, 255, 255)); // Translucent cell
+            EmptyDayBrush.Freeze();
+
+            Level1Brush = new SolidColorBrush(Color.FromArgb(85, 255, 255, 255)); // Frosted White L1
+            Level1Brush.Freeze();
+
+            Level2Brush = new SolidColorBrush(Color.FromArgb(165, 255, 255, 255)); // Frosted White L2
+            Level2Brush.Freeze();
+
+            Level3Brush = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255)); // Pure White L3
+            Level3Brush.Freeze();
+        }
 
         public ActivityHeatmap()
         {
@@ -64,7 +88,6 @@ namespace MyTodo.Controls
             }
 
             var today = DateTime.Today;
-            // Find current week's Sunday as end boundary
             int daysSinceMonday = ((int)today.DayOfWeek + 6) % 7;
             var startMonday = today.AddDays(-daysSinceMonday).AddDays(-(weeksToShow - 1) * 7);
 
@@ -81,7 +104,7 @@ namespace MyTodo.Controls
                     {
                         Width = 10,
                         Height = 10,
-                        CornerRadius = new CornerRadius(2),
+                        CornerRadius = new CornerRadius(2.5),
                         Margin = new Thickness(2),
                         HorizontalAlignment = HorizontalAlignment.Center,
                         VerticalAlignment = VerticalAlignment.Center
@@ -89,8 +112,7 @@ namespace MyTodo.Controls
 
                     if (cellDate > today)
                     {
-                        // Future date: very dim outline
-                        rect.Background = new SolidColorBrush(Color.FromArgb(10, 212, 175, 55));
+                        rect.Background = FutureDateBrush;
                         rect.ToolTip = $"{cellDate:MMM dd, yyyy} (Future)";
                     }
                     else
@@ -100,23 +122,23 @@ namespace MyTodo.Controls
 
                         if (score <= 0)
                         {
-                            rect.Background = new SolidColorBrush(Color.FromArgb(25, 212, 175, 55));
-                            rect.ToolTip = $"{cellDate:MMM dd, yyyy}: No recorded placement activity";
+                            rect.Background = EmptyDayBrush;
+                            rect.ToolTip = $"{cellDate:MMM dd, yyyy}: No recorded practice";
                         }
                         else if (score < 40)
                         {
-                            rect.Background = new SolidColorBrush(Color.FromArgb(90, 212, 175, 55));
+                            rect.Background = Level1Brush;
                             rect.ToolTip = $"{cellDate:MMM dd, yyyy}: 1-2 problems / reviews";
                         }
                         else if (score < 80)
                         {
-                            rect.Background = new SolidColorBrush(Color.FromArgb(180, 212, 175, 55));
-                            rect.ToolTip = $"{cellDate:MMM dd, yyyy}: Solid practice (3-4 items)";
+                            rect.Background = Level2Brush;
+                            rect.ToolTip = $"{cellDate:MMM dd, yyyy}: Solid practice session (3-4 items)";
                         }
                         else
                         {
-                            rect.Background = new SolidColorBrush(Color.FromRgb(255, 215, 0)); // Bright Gold
-                            rect.ToolTip = $"{cellDate:MMM dd, yyyy}: High Momentum Day! 🔥";
+                            rect.Background = Level3Brush;
+                            rect.ToolTip = $"{cellDate:MMM dd, yyyy}: Peak activity day";
                         }
                     }
 

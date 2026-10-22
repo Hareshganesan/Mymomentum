@@ -2,13 +2,12 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 
 namespace MyTodo.Controls
 {
     /// <summary>
-    /// Premium animated circular progress with gold styling and glow effects.
+    /// High-performance animated circular progress with cyber indigo/cyan gradient styling.
     /// </summary>
     public class CircularProgress : UserControl
     {
@@ -20,7 +19,7 @@ namespace MyTodo.Controls
 
         public static readonly DependencyProperty StrokeThicknessProperty =
             DependencyProperty.Register(nameof(StrokeThickness), typeof(double), typeof(CircularProgress),
-                new PropertyMetadata(8.0, OnPropertyChangedRefresh));
+                new PropertyMetadata(6.0, OnPropertyChangedRefresh));
 
         public static readonly DependencyProperty ProgressColorProperty =
             DependencyProperty.Register(nameof(ProgressColor), typeof(Brush), typeof(CircularProgress),
@@ -28,7 +27,7 @@ namespace MyTodo.Controls
 
         public static readonly DependencyProperty TrackColorProperty =
             DependencyProperty.Register(nameof(TrackColor), typeof(Brush), typeof(CircularProgress),
-                new PropertyMetadata(new SolidColorBrush(Color.FromRgb(26, 26, 34)), OnPropertyChangedRefresh));
+                new PropertyMetadata(null, OnPropertyChangedRefresh));
 
         public double Value
         {
@@ -59,12 +58,23 @@ namespace MyTodo.Controls
         private Path _progressPath = null!;
         private Path _trackPath = null!;
         private Grid _container = null!;
-        private double _animatedValue = 0;
 
-        // Gold gradient colors
-        private static readonly Color GoldDark = Color.FromRgb(184, 134, 11);
-        private static readonly Color GoldPrimary = Color.FromRgb(212, 175, 55);
-        private static readonly Color GoldLight = Color.FromRgb(255, 215, 0);
+        // Monochrome Frosted White / Platinum gradient colors (No purple/blue)
+        private static readonly Color WhiteColor = Color.FromArgb(255, 255, 255, 255);
+        private static readonly Color PlatinumColor = Color.FromArgb(180, 255, 255, 255);
+        private static readonly SolidColorBrush DefaultTrackBrush;
+        private static readonly LinearGradientBrush DefaultGradientBrush;
+
+        static CircularProgress()
+        {
+            DefaultTrackBrush = new SolidColorBrush(Color.FromArgb(35, 255, 255, 255)); // Translucent white track
+            DefaultTrackBrush.Freeze();
+
+            DefaultGradientBrush = new LinearGradientBrush(
+                WhiteColor, PlatinumColor,
+                new Point(0, 0), new Point(1, 1));
+            DefaultGradientBrush.Freeze();
+        }
 
         public CircularProgress()
         {
@@ -75,40 +85,35 @@ namespace MyTodo.Controls
         {
             _container = new Grid();
 
-            // Track (background circle)
             _trackPath = new Path
             {
                 StrokeThickness = StrokeThickness,
                 StrokeStartLineCap = PenLineCap.Round,
                 StrokeEndLineCap = PenLineCap.Round,
+                Stroke = DefaultTrackBrush
             };
 
-            // Progress arc with gradient
             _progressPath = new Path
             {
                 StrokeThickness = StrokeThickness,
                 StrokeStartLineCap = PenLineCap.Round,
                 StrokeEndLineCap = PenLineCap.Round,
+                Stroke = DefaultGradientBrush
             };
 
             _container.Children.Add(_trackPath);
             _container.Children.Add(_progressPath);
             Content = _container;
 
-            SizeChanged += OnSizeChanged;
-            Loaded += (s, e) => AnimateToValue(Value);
-        }
-
-        private void OnSizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            UpdateVisual();
+            SizeChanged += (s, e) => UpdateVisual();
+            Loaded += (s, e) => UpdateVisual();
         }
 
         private static void OnValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is CircularProgress cp)
             {
-                cp.AnimateToValue((double)e.NewValue);
+                cp.UpdateVisual();
             }
         }
 
@@ -120,55 +125,18 @@ namespace MyTodo.Controls
             }
         }
 
-        private void AnimateToValue(double targetValue)
-        {
-            var animation = new DoubleAnimation
-            {
-                From = _animatedValue,
-                To = targetValue,
-                Duration = TimeSpan.FromMilliseconds(800),
-                EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
-            };
-
-            animation.CurrentTimeInvalidated += (s, e) =>
-            {
-                if (s is AnimationClock clock && clock.CurrentProgress.HasValue)
-                {
-                    _animatedValue = _animatedValue + (targetValue - _animatedValue) * clock.CurrentProgress.Value;
-                    UpdateVisual();
-                }
-            };
-
-            animation.Completed += (s, e) =>
-            {
-                _animatedValue = targetValue;
-                UpdateVisual();
-            };
-
-            var storyboard = new Storyboard();
-            storyboard.Children.Add(animation);
-            Storyboard.SetTarget(animation, this);
-            Storyboard.SetTargetProperty(animation, new PropertyPath("(UIElement.Opacity)"));
-            
-            // Manual animation since we're updating visual
-            _animatedValue = targetValue;
-            UpdateVisual();
-        }
-
         private void UpdateVisual()
         {
             if (ActualWidth <= 0 || ActualHeight <= 0) return;
 
             var size = Math.Min(ActualWidth, ActualHeight);
-            var radius = (size - StrokeThickness) / 2;
+            var radius = Math.Max(1, (size - StrokeThickness) / 2);
             var center = new Point(size / 2, size / 2);
 
-            // Update track
-            _trackPath.Stroke = TrackColor;
+            _trackPath.Stroke = TrackColor ?? DefaultTrackBrush;
             _trackPath.StrokeThickness = StrokeThickness;
             _trackPath.Data = new EllipseGeometry(center, radius, radius);
 
-            // Update progress arc
             var clampedValue = Math.Max(0, Math.Min(100, Value));
             if (clampedValue > 0)
             {
@@ -176,30 +144,10 @@ namespace MyTodo.Controls
                 var startAngle = -90.0;
                 var endAngle = startAngle + angle;
 
-                // Use gold gradient if no custom color
-                if (ProgressColor != null)
-                {
-                    _progressPath.Stroke = ProgressColor;
-                }
-                else
-                {
-                    _progressPath.Stroke = new LinearGradientBrush(
-                        GoldDark, GoldLight, 
-                        new Point(0, 0), new Point(1, 1));
-                }
-                
+                _progressPath.Stroke = ProgressColor ?? DefaultGradientBrush;
                 _progressPath.StrokeThickness = StrokeThickness;
                 _progressPath.Data = CreateArc(center, radius, startAngle, endAngle);
                 _progressPath.Visibility = Visibility.Visible;
-
-                // Gold glow effect
-                _progressPath.Effect = new System.Windows.Media.Effects.DropShadowEffect
-                {
-                    BlurRadius = 20,
-                    ShadowDepth = 0,
-                    Color = GoldPrimary,
-                    Opacity = 0.6
-                };
             }
             else
             {

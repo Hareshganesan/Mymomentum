@@ -25,7 +25,7 @@ namespace MyTodo.Controls
 
         public static readonly DependencyProperty IconProperty =
             DependencyProperty.Register(nameof(Icon), typeof(string), typeof(StatCard),
-                new PropertyMetadata("📊", OnPropertyChanged));
+                new PropertyMetadata(string.Empty, OnPropertyChanged));
 
         public static readonly DependencyProperty AccentColorProperty =
             DependencyProperty.Register(nameof(AccentColor), typeof(Color), typeof(StatCard),

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -96,37 +96,48 @@ namespace MyTodo.Models
             set { _isFlipped = value; OnPropertyChanged(); }
         }
 
-        public string MasteredDisplay => IsMastered ? "Mastered ✓" : "Needs Review";
+        public string MasteredDisplay => IsMastered ? "Mastered" : "Needs Review";
 
-        public string SubjectDisplay => Subject switch
+        public string SubjectDisplay
         {
-            CsSubject.OperatingSystems => "Operating Systems",
-            CsSubject.DBMS => "DBMS & SQL",
-            CsSubject.ComputerNetworks => "Computer Networks",
-            CsSubject.OOPAndDesignPatterns => "OOP & Design Patterns",
-            CsSubject.SystemDesignBasics => "System Design / LLD",
-            _ => Subject.ToString()
-        };
+            get => Subject switch
+            {
+                CsSubject.OperatingSystems => "Operating Systems",
+                CsSubject.DBMS => "DBMS & SQL",
+                CsSubject.ComputerNetworks => "Computer Networks",
+                CsSubject.OOPAndDesignPatterns => "OOP & Design Patterns",
+                CsSubject.SystemDesignBasics => "System Design / LLD",
+                _ => Subject.ToString()
+            };
+            set { }
+        }
 
-        public string SubjectEmoji => Subject switch
+        public string SubjectEmoji
         {
-            CsSubject.OperatingSystems => "🖥️",
-            CsSubject.DBMS => "🗄️",
-            CsSubject.ComputerNetworks => "🌐",
-            CsSubject.OOPAndDesignPatterns => "🧱",
-            CsSubject.SystemDesignBasics => "🏗️",
-            _ => "📚"
-        };
-
-        public string SubjectColor => Subject switch
+            get => Subject switch
+            {
+                CsSubject.OperatingSystems => "OS",
+                CsSubject.DBMS => "DBMS",
+                CsSubject.ComputerNetworks => "CN",
+                CsSubject.OOPAndDesignPatterns => "OOP",
+                CsSubject.SystemDesignBasics => "SYS",
+                _ => "CS"
+            };
+            set { }
+        }
+        public string SubjectColor
         {
-            CsSubject.OperatingSystems => "#38BDF8",       // Sky Blue
-            CsSubject.DBMS => "#A78BFA",                   // Purple
-            CsSubject.ComputerNetworks => "#F472B6",       // Pink
-            CsSubject.OOPAndDesignPatterns => "#34D399",   // Emerald
-            CsSubject.SystemDesignBasics => "#FBBF24",     // Amber
-            _ => "#D4AF37"
-        };
+            get => Subject switch
+            {
+                CsSubject.OperatingSystems => "#CBD5E1",       // Platinum
+                CsSubject.DBMS => "#E2E8F0",                   // Silver
+                CsSubject.ComputerNetworks => "#FFFFFF",       // White
+                CsSubject.OOPAndDesignPatterns => "#F1F5F9",   // Ghost White
+                CsSubject.SystemDesignBasics => "#94A3B8",     // Slate
+                _ => "#E2E8F0"
+            };
+            set { }
+        }
 
         public event PropertyChangedEventHandler? PropertyChanged;
         protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)

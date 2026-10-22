@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -189,7 +189,7 @@ namespace MyTodo.Models
                 if (!NextReviewDate.HasValue) return "No review scheduled";
                 var days = (NextReviewDate.Value.Date - DateTime.Today).Days;
                 if (days < 0) return $"Overdue by {Math.Abs(days)}d";
-                if (days == 0) return "Due Today 🎯";
+                if (days == 0) return "Due Today";
                 if (days == 1) return "Due Tomorrow";
                 return $"Due in {days}d";
             }
@@ -197,12 +197,12 @@ namespace MyTodo.Models
 
         public string ConfidenceStars => ConfidenceLevel switch
         {
-            1 => "★☆☆☆☆ (Weak)",
-            2 => "★★☆☆☆ (Developing)",
-            3 => "★★★☆☆ (Comfortable)",
-            4 => "★★★★☆ (Strong)",
-            5 => "★★★★★ (Mastered)",
-            _ => "★★★☆☆"
+            1 => "Level 1 (Weak)",
+            2 => "Level 2 (Developing)",
+            3 => "Level 3 (Comfortable)",
+            4 => "Level 4 (Strong)",
+            5 => "Level 5 (Mastered)",
+            _ => "Level 3"
         };
 
         public string DifficultyDisplay => Difficulty switch
@@ -218,7 +218,7 @@ namespace MyTodo.Models
             ProblemDifficulty.Easy => "#4ADE80",   // Green
             ProblemDifficulty.Medium => "#FBBF24", // Yellow/Amber
             ProblemDifficulty.Hard => "#EF4444",   // Red
-            _ => "#D4AF37"
+            _ => "#E2E8F0"
         };
 
         public string StatusDisplay => Status switch
@@ -233,9 +233,9 @@ namespace MyTodo.Models
         public string StatusColor => Status switch
         {
             ProblemStatus.Unsolved => "#606068",
-            ProblemStatus.Solving => "#38BDF8",     // Sky Blue
-            ProblemStatus.Solved => "#4ADE80",      // Emerald Green
-            ProblemStatus.NeedsRevision => "#FB923C",// Orange
+            ProblemStatus.Solving => "#CBD5E1",     // Platinum
+            ProblemStatus.Solved => "#FFFFFF",      // Pure White
+            ProblemStatus.NeedsRevision => "#E2E8F0",// Silver
             _ => "#606068"
         };
 

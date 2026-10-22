@@ -18,16 +18,16 @@ namespace MyTodo.ViewModels
     /// </summary>
     public enum AppPage
     {
-        Home,         // 🏠 Momentum & Daily Placement Cockpit
-        DsaVault,     // 🧩 DSA Problem Bank, Pattern Matrix & Spaced Repetition
-        CoreCs,       // 📚 Core CS & System Design Flashcards
-        Companies,    // 💼 Placement Drive Kanban Pipeline
-        MockArena,    // ⏱️ Mock OA & Timed Code Sprint Arena
-        Behavioral,   // 👔 STAR Behavioral & HR Interview Vault
-        Analytics,    // 📊 Placement Readiness Matrix & Heatmap
-        Achievements, // 🏆 SDE Placement Badges
-        History,      // 📖 History & Reflections
-        Settings      // ⚙ Settings
+        Home,         // Momentum & Daily Placement Cockpit
+        DsaVault,     // DSA Problem Bank, Pattern Matrix & Spaced Repetition
+        CoreCs,       // Core CS & System Design Flashcards
+        Companies,    // Placement Drive Kanban Pipeline
+        MockArena,    // Mock OA & Timed Code Sprint Arena
+        Behavioral,   // STAR Behavioral & HR Interview Vault
+        Analytics,    // Placement Readiness Matrix & Heatmap
+        Achievements, // SDE Placement Badges
+        History,      // History & Reflections
+        Settings      // Settings
     }
 
     /// <summary>
@@ -183,11 +183,26 @@ namespace MyTodo.ViewModels
             ApplyDsaFilter();
             ApplyCoreCsFilter();
             UpdateDueReviewProblems();
+            RefreshKanbanProperties();
             UpdateMotivationalMessage();
             CheckStreakStatus();
             CheckDailyCheckInStatus();
             UpdateBadges();
             RecalculateReadinessScore();
+            InitializeAutoSaveTimer();
+            SaveData();
+        }
+
+        private DispatcherTimer? _autoSaveTimer;
+
+        private void InitializeAutoSaveTimer()
+        {
+            _autoSaveTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(15)
+            };
+            _autoSaveTimer.Tick += (s, e) => SaveData();
+            _autoSaveTimer.Start();
         }
 
         #endregion
@@ -269,11 +284,11 @@ namespace MyTodo.ViewModels
 
         public string ReadinessRank => PlacementReadinessScore switch
         {
-            >= 85 => "Dream Offer Material 👑",
-            >= 70 => "SDE Interview Ready 🚀",
-            >= 50 => "OA Ready Contender ⚡",
-            >= 25 => "Pattern Apprentice 🎯",
-            _ => "Novice Coder 🐣"
+            >= 85 => "Interview Ready",
+            >= 70 => "Advanced Candidate",
+            >= 50 => "Assessment Ready",
+            >= 25 => "Intermediate Level",
+            _ => "Foundation Stage"
         };
 
         public int TotalDsaSolved => DsaProblems.Count(p => p.Status == ProblemStatus.Solved);
@@ -302,14 +317,13 @@ namespace MyTodo.ViewModels
                 if (upcoming != null && upcoming.UpcomingEventDate.HasValue)
                 {
                     var days = (upcoming.UpcomingEventDate.Value.Date - DateTime.Today).Days;
-                    if (days == 0) return $"⚡ {upcoming.CompanyName} {upcoming.UpcomingEventTitle} is TODAY!";
-                    if (days == 1) return $"⚡ {upcoming.CompanyName} {upcoming.UpcomingEventTitle} is Tomorrow!";
-                    return $"⚡ {upcoming.CompanyName} {upcoming.UpcomingEventTitle} in {days} days";
+                    if (days == 0) return $"{upcoming.CompanyName}: {upcoming.UpcomingEventTitle} scheduled for Today";
+                    if (days == 1) return $"{upcoming.CompanyName}: {upcoming.UpcomingEventTitle} scheduled for Tomorrow";
+                    return $"{upcoming.CompanyName}: {upcoming.UpcomingEventTitle} in {days} days";
                 }
-                return "🎯 Consistent daily practice unlocks the dream offer!";
+                return "Daily placement preparation schedule active";
             }
         }
-
         public Dictionary<string, double> HeatmapActivityData => _dailyCompletionHistory;
 
         #endregion
@@ -378,10 +392,10 @@ namespace MyTodo.ViewModels
 
         public string NewTaskEnergyEmoji => NewTaskEnergy switch
         {
-            EnergyTag.Deep => "🧠",
-            EnergyTag.Quick => "⚡",
-            EnergyTag.LowEnergy => "😴",
-            _ => "⚡"
+            EnergyTag.Deep => "Deep",
+            EnergyTag.Quick => "Quick",
+            EnergyTag.LowEnergy => "Light",
+            _ => "Standard"
         };
 
         public string EnergySuggestion
@@ -393,15 +407,14 @@ namespace MyTodo.ViewModels
                 var quickWins = TodayTasks.Count(t => !t.IsCompleted && t.EnergyTag == EnergyTag.Quick);
 
                 if (hour >= 6 && hour < 13 && deepWork > 0)
-                    return $"🧠 Morning focus: {deepWork} deep work problem{(deepWork > 1 ? "s" : "")} waiting!";
+                    return $"Morning focus: {deepWork} deep work problem{(deepWork > 1 ? "s" : "")} remaining.";
                 if (hour >= 13 && hour < 17 && quickWins > 0)
-                    return $"⚡ Midday momentum: Knock out {quickWins} quick win{(quickWins > 1 ? "s" : "")}!";
+                    return $"Afternoon session: {quickWins} targeted problem{(quickWins > 1 ? "s" : "")} remaining.";
                 if (hour >= 18)
-                    return "🌙 Evening reflection: Revise 3 Core CS cards before wrapping up!";
-                return "🔥 Keep the streak burning! One step closer to placement!";
+                    return "Evening review: Revise computer science concepts and summarize notes.";
+                return "Daily targets active. Maintain problem solving consistency.";
             }
         }
-
         public double TodayProgress
         {
             get
@@ -425,12 +438,11 @@ namespace MyTodo.ViewModels
             get
             {
                 var hour = DateTime.Now.Hour;
-                if (hour < 12) return "Good Morning, SDE Aspirant! ☀️";
-                if (hour < 17) return "Good Afternoon, Future Engineer! ⚡";
-                return "Good Evening, Code Crusher! 🌙";
+                if (hour < 12) return "Good Morning";
+                if (hour < 17) return "Good Afternoon";
+                return "Good Evening";
             }
         }
-
         public string TodayDateFormatted => DateTime.Now.ToString("dddd, MMMM d");
 
         #endregion
@@ -476,9 +488,8 @@ namespace MyTodo.ViewModels
         }
 
         public string StreakStatusText => StreakPaused
-            ? $"⏸️ Streak paused ({PausedStreakValue} days saved)"
-            : $"🔥 {CurrentStreak} day streak";
-
+            ? $"Streak paused ({PausedStreakValue} days saved)"
+            : $"{CurrentStreak} Day Streak";
         public bool ShowMorningCheckIn
         {
             get => _showMorningCheckIn;
@@ -616,6 +627,48 @@ namespace MyTodo.ViewModels
 
         #region Core CS Properties
 
+        private int _currentFlashcardIndex;
+        private bool _isStudyDeckMode = true;
+
+        public bool IsStudyDeckMode
+        {
+            get => _isStudyDeckMode;
+            set { _isStudyDeckMode = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsAllCardsMode)); }
+        }
+
+        public bool IsAllCardsMode => !IsStudyDeckMode;
+
+        public int CurrentFlashcardIndex
+        {
+            get => _currentFlashcardIndex;
+            set
+            {
+                if (FilteredCoreCsQuestions.Count == 0)
+                {
+                    _currentFlashcardIndex = 0;
+                }
+                else
+                {
+                    if (value < 0) _currentFlashcardIndex = FilteredCoreCsQuestions.Count - 1;
+                    else if (value >= FilteredCoreCsQuestions.Count) _currentFlashcardIndex = 0;
+                    else _currentFlashcardIndex = value;
+                }
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(CurrentFlashcard));
+                OnPropertyChanged(nameof(FlashcardProgressText));
+            }
+        }
+
+        public CoreCsTopic? CurrentFlashcard =>
+            FilteredCoreCsQuestions.Count > 0 && CurrentFlashcardIndex >= 0 && CurrentFlashcardIndex < FilteredCoreCsQuestions.Count
+                ? FilteredCoreCsQuestions[CurrentFlashcardIndex]
+                : null;
+
+        public string FlashcardProgressText =>
+            FilteredCoreCsQuestions.Count > 0
+                ? $"Card {CurrentFlashcardIndex + 1} of {FilteredCoreCsQuestions.Count}"
+                : "0 / 0 Cards";
+
         public string CoreCsSearchText
         {
             get => _coreCsSearchText;
@@ -676,7 +729,7 @@ namespace MyTodo.ViewModels
 
         // Kanban Pipeline Collections
         public IEnumerable<CompanyApplication> WishlistApplications => CompanyApplications.Where(a => a.Stage == DriveStage.Wishlist);
-        public IEnumerable<CompanyApplication> AppliedApplications => CompanyApplications.Where(a => a.Stage == DriveStage.Applied);
+        public IEnumerable<CompanyApplication> AppliedApplications => CompanyApplications.Where(a => a.Stage == DriveStage.Applied || a.Stage == DriveStage.Wishlist);
         public IEnumerable<CompanyApplication> OaApplications => CompanyApplications.Where(a => a.Stage == DriveStage.OnlineAssessment);
         public IEnumerable<CompanyApplication> TechnicalApplications => CompanyApplications.Where(a => a.Stage == DriveStage.TechnicalRound);
         public IEnumerable<CompanyApplication> HrApplications => CompanyApplications.Where(a => a.Stage == DriveStage.HrRound);
@@ -798,7 +851,7 @@ namespace MyTodo.ViewModels
             }
         }
 
-        public string LeetCodeSyncButtonText => IsLeetCodeSyncing ? "Syncing..." : "Sync LeetCode ⚡";
+        public string LeetCodeSyncButtonText => IsLeetCodeSyncing ? "Syncing..." : "Sync LeetCode";
 
         public string LeetCodeStatusMessage
         {
@@ -911,6 +964,13 @@ namespace MyTodo.ViewModels
         // Core CS Commands
         public ICommand ToggleFlashcardAnswerCommand { get; private set; } = null!;
         public ICommand ToggleCoreCsMasteredCommand { get; private set; } = null!;
+        public ICommand FlipCurrentFlashcardCommand { get; private set; } = null!;
+        public ICommand NextFlashcardCommand { get; private set; } = null!;
+        public ICommand PreviousFlashcardCommand { get; private set; } = null!;
+        public ICommand ShuffleFlashcardsCommand { get; private set; } = null!;
+        public ICommand ToggleStudyDeckModeCommand { get; private set; } = null!;
+        public ICommand MarkCurrentMasteredCommand { get; private set; } = null!;
+        public ICommand MarkCurrentNeedsReviewCommand { get; private set; } = null!;
 
         // Kanban Commands
         public ICommand AddCompanyCommand { get; private set; } = null!;
@@ -1115,9 +1175,73 @@ namespace MyTodo.ViewModels
                 if (card != null)
                 {
                     card.IsMastered = !card.IsMastered;
-                    if (card.IsMastered) RecordDailyActivity(15);
+                    if (card.IsMastered)
+                    {
+                        RecordDailyActivity(15);
+                        TriggerConfetti();
+                    }
                     RecalculateReadinessScore();
                     SaveData();
+                }
+            });
+            FlipCurrentFlashcardCommand = new RelayCommand(() =>
+            {
+                if (CurrentFlashcard != null)
+                {
+                    CurrentFlashcard.IsFlipped = !CurrentFlashcard.IsFlipped;
+                }
+            });
+            NextFlashcardCommand = new RelayCommand(() =>
+            {
+                if (CurrentFlashcard != null) CurrentFlashcard.IsFlipped = false;
+                CurrentFlashcardIndex++;
+            });
+            PreviousFlashcardCommand = new RelayCommand(() =>
+            {
+                if (CurrentFlashcard != null) CurrentFlashcard.IsFlipped = false;
+                CurrentFlashcardIndex--;
+            });
+            ShuffleFlashcardsCommand = new RelayCommand(() =>
+            {
+                if (FilteredCoreCsQuestions.Count > 1)
+                {
+                    var rng = new Random();
+                    var list = FilteredCoreCsQuestions.OrderBy(_ => rng.Next()).ToList();
+                    FilteredCoreCsQuestions.Clear();
+                    foreach (var item in list)
+                    {
+                        item.IsFlipped = false;
+                        FilteredCoreCsQuestions.Add(item);
+                    }
+                    CurrentFlashcardIndex = 0;
+                }
+            });
+            ToggleStudyDeckModeCommand = new RelayCommand(() =>
+            {
+                IsStudyDeckMode = !IsStudyDeckMode;
+            });
+            MarkCurrentMasteredCommand = new RelayCommand(() =>
+            {
+                if (CurrentFlashcard != null)
+                {
+                    CurrentFlashcard.IsMastered = true;
+                    RecordDailyActivity(15);
+                    TriggerConfetti();
+                    RecalculateReadinessScore();
+                    SaveData();
+                    if (CurrentFlashcard != null) CurrentFlashcard.IsFlipped = false;
+                    CurrentFlashcardIndex++;
+                }
+            });
+            MarkCurrentNeedsReviewCommand = new RelayCommand(() =>
+            {
+                if (CurrentFlashcard != null)
+                {
+                    CurrentFlashcard.IsMastered = false;
+                    RecalculateReadinessScore();
+                    SaveData();
+                    if (CurrentFlashcard != null) CurrentFlashcard.IsFlipped = false;
+                    CurrentFlashcardIndex++;
                 }
             });
 
@@ -1536,7 +1660,7 @@ namespace MyTodo.ViewModels
                     if (newlySolvedCount > 0)
                     {
                         TriggerConfetti();
-                        LeetCodeStatusMessage = $"Synced! Connected as @{LeetCodeUsername}. Found {newlySolvedCount} newly solved problems from your profile! 🚀";
+                        LeetCodeStatusMessage = $"Synced! Connected as @{LeetCodeUsername}. Found {newlySolvedCount} newly solved problems from your profile.";
                     }
                     else
                     {
@@ -1593,15 +1717,15 @@ namespace MyTodo.ViewModels
             {
                 var term = CoreCsSearchText.Trim().ToLower();
                 query = query.Where(q =>
-                    q.Question.ToLower().Contains(term) ||
-                    q.ShortAnswer.ToLower().Contains(term) ||
-                    q.DetailedExplanation.ToLower().Contains(term) ||
-                    q.HighYieldKeywords.ToLower().Contains(term));
+                    (!string.IsNullOrEmpty(q.Question) && q.Question.ToLower().Contains(term)) ||
+                    (!string.IsNullOrEmpty(q.ShortAnswer) && q.ShortAnswer.ToLower().Contains(term)) ||
+                    (!string.IsNullOrEmpty(q.DetailedExplanation) && q.DetailedExplanation.ToLower().Contains(term)) ||
+                    (!string.IsNullOrEmpty(q.HighYieldKeywords) && q.HighYieldKeywords.ToLower().Contains(term)));
             }
 
             if (!string.IsNullOrWhiteSpace(SelectedCoreCsSubjectFilter) && SelectedCoreCsSubjectFilter != "All Subjects")
             {
-                query = query.Where(q => q.SubjectDisplay.Equals(SelectedCoreCsSubjectFilter, StringComparison.OrdinalIgnoreCase) ||
+                query = query.Where(q => (!string.IsNullOrEmpty(q.SubjectDisplay) && q.SubjectDisplay.Equals(SelectedCoreCsSubjectFilter, StringComparison.OrdinalIgnoreCase)) ||
                                          q.Subject.ToString().Equals(SelectedCoreCsSubjectFilter, StringComparison.OrdinalIgnoreCase));
             }
 
@@ -1609,6 +1733,10 @@ namespace MyTodo.ViewModels
             {
                 FilteredCoreCsQuestions.Add(item);
             }
+
+            CurrentFlashcardIndex = 0;
+            OnPropertyChanged(nameof(CurrentFlashcard));
+            OnPropertyChanged(nameof(FlashcardProgressText));
         }
 
         #endregion
@@ -1762,19 +1890,18 @@ namespace MyTodo.ViewModels
             int offers = OffersCount;
             double score = PlacementReadinessScore;
 
-            AllBadges.Add(new BadgeInfo { Emoji = "🎯", Name = "First Blood", Description = "Complete your first task or problem", IsUnlocked = TotalTasksCompleted > 0 || solved > 0 });
-            AllBadges.Add(new BadgeInfo { Emoji = "⚡", Name = "Array & Two Pointers", Description = "Solve 5 Array/Two Pointer problems", IsUnlocked = solved >= 5 });
-            AllBadges.Add(new BadgeInfo { Emoji = "🌲", Name = "Tree & Graph Master", Description = "Solve 10 Tree or Graph problems", IsUnlocked = solved >= 10 });
-            AllBadges.Add(new BadgeInfo { Emoji = "👑", Name = "DP Conqueror", Description = "Master 15 high-frequency DSA patterns", IsUnlocked = solved >= 15 });
-            AllBadges.Add(new BadgeInfo { Emoji = "🧠", Name = "CS Core Scholar", Description = "Master 5 Core CS / OS / SQL cards", IsUnlocked = csMastered >= 5 });
-            AllBadges.Add(new BadgeInfo { Emoji = "💼", Name = "Placement Hustler", Description = "Track 3 active campus drives in Kanban", IsUnlocked = apps >= 3 });
-            AllBadges.Add(new BadgeInfo { Emoji = "⏱️", Name = "OA Arena Veteran", Description = "Complete 1 timed mock OA sprint", IsUnlocked = mockCount >= 1 });
-            AllBadges.Add(new BadgeInfo { Emoji = "🔥", Name = "Week of Steel", Description = "Maintain a 7-day preparation streak", IsUnlocked = BestStreak >= 7 || CurrentStreak >= 7 });
-            AllBadges.Add(new BadgeInfo { Emoji = "🚀", Name = "Interview Ready", Description = "Reach 70% Placement Readiness score", IsUnlocked = score >= 70 });
-            AllBadges.Add(new BadgeInfo { Emoji = "🏆", Name = "The Dream Offer!", Description = "Secure an SDE placement offer", IsUnlocked = offers >= 1 });
-            AllBadges.Add(new BadgeInfo { Emoji = "🎖️", Name = "Unstoppable", Description = "Solve 25+ DSA problems", IsUnlocked = solved >= 25 });
-            AllBadges.Add(new BadgeInfo { Emoji = "🧘", Name = "Deep Work Pro", Description = "Complete 50 total tasks & sessions", IsUnlocked = TotalTasksCompleted >= 50 });
-
+            AllBadges.Add(new BadgeInfo { Emoji = "01", Name = "First Solved", Description = "Complete your first task or problem", IsUnlocked = TotalTasksCompleted > 0 || solved > 0 });
+            AllBadges.Add(new BadgeInfo { Emoji = "05", Name = "Arrays & Pointers", Description = "Solve 5 Array/Two Pointer problems", IsUnlocked = solved >= 5 });
+            AllBadges.Add(new BadgeInfo { Emoji = "10", Name = "Trees & Graphs", Description = "Solve 10 Tree or Graph problems", IsUnlocked = solved >= 10 });
+            AllBadges.Add(new BadgeInfo { Emoji = "15", Name = "Dynamic Programming", Description = "Master 15 high-frequency DSA patterns", IsUnlocked = solved >= 15 });
+            AllBadges.Add(new BadgeInfo { Emoji = "CS", Name = "Computer Science", Description = "Master 5 Core CS / OS / SQL cards", IsUnlocked = csMastered >= 5 });
+            AllBadges.Add(new BadgeInfo { Emoji = "KB", Name = "Pipeline Tracking", Description = "Track 3 active campus drives in Kanban", IsUnlocked = apps >= 3 });
+            AllBadges.Add(new BadgeInfo { Emoji = "OA", Name = "Mock Assessment", Description = "Complete 1 timed mock OA sprint", IsUnlocked = mockCount >= 1 });
+            AllBadges.Add(new BadgeInfo { Emoji = "7D", Name = "Weekly Cadence", Description = "Maintain a 7-day preparation streak", IsUnlocked = BestStreak >= 7 || CurrentStreak >= 7 });
+            AllBadges.Add(new BadgeInfo { Emoji = "70%", Name = "Assessment Ready", Description = "Reach 70% Placement Readiness score", IsUnlocked = score >= 70 });
+            AllBadges.Add(new BadgeInfo { Emoji = "OFFER", Name = "Placement Secured", Description = "Secure an SDE placement offer", IsUnlocked = offers >= 1 });
+            AllBadges.Add(new BadgeInfo { Emoji = "25+", Name = "Pattern Mastery", Description = "Solve 25+ DSA problems", IsUnlocked = solved >= 25 });
+            AllBadges.Add(new BadgeInfo { Emoji = "50+", Name = "Execution Focus", Description = "Complete 50 total tasks & sessions", IsUnlocked = TotalTasksCompleted >= 50 });
             OnPropertyChanged(nameof(UnlockedBadgesCount));
             OnPropertyChanged(nameof(TotalBadges));
         }
@@ -1901,13 +2028,12 @@ namespace MyTodo.ViewModels
         {
             var quotes = new[]
             {
-                "The pain of debugging is temporary, the offer letter is forever 🚀",
-                "Consistency beats talent every single time. One problem at a time! 💪",
-                "Companies aren't looking for geniuses; they're looking for prepared engineers! ⚡",
-                "Master the patterns, not just the solutions! 🎯",
-                "Small daily disciplines compound into massive placement victories! 🏆"
-            };
-            var random = new Random();
+                "Focus on core principles: Time and space complexity, edge cases, and clean abstractions.",
+                "Systematic problem solving: Understand constraints, identify patterns, then implement.",
+                "Engineering excellence is built through deliberate daily practice.",
+                "Review past submissions to solidify algorithmic intuition and optimal patterns.",
+                "Maintain consistency across algorithmic problem solving, core computer science, and mock assessments."
+            };            var random = new Random();
             MotivationalMessage = quotes[random.Next(quotes.Length)];
         }
 
@@ -1933,7 +2059,14 @@ namespace MyTodo.ViewModels
 
             // Load Core CS
             CoreCsQuestions.Clear();
-            foreach (var card in data.CoreCsQuestions) CoreCsQuestions.Add(card);
+            if (data.CoreCsQuestions != null && data.CoreCsQuestions.Count > 0)
+            {
+                foreach (var card in data.CoreCsQuestions) CoreCsQuestions.Add(card);
+            }
+            else
+            {
+                foreach (var card in SeedDataService.GetCuratedCoreCsQuestions()) CoreCsQuestions.Add(card);
+            }
 
             // Load Applications
             CompanyApplications.Clear();

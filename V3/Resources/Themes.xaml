@@ -1,33 +1,36 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     
-    <!-- ============================================== -->
-    <!-- PREMIUM BLACK, GOLD & FROSTED GLASS THEME      -->
-    <!-- ============================================== -->
+    <!-- ======================================================= -->
+    <!-- PURE MONOCHROME TRANSLUCENT FROSTED GLASS DESIGN SYSTEM -->
+    <!-- Zero purple/blue. Translucent white, slate, and glass.  -->
+    <!-- Windows 11 Native Acrylic + Neutral Glassmorphism       -->
+    <!-- ======================================================= -->
     
-    <!-- Background Colors - Deep Space Black -->
-    <Color x:Key="DarkBackground">#FF07070D</Color>
-    <Color x:Key="DarkSurface">#FF0E0E16</Color>
-    <Color x:Key="DarkCard">#FF14141E</Color>
-    <Color x:Key="DarkCardHover">#FF1E1E2C</Color>
-    <Color x:Key="DarkBorder">#FF282838</Color>
+    <!-- Neutral Translucent Glass Palette -->
+    <Color x:Key="DarkBackground">#35000000</Color>      <!-- 21% Neutral Dark Smoke Glass -->
+    <Color x:Key="DarkSurface">#15FFFFFF</Color>         <!-- 8% Translucent White Glass Surface -->
+    <Color x:Key="DarkCard">#18FFFFFF</Color>            <!-- 9.5% Translucent Glass Card -->
+    <Color x:Key="DarkCardHover">#28FFFFFF</Color>       <!-- 16% Luminous White Hover -->
+    <Color x:Key="DarkBorder">#25FFFFFF</Color>          <!-- 1px Clean Crisp White Frosted Edge -->
     
-    <!-- Gold Accent Colors -->
-    <Color x:Key="GoldPrimary">#FFD4AF37</Color>
-    <Color x:Key="GoldLight">#FFFFD700</Color>
-    <Color x:Key="GoldDark">#FFB8860B</Color>
-    <Color x:Key="GoldMuted">#FF9E8765</Color>
+    <!-- Pure Monochrome Titanium & Silver Accents -->
+    <Color x:Key="GoldPrimary">#FFFFFFFF</Color>       <!-- Pure White -->
+    <Color x:Key="GoldLight">#FFE2E8F0</Color>         <!-- Silver White -->
+    <Color x:Key="GoldDark">#FF94A3B8</Color>          <!-- Cool Slate -->
+    <Color x:Key="GoldMuted">#FF94A3B8</Color>         <!-- Cool Slate Muted -->
     
-    <!-- Status Colors -->
-    <Color x:Key="StatusGreen">#FF4ADE80</Color>
-    <Color x:Key="StatusYellow">#FFFBBF24</Color>
-    <Color x:Key="StatusRed">#FFEF4444</Color>
+    <!-- Neutral Status Colors -->
+    <Color x:Key="StatusGreen">#FFFFFFFF</Color>       <!-- Crisp Pure White -->
+    <Color x:Key="StatusYellow">#FFE2E8F0</Color>      <!-- Silver -->
+    <Color x:Key="StatusRed">#FFF87171</Color>         <!-- Muted Alert -->
+    <Color x:Key="StatusCyan">#FFFFFFFF</Color>        <!-- Pure White -->
     
-    <!-- Text Colors -->
-    <Color x:Key="TextPrimary">#FFFFFFFF</Color>
-    <Color x:Key="TextSecondary">#FFB4B4C0</Color>
-    <Color x:Key="TextMuted">#FF6E6E7C</Color>
-    <Color x:Key="TextGold">#FFD4AF37</Color>
+    <!-- Pure High-Contrast Text Colors -->
+    <Color x:Key="TextPrimary">#FFFFFFFF</Color>       <!-- Pure Crisp White -->
+    <Color x:Key="TextSecondary">#FFCBD5E1</Color>     <!-- Light Smoke Slate -->
+    <Color x:Key="TextMuted">#FF94A3B8</Color>         <!-- Medium Slate -->
+    <Color x:Key="TextGold">#FFFFFFFF</Color>          <!-- Pure White Accent -->
     
     <!-- Brushes -->
     <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource DarkBackground}"/>
@@ -35,6 +38,7 @@
     <SolidColorBrush x:Key="CardBrush" Color="{StaticResource DarkCard}"/>
     <SolidColorBrush x:Key="CardHoverBrush" Color="{StaticResource DarkCardHover}"/>
     <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource DarkBorder}"/>
+    <SolidColorBrush x:Key="DarkBorderBrush" Color="{StaticResource DarkBorder}"/>
     <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource GoldPrimary}"/>
     <SolidColorBrush x:Key="AccentSecondaryBrush" Color="{StaticResource GoldLight}"/>
     <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimary}"/>
@@ -47,113 +51,101 @@
     
     <!-- Additional UI Brushes -->
     <SolidColorBrush x:Key="DarkBackgroundBrush" Color="{StaticResource DarkBackground}"/>
-    <SolidColorBrush x:Key="GoldBorderBrush" Color="#30D4AF37"/>
+    <SolidColorBrush x:Key="GoldBorderBrush" Color="#30FFFFFF"/>
     <SolidColorBrush x:Key="GoldMutedBrush" Color="{StaticResource GoldMuted}"/>
+    <SolidColorBrush x:Key="GlassBorderSubtle" Color="#18FFFFFF"/>
     
-    <!-- Premium Gold Gradient -->
+    <!-- Pure Frosted Silver/White Gradients -->
     <LinearGradientBrush x:Key="GoldGradient" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#FFD4AF37" Offset="0"/>
-        <GradientStop Color="#FFFFD700" Offset="0.5"/>
-        <GradientStop Color="#FFB8860B" Offset="1"/>
+        <GradientStop Color="#FFFFFFFF" Offset="0"/>
+        <GradientStop Color="#FFE2E8F0" Offset="0.5"/>
+        <GradientStop Color="#FFCBD5E1" Offset="1"/>
     </LinearGradientBrush>
     
     <LinearGradientBrush x:Key="GoldGradientHorizontal" StartPoint="0,0" EndPoint="1,0">
-        <GradientStop Color="#FFB8860B" Offset="0"/>
-        <GradientStop Color="#FFD4AF37" Offset="0.3"/>
-        <GradientStop Color="#FFFFD700" Offset="0.6"/>
-        <GradientStop Color="#FFD4AF37" Offset="1"/>
+        <GradientStop Color="#FFFFFFFF" Offset="0"/>
+        <GradientStop Color="#FFE2E8F0" Offset="0.5"/>
+        <GradientStop Color="#FF94A3B8" Offset="1"/>
     </LinearGradientBrush>
     
-    <!-- Advanced Frosted Glass Effects -->
+    <!-- Neutral Translucent Frosted Glass Surfaces -->
     <LinearGradientBrush x:Key="GlassBrush" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#18FFFFFF" Offset="0"/>
-        <GradientStop Color="#0AFFFFFF" Offset="0.5"/>
-        <GradientStop Color="#05FFFFFF" Offset="1"/>
+        <GradientStop Color="#20FFFFFF" Offset="0"/>
+        <GradientStop Color="#0DFFFFFF" Offset="1"/>
     </LinearGradientBrush>
     
     <LinearGradientBrush x:Key="GlassBorderBrush" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#40FFFFFF" Offset="0"/>
-        <GradientStop Color="#15FFFFFF" Offset="0.5"/>
-        <GradientStop Color="#25D4AF37" Offset="1"/>
+        <GradientStop Color="#35FFFFFF" Offset="0"/>
+        <GradientStop Color="#18FFFFFF" Offset="0.5"/>
+        <GradientStop Color="#25FFFFFF" Offset="1"/>
     </LinearGradientBrush>
 
     <LinearGradientBrush x:Key="GoldGlassCardBrush" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#281A1A2E" Offset="0"/>
-        <GradientStop Color="#18111220" Offset="0.5"/>
-        <GradientStop Color="#22151828" Offset="1"/>
+        <GradientStop Color="#1CFFFFFF" Offset="0"/>
+        <GradientStop Color="#0FFFFFFF" Offset="1"/>
     </LinearGradientBrush>
 
     <LinearGradientBrush x:Key="GlassSurfaceBrush" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#24141628" Offset="0"/>
-        <GradientStop Color="#160E101D" Offset="0.5"/>
-        <GradientStop Color="#1E121526" Offset="1"/>
+        <GradientStop Color="#15FFFFFF" Offset="0"/>
+        <GradientStop Color="#08FFFFFF" Offset="1"/>
     </LinearGradientBrush>
 
     <LinearGradientBrush x:Key="GlassCardShineBrush" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#3520233E" Offset="0"/>
-        <GradientStop Color="#1C121524" Offset="0.6"/>
-        <GradientStop Color="#26171B30" Offset="1"/>
+        <GradientStop Color="#2AFFFFFF" Offset="0"/>
+        <GradientStop Color="#12FFFFFF" Offset="1"/>
     </LinearGradientBrush>
 
     <LinearGradientBrush x:Key="GoldGlassBorderBrush" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#65D4AF37" Offset="0"/>
-        <GradientStop Color="#30FFFFFF" Offset="0.35"/>
-        <GradientStop Color="#20D4AF37" Offset="0.75"/>
-        <GradientStop Color="#40D4AF37" Offset="1"/>
+        <GradientStop Color="#35FFFFFF" Offset="0"/>
+        <GradientStop Color="#1AFFFFFF" Offset="0.6"/>
+        <GradientStop Color="#2AFFFFFF" Offset="1"/>
     </LinearGradientBrush>
 
     <LinearGradientBrush x:Key="CyanGlassBorderBrush" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#6538BDF8" Offset="0"/>
-        <GradientStop Color="#30FFFFFF" Offset="0.35"/>
-        <GradientStop Color="#2038BDF8" Offset="0.75"/>
-        <GradientStop Color="#450284C7" Offset="1"/>
+        <GradientStop Color="#30FFFFFF" Offset="0"/>
+        <GradientStop Color="#15FFFFFF" Offset="0.5"/>
+        <GradientStop Color="#25FFFFFF" Offset="1"/>
     </LinearGradientBrush>
 
     <LinearGradientBrush x:Key="UltraGlassBorderBrush" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#65D4AF37" Offset="0"/>
-        <GradientStop Color="#35FFFFFF" Offset="0.3"/>
-        <GradientStop Color="#18D4AF37" Offset="0.65"/>
-        <GradientStop Color="#5038BDF8" Offset="1"/>
-    </LinearGradientBrush>
-
-    <LinearGradientBrush x:Key="GlassBorderSubtle" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#35FFFFFF" Offset="0"/>
-        <GradientStop Color="#15FFFFFF" Offset="0.5"/>
-        <GradientStop Color="#25D4AF37" Offset="1"/>
+        <GradientStop Color="#40FFFFFF" Offset="0"/>
+        <GradientStop Color="#20FFFFFF" Offset="0.3"/>
+        <GradientStop Color="#15FFFFFF" Offset="0.65"/>
+        <GradientStop Color="#35FFFFFF" Offset="1"/>
     </LinearGradientBrush>
     
-    <!-- Card Shadows & Glows -->
+    <!-- Lightweight Neutral Glass Shadows -->
     <DropShadowEffect x:Key="CardShadow" 
-                      BlurRadius="25" 
-                      ShadowDepth="0" 
+                      BlurRadius="16" 
+                      ShadowDepth="2" 
                       Direction="270"
                       Color="#000000" 
-                      Opacity="0.6"/>
+                      Opacity="0.25"/>
     
     <DropShadowEffect x:Key="CardShadowHover" 
-                      BlurRadius="35" 
-                      ShadowDepth="0" 
+                      BlurRadius="22" 
+                      ShadowDepth="3" 
                       Direction="270"
                       Color="#000000" 
-                      Opacity="0.7"/>
+                      Opacity="0.35"/>
     
-    <!-- Gold Glow Effects -->
+    <!-- Subtle White Frosted Luminous Sheen -->
     <DropShadowEffect x:Key="GoldGlow" 
-                      BlurRadius="20" 
+                      BlurRadius="14" 
                       ShadowDepth="0" 
-                      Color="{StaticResource GoldPrimary}" 
-                      Opacity="0.5"/>
+                      Color="#FFFFFF" 
+                      Opacity="0.20"/>
     
     <DropShadowEffect x:Key="GoldGlowStrong" 
-                      BlurRadius="30" 
+                      BlurRadius="20" 
                       ShadowDepth="0" 
-                      Color="{StaticResource GoldLight}" 
-                      Opacity="0.6"/>
+                      Color="#FFFFFF" 
+                      Opacity="0.35"/>
     
     <DropShadowEffect x:Key="GreenGlow" 
-                      BlurRadius="15" 
+                      BlurRadius="12" 
                       ShadowDepth="0" 
-                      Color="{StaticResource StatusGreen}" 
-                      Opacity="0.5"/>
+                      Color="#FFFFFF" 
+                      Opacity="0.25"/>
 
 </ResourceDictionary>

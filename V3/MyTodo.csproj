@@ -8,6 +8,13 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>MyTodo</AssemblyName>
     <RootNamespace>MyTodo</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\app_icon.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\app_icon.ico" />
+    <Resource Include="Assets\app_icon.png" />
+  </ItemGroup>
 
 </Project>

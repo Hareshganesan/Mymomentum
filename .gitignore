@@ -1,0 +1,27 @@
+# .NET build artifacts
+**/bin/
+**/obj/
+**/publish/
+
+# Visual Studio / VS Code cache
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vscode/
+
+# Temporary / backup binaries
+*.bak
+*_old.exe
+*_temp.*
+
+# User local data & personal progress state
+**/placement_data.json
+**/placement_data.json.bak
+**/data/
+
+# OS metadata
+Thumbs.db
+Desktop.ini
+.DS_Store
