@@ -1,0 +1,58 @@
+<!-- Quiet Graphite — dark. Depth comes from surface steps, not shadows or glows. Amber is used sparingly. -->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Surfaces -->
+    <SolidColorBrush x:Key="Bg" Color="#0B0C0E"/>
+    <SolidColorBrush x:Key="Sidebar" Color="#101114"/>
+    <SolidColorBrush x:Key="Surface" Color="#121417"/>
+    <SolidColorBrush x:Key="Surface2" Color="#17191D"/>
+    <SolidColorBrush x:Key="Hover" Color="#1C1F24"/>
+    <SolidColorBrush x:Key="Pressed" Color="#22252B"/>
+    <SolidColorBrush x:Key="Border" Color="#25282D"/>
+    <SolidColorBrush x:Key="BorderStrong" Color="#383C42"/>
+    <SolidColorBrush x:Key="Divider" Color="#1E2125"/>
+    <SolidColorBrush x:Key="PopupBg" Color="#191C20"/>
+
+    <!-- Text -->
+    <SolidColorBrush x:Key="Text" Color="#F0F0EE"/>
+    <SolidColorBrush x:Key="TextMuted" Color="#A0A5AE"/>
+    <SolidColorBrush x:Key="TextFaint" Color="#7A7F89"/>
+
+    <!-- Brand + semantic -->
+    <SolidColorBrush x:Key="Accent" Color="#E8B458"/>
+    <SolidColorBrush x:Key="AccentHover" Color="#F0C273"/>
+    <SolidColorBrush x:Key="AccentSoft" Color="#17E8B458"/>
+    <SolidColorBrush x:Key="AccentLine" Color="#66E8B458"/>
+    <SolidColorBrush x:Key="OnAccent" Color="#17140D"/>
+    <SolidColorBrush x:Key="PrimaryBg" Color="#E8B458"/>
+    <SolidColorBrush x:Key="PrimaryHover" Color="#F0C273"/>
+    <SolidColorBrush x:Key="PrimaryFg" Color="#17140D"/>
+    <SolidColorBrush x:Key="Success" Color="#70C99A"/>
+    <SolidColorBrush x:Key="SuccessSoft" Color="#1F70C99A"/>
+    <SolidColorBrush x:Key="Warning" Color="#E8B458"/>
+    <SolidColorBrush x:Key="WarningSoft" Color="#1FE8B458"/>
+    <SolidColorBrush x:Key="Danger" Color="#E87979"/>
+    <SolidColorBrush x:Key="DangerSoft" Color="#1FE87979"/>
+    <SolidColorBrush x:Key="EasyBrush" Color="#70C99A"/>
+    <SolidColorBrush x:Key="MediumBrush" Color="#E8B458"/>
+    <SolidColorBrush x:Key="HardBrush" Color="#E87979"/>
+    <SolidColorBrush x:Key="ProgressTrack" Color="#22252A"/>
+    <SolidColorBrush x:Key="ProgressNeutral" Color="#5A5F68"/>
+
+    <!-- Heatmap -->
+    <SolidColorBrush x:Key="HeatEmpty" Color="#1A1D21"/>
+    <SolidColorBrush x:Key="Heat1" Color="#3A3122"/>
+    <SolidColorBrush x:Key="Heat2" Color="#705731"/>
+    <SolidColorBrush x:Key="Heat3" Color="#B38841"/>
+    <SolidColorBrush x:Key="Heat4" Color="#F4C66C"/>
+
+    <!-- Legacy keys kept so older templates resolve; all flat now. -->
+    <SolidColorBrush x:Key="GlassFill" Color="#141619"/>
+    <SolidColorBrush x:Key="GlassRim" Color="#292C31"/>
+    <SolidColorBrush x:Key="TileFill" Color="#191C20"/>
+    <!-- Card edge: a hair lighter on top so panels read as slightly raised -->
+    <LinearGradientBrush x:Key="CardEdge" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#33373D" Offset="0"/>
+        <GradientStop Color="#25282D" Offset="0.35"/>
+    </LinearGradientBrush>
+</ResourceDictionary>

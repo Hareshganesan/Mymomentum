@@ -1,0 +1,199 @@
+<UserControl x:Class="Momentum.Views.StoriesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="32,24,32,32" MaxWidth="1280">
+            <TextBlock Text="HR &amp; stories" Style="{StaticResource H1}"/>
+            <TextBlock Style="{StaticResource Muted}" Margin="0,4,0,20" FontSize="14"
+                       Text="Behavioural rounds reward preparation. Write a handful of STAR stories once, tag their themes, and you can answer almost any HR question."/>
+
+            <!-- Pitch builder -->
+            <Border Style="{StaticResource Card}" Padding="22">
+                <StackPanel>
+                    <Grid>
+                        <StackPanel>
+                            <TextBlock Text="&quot;Tell me about yourself&quot;" Style="{StaticResource H2}"/>
+                            <TextBlock Text="Asked in nearly every interview. Present → Past → Future." Style="{StaticResource Caption}" Margin="0,3,0,0"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding PitchLength}" Style="{StaticResource Caption}" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+                    </Grid>
+                    <Grid Margin="0,14,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="Present — who you are" Style="{StaticResource Overline}" Margin="0,0,0,6"/>
+                            <TextBox Style="{StaticResource MultilineBox}" MinHeight="96" Text="{Binding PitchPresent, UpdateSourceTrigger=PropertyChanged, Delay=300}"
+                                     Tag="Final-year CSE student at … I enjoy building backend systems and have solved 300+ problems…"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Past — proof points" Style="{StaticResource Overline}" Margin="0,0,0,6"/>
+                            <TextBox Style="{StaticResource MultilineBox}" MinHeight="96" Text="{Binding PitchPast, UpdateSourceTrigger=PropertyChanged, Delay=300}"
+                                     Tag="Internship at …, built … used by … users; won …"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="4">
+                            <TextBlock Text="Future — why this role" Style="{StaticResource Overline}" Margin="0,0,0,6"/>
+                            <TextBox Style="{StaticResource MultilineBox}" MinHeight="96" Text="{Binding PitchFuture, UpdateSourceTrigger=PropertyChanged, Delay=300}"
+                                     Tag="I want to work on large-scale systems, which is why …"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <Grid Margin="0,16,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="420"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Question bank: one line per question, details for the selected one -->
+                <Border Grid.Column="2" Style="{StaticResource Card}" VerticalAlignment="Top" Padding="18,16">
+                    <StackPanel>
+                        <Grid>
+                            <TextBlock Text="Question bank" Style="{StaticResource H2}"/>
+                            <ToggleButton Style="{StaticResource Chip}" Content="Missing only" IsChecked="{Binding MissingOnly}" HorizontalAlignment="Right" Margin="0"/>
+                        </Grid>
+                        <TextBlock Style="{StaticResource Caption}" Margin="0,4,0,8">
+                            <Run Text="{Binding CoveredQuestions, Mode=OneWay}"/><Run Text=" of "/><Run Text="{Binding TotalQuestions, Mode=OneWay}"/><Run Text=" covered by a story or your pitch"/>
+                        </TextBlock>
+                        <ProgressBar Value="{Binding CoverageRatio, Mode=OneWay}" Height="4" Margin="0,0,0,10"/>
+
+                        <ListBox ItemsSource="{Binding VisibleQuestions}" SelectedItem="{Binding SelectedQuestion, Mode=TwoWay}" Style="{StaticResource PlainList}"
+                                 ItemContainerStyle="{StaticResource RowItem}" MaxHeight="250" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="16"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Ellipse Width="7" Height="7" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                                 Fill="{Binding Covered, Converter={StaticResource BoolToBrush}, ConverterParameter=Success|BorderStrong}"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding Def.Question}" FontSize="13" Foreground="{DynamicResource Text}"
+                                                   TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding Def.Theme}" Style="{StaticResource Caption}" Margin="10,0,0,0" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <Border Style="{StaticResource Inset}" Margin="0,12,0,0" Visibility="{Binding SelectedQuestion, Converter={StaticResource NullToVis}}">
+                            <StackPanel DataContext="{Binding SelectedQuestion}">
+                                <TextBlock Text="{Binding Def.Question}" Style="{StaticResource H3}" TextWrapping="Wrap" TextTrimming="None"/>
+                                <TextBlock Text="{Binding Def.Tip}" Style="{StaticResource Muted}" Margin="0,6,0,0"/>
+                                <Grid Margin="0,10,0,0">
+                                    <TextBlock Text="{Binding CoverText}" FontSize="12.5" VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,110,0"
+                                               Foreground="{Binding Covered, Converter={StaticResource BoolToBrush}, ConverterParameter=Success|Warning}"/>
+                                    <Button Content="Write a story" Style="{StaticResource SecondaryButton}" Padding="10,5" HorizontalAlignment="Right"
+                                            Command="{Binding DataContext.WriteForQuestionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <!-- Stories -->
+                <StackPanel Grid.Column="0">
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <Grid>
+                                <StackPanel>
+                                    <TextBlock Text="Your STAR stories" Style="{StaticResource H2}"/>
+                                    <TextBlock Style="{StaticResource Caption}" Margin="0,3,0,0">
+                                        <Run Text="{Binding CoveredThemes, Mode=OneWay}"/><Run Text=" of "/><Run Text="{Binding TotalThemes, Mode=OneWay}"/><Run Text=" themes covered — 5 or 6 strong stories is usually enough."/>
+                                    </TextBlock>
+                                </StackPanel>
+                                <Button HorizontalAlignment="Right" VerticalAlignment="Top" Style="{StaticResource PrimaryButton}" Command="{Binding NewStoryCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE710;" FontFamily="{StaticResource IconFont}" FontSize="12" VerticalAlignment="Center"/>
+                                        <TextBlock Text="New story" Margin="8,0,0,0"/>
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+                            <TextBlock Style="{StaticResource Muted}" Margin="0,12,0,0" Visibility="{Binding Stories.Count, Converter={StaticResource CountToVis}, ConverterParameter=invert}"
+                                       Text="No stories yet. Start with your hardest technical bug, a team conflict, and a failure you learned from — those three cover half the bank."/>
+                            <ItemsControl ItemsSource="{Binding Stories}" Margin="0,12,0,0">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button Style="{StaticResource SecondaryButton}" Margin="0,0,8,8" Padding="12,8" FontWeight="Normal" Width="220"
+                                                HorizontalContentAlignment="Stretch" CommandParameter="{Binding}"
+                                                Command="{Binding DataContext.SelectCommand, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding DisplayTitle}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding ThemesText}" Style="{StaticResource Caption}" Margin="0,2,0,6"/>
+                                                <ProgressBar Value="{Binding Completeness, Mode=OneWay}" Height="3" Foreground="{DynamicResource Success}"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Editor -->
+                    <Border Style="{StaticResource Card}" Margin="0,16,0,0" Padding="22" Visibility="{Binding HasSelection, Converter={StaticResource BoolToVis}}">
+                        <StackPanel DataContext="{Binding Selected}">
+                            <Grid>
+                                <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" FontSize="16" FontWeight="SemiBold" Tag="Story title, e.g. 'Race condition in hackathon payment flow'" Margin="0,0,44,0"/>
+                                <Button Style="{StaticResource IconButton}" Content="&#xE74D;" HorizontalAlignment="Right" ToolTip="Delete story"
+                                        Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                            </Grid>
+                            <TextBlock Text="Themes this story can answer" Style="{StaticResource Overline}" Margin="0,16,0,8"/>
+                            <ItemsControl ItemsSource="{Binding Themes}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <ToggleButton Style="{StaticResource Chip}" Content="{Binding Name}" IsChecked="{Binding IsOn}" Margin="0,0,6,6"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <Grid Margin="0,12,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <StackPanel Margin="0,0,0,12">
+                                    <TextBlock Text="S — situation" Style="{StaticResource Overline}" Margin="0,0,0,6"/>
+                                    <TextBox Style="{StaticResource MultilineBox}" MinHeight="90" Text="{Binding Situation, UpdateSourceTrigger=PropertyChanged, Delay=300}"
+                                             Tag="Context in 2 sentences: where, when, what was at stake."/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2" Margin="0,0,0,12">
+                                    <TextBlock Text="T — task" Style="{StaticResource Overline}" Margin="0,0,0,6"/>
+                                    <TextBox Style="{StaticResource MultilineBox}" MinHeight="90" Text="{Binding Task, UpdateSourceTrigger=PropertyChanged, Delay=300}"
+                                             Tag="What were YOU responsible for?"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="1">
+                                    <TextBlock Text="A — action (the longest part)" Style="{StaticResource Overline}" Margin="0,0,0,6"/>
+                                    <TextBox Style="{StaticResource MultilineBox}" MinHeight="120" Text="{Binding Action, UpdateSourceTrigger=PropertyChanged, Delay=300}"
+                                             Tag="Concrete steps you took, decisions and trade-offs. Use 'I', not 'we'."/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Grid.Column="2">
+                                    <TextBlock Text="R — result" Style="{StaticResource Overline}" Margin="0,0,0,6"/>
+                                    <TextBox Style="{StaticResource MultilineBox}" MinHeight="120" Text="{Binding Result, UpdateSourceTrigger=PropertyChanged, Delay=300}"
+                                             Tag="Measurable outcome + what you learned."/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

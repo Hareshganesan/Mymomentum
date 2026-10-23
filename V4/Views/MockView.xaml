@@ -1,0 +1,310 @@
+<UserControl x:Class="Momentum.Views.MockView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:Momentum.Controls">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="32,24,32,32" MaxWidth="1180">
+            <TextBlock Text="Mock interview" Style="{StaticResource H1}"/>
+            <TextBlock Style="{StaticResource Muted}" Margin="0,4,0,20" FontSize="14"
+                       Text="Simulate a real round: a timer, interviewer-style phases, and an honest debrief. Solve it on LeetCode while Momentum keeps time and scores you."/>
+
+            <!-- ============ Setup ============ -->
+            <Grid Visibility="{Binding IsSetup, Converter={StaticResource BoolToVis}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="360"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Style="{StaticResource Card}" Padding="24">
+                    <StackPanel>
+                        <TextBlock Text="1 · What to practise" Style="{StaticResource Overline}"/>
+                        <WrapPanel Margin="0,10,0,0">
+                            <RadioButton Style="{StaticResource ChipRadio}" Content="Weakest pattern" GroupName="src" Margin="0,0,6,6"
+                                         IsChecked="{Binding Source, Converter={StaticResource Equals}, ConverterParameter=Weak}"/>
+                            <RadioButton Style="{StaticResource ChipRadio}" Content="Company" GroupName="src" Margin="0,0,6,6"
+                                         IsChecked="{Binding Source, Converter={StaticResource Equals}, ConverterParameter=Company}"/>
+                            <RadioButton Style="{StaticResource ChipRadio}" Content="Random Medium" GroupName="src" Margin="0,0,6,6"
+                                         IsChecked="{Binding Source, Converter={StaticResource Equals}, ConverterParameter=Random}"/>
+                            <RadioButton Style="{StaticResource ChipRadio}" Content="Unsolved Hard" GroupName="src" Margin="0,0,6,6"
+                                         IsChecked="{Binding Source, Converter={StaticResource Equals}, ConverterParameter=Hard}"/>
+                        </WrapPanel>
+                        <ComboBox ItemsSource="{Binding CompanyChoices}" SelectedItem="{Binding Company}" Width="240" HorizontalAlignment="Left" Margin="0,6,0,0"
+                                  Visibility="{Binding IsCompanySource, Converter={StaticResource BoolToVis}}" MaxDropDownHeight="320"/>
+
+                        <TextBlock Text="2 · Round length" Style="{StaticResource Overline}" Margin="0,22,0,10"/>
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton Style="{StaticResource ChipRadio}" Content="30 min · OA style" GroupName="dur"
+                                         IsChecked="{Binding Duration, Converter={StaticResource Equals}, ConverterParameter=30}"/>
+                            <RadioButton Style="{StaticResource ChipRadio}" Content="45 min · Interview" GroupName="dur"
+                                         IsChecked="{Binding Duration, Converter={StaticResource Equals}, ConverterParameter=45}"/>
+                            <RadioButton Style="{StaticResource ChipRadio}" Content="60 min · Deep round" GroupName="dur"
+                                         IsChecked="{Binding Duration, Converter={StaticResource Equals}, ConverterParameter=60}"/>
+                        </StackPanel>
+
+                        <TextBlock Text="3 · Your problem" Style="{StaticResource Overline}" Margin="0,22,0,10"/>
+                        <Border Style="{StaticResource Inset}" Padding="18">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Problem.Title}" Style="{StaticResource H2}" TextWrapping="Wrap"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                        <TextBlock Text="{Binding Problem.DifficultyText}" FontWeight="SemiBold" FontSize="12.5"
+                                                   Foreground="{Binding Problem.Difficulty, Converter={StaticResource DifficultyBrush}}"/>
+                                        <TextBlock Text="{Binding Problem.PatternName, StringFormat={} · {0}}" Style="{StaticResource Caption}" FontSize="12.5"/>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding PickReason}" Style="{StaticResource Caption}" Margin="0,8,0,0" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <Button Grid.Column="1" Style="{StaticResource GhostButton}" Command="{Binding ShuffleCommand}" VerticalAlignment="Top">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE8B1;" FontFamily="{StaticResource IconFont}" FontSize="12" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Another" Margin="6,0,0,0"/>
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+                        </Border>
+
+                        <Button Content="Start interview" Style="{StaticResource PrimaryButton}" Command="{Binding StartCommand}"
+                                HorizontalAlignment="Left" Margin="0,22,0,0" Padding="22,12" FontSize="14"/>
+                    </StackPanel>
+                </Border>
+
+                <StackPanel Grid.Column="2">
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="Your mock record" Style="{StaticResource Overline}"/>
+                            <UniformGrid Columns="2" Margin="0,10,0,0">
+                                <StackPanel Margin="0,0,0,12">
+                                    <TextBlock Text="{Binding MockCount}" Style="{StaticResource Stat}" FontSize="24"/>
+                                    <TextBlock Text="mocks done" Style="{StaticResource Caption}"/>
+                                </StackPanel>
+                                <StackPanel Margin="0,0,0,12">
+                                    <TextBlock Text="{Binding SolveRate}" Style="{StaticResource Stat}" FontSize="24"/>
+                                    <TextBlock Text="solved in time" Style="{StaticResource Caption}"/>
+                                </StackPanel>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding AvgScore}" Style="{StaticResource Stat}" FontSize="24"/>
+                                    <TextBlock Text="avg self-score" Style="{StaticResource Caption}"/>
+                                </StackPanel>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding AvgTime}" Style="{StaticResource Stat}" FontSize="24"/>
+                                    <TextBlock Text="avg time" Style="{StaticResource Caption}"/>
+                                </StackPanel>
+                            </UniformGrid>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Card}" Margin="0,16,0,0">
+                        <StackPanel>
+                            <TextBlock Text="Recent" Style="{StaticResource Overline}"/>
+                            <TextBlock Text="Your mocks will appear here." Style="{StaticResource Muted}" Margin="0,10,0,0"
+                                       Visibility="{Binding History.Count, Converter={StaticResource CountToVis}, ConverterParameter=invert}"/>
+                            <ItemsControl ItemsSource="{Binding History}" Margin="0,4,0,0">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0,8,0,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Title}" Style="{StaticResource H3}" FontWeight="Normal"/>
+                                                <TextBlock Style="{StaticResource Caption}">
+                                                    <Run Text="{Binding Date, Mode=OneWay}"/><Run Text=" · "/><Run Text="{Binding Time, Mode=OneWay}"/><Run Text=" · "/><Run Text="{Binding Score, Mode=OneWay}"/>
+                                                </TextBlock>
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="1" Text="{Binding Result}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"
+                                                       Foreground="{Binding Solved, Converter={StaticResource BoolToBrush}, ConverterParameter=Success|Danger}"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+
+            <!-- ============ Running ============ -->
+            <Grid Visibility="{Binding IsRunning, Converter={StaticResource BoolToVis}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="320"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <Border Style="{StaticResource Card}" Padding="24">
+                        <StackPanel HorizontalAlignment="Center">
+                            <Grid Width="200" Height="200">
+                                <controls:ProgressRing Value="{Binding TimeProgress}" Thickness="10" TrackBrush="{DynamicResource Surface2}"
+                                                       FillBrush="{Binding IsOvertime, Converter={StaticResource BoolToBrush}, ConverterParameter=Danger|Accent}"/>
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <TextBlock Text="{Binding TimerText}" FontFamily="{StaticResource MonoFont}" FontSize="40" FontWeight="SemiBold" HorizontalAlignment="Center"
+                                               Foreground="{Binding IsOvertime, Converter={StaticResource BoolToBrush}, ConverterParameter=Danger|Text}"/>
+                                    <TextBlock Text="{Binding CurrentPhase.Name}" Style="{StaticResource Caption}" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Grid>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,18,0,0">
+                                <Button Content="{Binding PauseLabel}" Style="{StaticResource SecondaryButton}" Command="{Binding PauseCommand}" Width="96"/>
+                                <Button Content="Finish" Style="{StaticResource PrimaryButton}" Command="{Binding FinishCommand}" Width="96" Margin="8,0,0,0"/>
+                            </StackPanel>
+                            <Button Content="Abandon" Style="{StaticResource GhostButton}" Command="{Binding AbandonCommand}" HorizontalAlignment="Center" Margin="0,8,0,0" FontSize="12"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Card}" Margin="0,16,0,0">
+                        <StackPanel>
+                            <TextBlock Text="Phases" Style="{StaticResource Overline}"/>
+                            <ItemsControl ItemsSource="{Binding Phases}" Margin="0,8,0,0">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border CornerRadius="8" Padding="10,8" Margin="0,0,0,4"
+                                                Background="{Binding IsCurrent, Converter={StaticResource BoolToBrush}, ConverterParameter=AccentSoft|Surface}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="&#xE73E;" FontFamily="{StaticResource IconFont}" FontSize="11" Width="20" VerticalAlignment="Center"
+                                                           Foreground="{Binding IsDone, Converter={StaticResource BoolToBrush}, ConverterParameter=Success|Border}"/>
+                                                <TextBlock Text="{Binding Label}" FontSize="13" Foreground="{DynamicResource Text}"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2">
+                    <Border Style="{StaticResource Card}" Padding="24">
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Problem.Title}" Style="{StaticResource H2}" FontSize="20"/>
+                                    <TextBlock Text="{Binding Problem.DifficultyText}" FontWeight="SemiBold" FontSize="12.5" Margin="0,4,0,0"
+                                               Foreground="{Binding Problem.Difficulty, Converter={StaticResource DifficultyBrush}}"/>
+                                </StackPanel>
+                                <Button Grid.Column="1" Style="{StaticResource SecondaryButton}" Command="{Binding OpenCommand}" VerticalAlignment="Top">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Open problem"/>
+                                        <TextBlock Text="&#xE8A7;" FontFamily="{StaticResource IconFont}" FontSize="11" Margin="6,0,0,0" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+
+                            <Border Style="{StaticResource Inset}" Margin="0,18,0,0" Padding="18">
+                                <StackPanel>
+                                    <Grid>
+                                        <TextBlock Text="{Binding CurrentPhase.Name, StringFormat=Interviewer checklist · {0}}" Style="{StaticResource Overline}"/>
+                                        <Button Style="{StaticResource LinkButton}" Content="Next phase →" HorizontalAlignment="Right" FontSize="12.5" Command="{Binding NextPhaseCommand}"/>
+                                    </Grid>
+                                    <ItemsControl ItemsSource="{Binding CurrentPhase.Prompts}" Margin="0,10,0,0">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" Margin="0,4">
+                                                    <TextBlock Text="•" Foreground="{DynamicResource Accent}" Margin="0,0,10,0" FontWeight="Bold"/>
+                                                    <TextBlock Text="{Binding}" Style="{StaticResource Body}"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <TextBlock Text="{Binding PhaseNudge}" Foreground="{DynamicResource Warning}" FontSize="12.5" Margin="0,10,0,0"
+                                               Visibility="{Binding PhaseNudge, Converter={StaticResource StringToVis}}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Grid Margin="0,16,0,0">
+                                <TextBlock Text="Stuck?" Style="{StaticResource Overline}" VerticalAlignment="Center"/>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <TextBlock Text="{Binding HintsUsed, StringFormat=Hints used: {0}}" Style="{StaticResource Caption}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                    <Button Content="Ask for a hint" Style="{StaticResource SecondaryButton}" Command="{Binding HintCommand}" Padding="12,6"/>
+                                </StackPanel>
+                            </Grid>
+                            <Border Style="{StaticResource Inset}" Margin="0,10,0,0" Visibility="{Binding HintVisible, Converter={StaticResource BoolToVis}}">
+                                <TextBlock Text="{Binding Problem.Hint}" Style="{StaticResource Body}"/>
+                            </Border>
+
+                            <TextBlock Text="Scratchpad" Style="{StaticResource Overline}" Margin="0,18,0,6"/>
+                            <TextBox Style="{StaticResource MultilineBox}" MinHeight="160" FontFamily="{StaticResource MonoFont}" FontSize="13"
+                                     Text="{Binding Scratch, UpdateSourceTrigger=PropertyChanged}" AcceptsTab="True"
+                                     Tag="Clarifying questions, examples, brute force → optimal idea, complexity…"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+
+            <!-- ============ Debrief ============ -->
+            <Border Style="{StaticResource Card}" Padding="28" MaxWidth="760" HorizontalAlignment="Left"
+                    Visibility="{Binding IsDebrief, Converter={StaticResource BoolToVis}}">
+                <StackPanel>
+                    <TextBlock Text="Debrief" Style="{StaticResource H1}" FontSize="22"/>
+                    <TextBlock Style="{StaticResource Muted}" Margin="0,4,0,0">
+                        <Run Text="{Binding Problem.Title, Mode=OneWay}"/><Run Text=" · "/><Run Text="{Binding ElapsedText, Mode=OneWay}"/><Run Text=" · hints: "/><Run Text="{Binding HintsUsed, Mode=OneWay}"/>
+                    </TextBlock>
+
+                    <TextBlock Text="Outcome" Style="{StaticResource Overline}" Margin="0,20,0,8"/>
+                    <StackPanel Orientation="Horizontal">
+                        <RadioButton Style="{StaticResource ChipRadio}" Content="Solved, all tests pass" GroupName="out"
+                                     IsChecked="{Binding Outcome, Converter={StaticResource Equals}, ConverterParameter=Solved}"/>
+                        <RadioButton Style="{StaticResource ChipRadio}" Content="Partially" GroupName="out"
+                                     IsChecked="{Binding Outcome, Converter={StaticResource Equals}, ConverterParameter=Partial}"/>
+                        <RadioButton Style="{StaticResource ChipRadio}" Content="Couldn't solve" GroupName="out"
+                                     IsChecked="{Binding Outcome, Converter={StaticResource Equals}, ConverterParameter=No}"/>
+                    </StackPanel>
+
+                    <TextBlock Text="Rate yourself like an interviewer would (1 = no hire, 4 = strong hire)" Style="{StaticResource Overline}" Margin="0,22,0,10"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="170"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Communication" Style="{StaticResource Body}" VerticalAlignment="Center"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,0,0,8">
+                            <RadioButton Style="{StaticResource Segment}" Content="1" GroupName="c" IsChecked="{Binding Communication, Converter={StaticResource Equals}, ConverterParameter=1}"/>
+                            <RadioButton Style="{StaticResource Segment}" Content="2" GroupName="c" IsChecked="{Binding Communication, Converter={StaticResource Equals}, ConverterParameter=2}"/>
+                            <RadioButton Style="{StaticResource Segment}" Content="3" GroupName="c" IsChecked="{Binding Communication, Converter={StaticResource Equals}, ConverterParameter=3}"/>
+                            <RadioButton Style="{StaticResource Segment}" Content="4" GroupName="c" IsChecked="{Binding Communication, Converter={StaticResource Equals}, ConverterParameter=4}"/>
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="Problem solving" Style="{StaticResource Body}" VerticalAlignment="Center"/>
+                        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="0,0,0,8">
+                            <RadioButton Style="{StaticResource Segment}" Content="1" GroupName="p" IsChecked="{Binding ProblemSolving, Converter={StaticResource Equals}, ConverterParameter=1}"/>
+                            <RadioButton Style="{StaticResource Segment}" Content="2" GroupName="p" IsChecked="{Binding ProblemSolving, Converter={StaticResource Equals}, ConverterParameter=2}"/>
+                            <RadioButton Style="{StaticResource Segment}" Content="3" GroupName="p" IsChecked="{Binding ProblemSolving, Converter={StaticResource Equals}, ConverterParameter=3}"/>
+                            <RadioButton Style="{StaticResource Segment}" Content="4" GroupName="p" IsChecked="{Binding ProblemSolving, Converter={StaticResource Equals}, ConverterParameter=4}"/>
+                        </StackPanel>
+                        <TextBlock Grid.Row="2" Text="Code quality" Style="{StaticResource Body}" VerticalAlignment="Center"/>
+                        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Margin="0,0,0,8">
+                            <RadioButton Style="{StaticResource Segment}" Content="1" GroupName="q" IsChecked="{Binding CodeQuality, Converter={StaticResource Equals}, ConverterParameter=1}"/>
+                            <RadioButton Style="{StaticResource Segment}" Content="2" GroupName="q" IsChecked="{Binding CodeQuality, Converter={StaticResource Equals}, ConverterParameter=2}"/>
+                            <RadioButton Style="{StaticResource Segment}" Content="3" GroupName="q" IsChecked="{Binding CodeQuality, Converter={StaticResource Equals}, ConverterParameter=3}"/>
+                            <RadioButton Style="{StaticResource Segment}" Content="4" GroupName="q" IsChecked="{Binding CodeQuality, Converter={StaticResource Equals}, ConverterParameter=4}"/>
+                        </StackPanel>
+                        <TextBlock Grid.Row="3" Text="Testing &amp; edge cases" Style="{StaticResource Body}" VerticalAlignment="Center"/>
+                        <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal">
+                            <RadioButton Style="{StaticResource Segment}" Content="1" GroupName="t" IsChecked="{Binding Testing, Converter={StaticResource Equals}, ConverterParameter=1}"/>
+                            <RadioButton Style="{StaticResource Segment}" Content="2" GroupName="t" IsChecked="{Binding Testing, Converter={StaticResource Equals}, ConverterParameter=2}"/>
+                            <RadioButton Style="{StaticResource Segment}" Content="3" GroupName="t" IsChecked="{Binding Testing, Converter={StaticResource Equals}, ConverterParameter=3}"/>
+                            <RadioButton Style="{StaticResource Segment}" Content="4" GroupName="t" IsChecked="{Binding Testing, Converter={StaticResource Equals}, ConverterParameter=4}"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <TextBlock Text="What would you do differently?" Style="{StaticResource Overline}" Margin="0,22,0,6"/>
+                    <TextBox Style="{StaticResource MultilineBox}" Text="{Binding Learnings, UpdateSourceTrigger=PropertyChanged}"
+                             Tag="e.g. Jumped into code before confirming the approach; missed the empty-array case. (Saved to this problem's mistake notes.)"/>
+
+                    <Button Content="Save debrief" Style="{StaticResource PrimaryButton}" Command="{Binding SaveCommand}" HorizontalAlignment="Left" Margin="0,20,0,0"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
