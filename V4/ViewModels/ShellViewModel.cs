@@ -191,6 +191,71 @@ namespace Momentum.ViewModels
             }
         }
 
+        // ---------- Inbox sync ----------
+
+        private bool _isMailSyncing;
+        public bool IsMailSyncing { get => _isMailSyncing; private set { Set(ref _isMailSyncing, value); CommandManager.InvalidateRequerySuggested(); } }
+        public string MailStatus { get; private set; } = string.Empty;
+
+        /// <summary>Reads job emails and updates Applications. Quiet mode (startup) only speaks up when something changed.</summary>
+        public async Task SyncMailAsync(bool quiet)
+        {
+            var p = Store.State.Profile;
+            if (IsMailSyncing || !MailSyncService.IsConnected(p)) return;
+            IsMailSyncing = true;
+            try
+            {
+                MailStatus = "Connecting to your inbox…"; OnPropertyChanged(nameof(MailStatus));
+                var progress = new Progress<string>(m => { MailStatus = m; OnPropertyChanged(nameof(MailStatus)); });
+                var r = await MailSyncService.SyncAsync(Store.State, progress);
+                MailStatus = r.Success
+                    ? $"Checked {r.Scanned} emails · {r.JobEmails} job updates · {p.MailLastSync:d MMM, HH:mm}"
+                    : r.Error;
+                OnPropertyChanged(nameof(MailStatus));
+                if (r.Success) Store.NotifyChanged();
+                if (!r.Success && !quiet) ShowToast(r.Error);
+                else if (r.Created + r.Updated > 0)
+                    ShowToast($"Inbox: {string.Join(", ", r.Changes.Take(4))}{(r.Changes.Count > 4 ? $" +{r.Changes.Count - 4} more" : "")}");
+                else if (!quiet) ShowToast("Inbox checked — no new job emails.");
+                CurrentPage?.OnShown();
+            }
+            finally { IsMailSyncing = false; }
+        }
+
+        // ---------- In-app confirm dialog ----------
+
+        public sealed class ConfirmRequest
+        {
+            public string Title { get; init; } = string.Empty;
+            public string Message { get; init; } = string.Empty;
+            public string ConfirmText { get; init; } = "Confirm";
+            public bool IsDanger { get; init; }
+            public bool IsNormal => !IsDanger;
+            internal TaskCompletionSource<bool> Tcs { get; } = new();
+        }
+
+        private ConfirmRequest? _confirm;
+        public ConfirmRequest? Confirm { get => _confirm; private set { Set(ref _confirm, value); OnPropertyChanged(nameof(HasConfirm)); } }
+        public bool HasConfirm => Confirm != null;
+        public ICommand ConfirmYesCommand => new RelayCommand(() => Answer(true));
+        public ICommand ConfirmNoCommand => new RelayCommand(() => Answer(false));
+
+        /// <summary>Themed replacement for MessageBox: resolves true when the user confirms.</summary>
+        public Task<bool> ConfirmAsync(string title, string message, string confirmText = "Confirm", bool danger = false)
+        {
+            Confirm?.Tcs.TrySetResult(false);
+            var req = new ConfirmRequest { Title = title, Message = message, ConfirmText = confirmText, IsDanger = danger };
+            Confirm = req;
+            return req.Tcs.Task;
+        }
+
+        public void Answer(bool yes)
+        {
+            var req = Confirm;
+            Confirm = null;
+            req?.Tcs.TrySetResult(yes);
+        }
+
         // ---------- Toast ----------
 
         public string Toast { get => _toast; private set => Set(ref _toast, value); }

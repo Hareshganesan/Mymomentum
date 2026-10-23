@@ -92,6 +92,8 @@ namespace Momentum.Services
             s.Mocks ??= new();
             s.Tasks ??= new();
             s.Activity ??= new();
+            s.SeenMail ??= new();
+            foreach (var a in s.Applications) a.Emails ??= new();
             foreach (var p in s.Problems.Values) p.Srs ??= new SrsState();
             foreach (var c in s.Cards.Values) c.Srs ??= new SrsState();
             return s;

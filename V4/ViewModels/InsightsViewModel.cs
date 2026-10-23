@@ -39,6 +39,8 @@ namespace Momentum.ViewModels
         public Readiness Readiness { get; private set; } = new();
         public List<PatternStat> Patterns { get; private set; } = new();
         public List<WeekBar> Weeks { get; private set; } = new();
+        public List<WeekBar> Forecast { get; private set; } = new();
+        public string ForecastSummary { get; private set; } = string.Empty;
         public Dictionary<string, int> Activity { get; private set; } = new();
         public string Weakest { get; private set; } = string.Empty;
 
@@ -69,6 +71,14 @@ namespace Momentum.ViewModels
             }).ToList();
             var max = Math.Max(1, raw.Max(r => r.Value));
             Weeks = raw.Select(r => new WeekBar { Label = r.Label, Value = r.Value, Height = 4 + 96.0 * r.Value / max }).ToList();
+            // Reviews coming due over the next 14 days (problems + cards), so heavy days are visible in advance.
+            var days = Enumerable.Range(0, 14).Select(i => DateTime.Today.AddDays(i)).ToList();
+            var counts = days.Select(d => Store.Problems.Count(p => p.IsSolved && p.Progress.Srs.Due?.Date == d)
+                                        + Store.Cards.Count(c => c.Progress.Srs.Due?.Date == d)
+                                        + (d == DateTime.Today ? Store.Problems.Count(p => p.IsDue && p.Progress.Srs.Due!.Value.Date < d) + Store.Cards.Count(c => c.IsDue && c.Progress.Srs.Due!.Value.Date < d) : 0)).ToList();
+            var fmax = Math.Max(1, counts.Max());
+            Forecast = days.Select((d, i) => new WeekBar { Label = i == 0 ? "Today" : d.ToString("ddd d"), Value = counts[i], Height = 3 + 90.0 * counts[i] / fmax }).ToList();
+            ForecastSummary = $"{counts.Sum()} reviews in the next 2 weeks · busiest {Forecast[counts.IndexOf(counts.Max())].Label} ({counts.Max()})";
             RaiseAll();
         }
     }

@@ -25,3 +25,8 @@
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+# Per-account app data and secrets (never commit)
+**/momentum.json
+**/accounts.json
+*.pdb

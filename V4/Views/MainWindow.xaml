@@ -152,23 +152,38 @@
             <views:LoginView x:Name="Login"/>
         </Grid>
 
+        <!-- ================= Confirm dialog (themed, in-app) ================= -->
+        <Grid Grid.RowSpan="2" Grid.ColumnSpan="2" Background="#99000000" Visibility="{Binding HasConfirm, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}">
+            <Border Style="{StaticResource Card}" Width="420" Padding="22,20" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{DynamicResource Surface2}"
+                    DataContext="{Binding Confirm}">
+                <StackPanel>
+                    <TextBlock Text="{Binding Title}" Style="{StaticResource H2}"/>
+                    <TextBlock Text="{Binding Message}" Style="{StaticResource Muted}" Margin="0,8,0,0"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+                        <Button Content="Cancel" Style="{StaticResource SecondaryButton}" Margin="0,0,8,0"
+                                Command="{Binding DataContext.ConfirmNoCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                        <Button Content="{Binding ConfirmText}" Style="{StaticResource PrimaryButton}" Visibility="{Binding IsNormal, Converter={StaticResource BoolToVis}}"
+                                Command="{Binding DataContext.ConfirmYesCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                        <Button Content="{Binding ConfirmText}" Style="{StaticResource BaseButton}" Background="{DynamicResource Danger}" BorderBrush="{DynamicResource Danger}"
+                                Foreground="{DynamicResource Bg}" Visibility="{Binding IsDanger, Converter={StaticResource BoolToVis}}"
+                                Command="{Binding DataContext.ConfirmYesCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+
         <!-- ================= Launch animation ("hello") ================= -->
         <Grid x:Name="SplashLayer" Grid.RowSpan="2" Grid.ColumnSpan="2" Background="{DynamicResource Bg}" MouseDown="Splash_MouseDown" Cursor="Hand" ClipToBounds="True">
             <Canvas x:Name="GreetingCanvas" Opacity="0"/>
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Viewbox Width="440">
-                    <Canvas Width="232" Height="104">
-                        <!-- Hand-drawn monoline script: h-e-l-l-o in one continuous stroke. -->
-                        <Path x:Name="SplashHello" Stroke="{DynamicResource Text}" StrokeThickness="4.2"
-                              StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
-                              Data="M8,88 C20,80 38,58 44,38 C48,24 46,12 40,12 C33,12 30,24 30,40 L30,90 C30,74 36,58 48,58 C58,58 60,68 60,78 C60,86 62,90 68,90 C76,90 86,82 92,74 C96,68 96,60 90,60 C82,60 78,70 78,78 C78,86 84,91 92,91 C98,91 104,87 108,83 C116,74 130,52 134,36 C138,22 136,12 129,12 C122,12 120,24 120,40 C120,60 120,78 121,84 C122,89 126,91 131,91 C136,91 140,88 143,84 C151,74 165,52 169,36 C173,22 171,12 164,12 C157,12 155,24 155,40 C155,60 155,78 156,84 C157,89 161,91 166,91 C171,91 175,88 178,84 C182,74 190,60 200,60 C210,60 214,70 213,78 C212,86 206,91 199,91 C192,91 188,85 189,77 C190,68 197,61 205,61 C211,61 216,63 222,60"/>
-                    </Canvas>
-                </Viewbox>
-                <StackPanel x:Name="SplashBrand" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,24,0,0" Opacity="0">
-                    <ContentControl Content="{StaticResource LogoMark}" Focusable="False" Width="20" Height="20"/>
-                    <TextBlock Text="Momentum" FontSize="14" FontWeight="Medium" Foreground="{DynamicResource TextMuted}" VerticalAlignment="Center" Margin="9,0,0,0"/>
-                </StackPanel>
-            </StackPanel>
+            <Viewbox Width="600" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Canvas Width="330" Height="104">
+                    <!-- Hand-drawn monoline script: "momentum" in one continuous stroke, plus the t's crossbar. -->
+                    <Path x:Name="SplashScript" Stroke="{DynamicResource Text}" StrokeThickness="4.4"
+                          StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Data="M4,88 C8,80 10,70 10,62 L10,90 C10,72 15,60 21,60 C27,60 29,66 29,74 L29,90 C29,72 34,60 40,60 C46,60 48,66 48,74 L48,86 C48,90 51,91 55,88 C59,74 67,60 77,60 C87,60 91,70 90,78 C89,86 83,91 76,91 C69,91 65,85 66,77 C67,68 74,61 82,61 C88,61 93,63 99,60 C102,60 103,62 103,66 L103,90 C103,72 108,60 114,60 C120,60 122,66 122,74 L122,90 C122,72 127,60 133,60 C139,60 141,66 141,74 L141,86 C141,90 144,91 148,88 C156,84 166,76 170,70 C173,64 171,59 165,59 C157,59 153,69 153,77 C153,86 159,91 167,91 C173,91 178,88 182,84 C185,78 187,70 187,62 L187,90 C187,72 192,60 198,60 C204,60 206,66 206,74 L206,86 C206,90 209,91 213,88 C217,80 222,64 224,40 L224,84 C224,89 227,91 231,91 C235,91 238,89 241,86 C243,78 245,70 245,62 L245,82 C245,88 249,91 254,91 C259,91 263,86 264,78 L264,62 L264,86 C264,90 267,91 271,88 C274,82 276,72 276,62 L276,90 C276,72 281,60 287,60 C293,60 295,66 295,74 L295,90 C295,72 300,60 306,60 C312,60 314,66 314,74 L314,86 C314,90 317,91 322,87"/>
+                    <Path x:Name="SplashCross" Stroke="{DynamicResource Text}" StrokeThickness="4.4" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                          Data="M214,53 L236,51"/>
+                </Canvas>
+            </Viewbox>
         </Grid>
     </Grid>
 </Window>

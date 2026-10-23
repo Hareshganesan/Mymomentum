@@ -12,6 +12,10 @@ namespace Momentum.Views
         public static readonly IValueConverter SolvedPrompt = new Lambda(v => v is true ? "Reviewed it again? Grade your recall" : "Solved it? Grade how it went");
         public static readonly IValueConverter RevealGlyph = new Lambda(v => v is true ? "" : "");
 
+        /// <summary>Theme brush by key name, e.g. "Accent".</summary>
+        public static readonly IValueConverter ResourceBrush = new Lambda(v => Application.Current.TryFindResource(v as string ?? "TextMuted") ?? System.Windows.Media.Brushes.Gray);
+        public static readonly IValueConverter TrackStroke = new Lambda(v => Application.Current.TryFindResource(v is int i && i > 0 ? "Accent" : "BorderStrong") ?? System.Windows.Media.Brushes.Gray);
+
         internal sealed class Lambda : IValueConverter
         {
             private readonly Func<object?, object> _f;

@@ -29,12 +29,6 @@ namespace Momentum.Views
 
         // ---------- Launch animation ----------
 
-        private static readonly string[] Greetings =
-        {
-            "salut", "olá", "hola", "hej", "ciao", "ahoj", "hallo", "bonjour", "привет", "வணக்கம்", "नमस्ते", "こんにちは",
-            "안녕하세요", "merhaba", "hei", "xin chào", "γεια σας", "szia", "mabuhay", "habari", "hallå", "namaskar", "aloha", "salve",
-        };
-
         private void PlaySplash()
         {
             // Respect Windows' "Animation effects" setting.
@@ -47,24 +41,37 @@ namespace Momentum.Views
             static DoubleAnimation Anim(double from, double to, double startSec, double durSec, IEasingFunction? ease = null) =>
                 new(from, to, TimeSpan.FromSeconds(durSec)) { BeginTime = TimeSpan.FromSeconds(startSec), EasingFunction = ease ?? new CubicEase { EasingMode = EasingMode.EaseInOut }, FillBehavior = FillBehavior.HoldEnd };
 
+            // Keep the app hidden behind the splash, then fade it in as the splash leaves.
+            var behind = Root.Children.OfType<UIElement>().Where(c => c != SplashLayer).ToList();
+            foreach (var c in behind) c.Opacity = 0;
+
             BuildGreetings();
             GreetingCanvas.BeginAnimation(OpacityProperty, Anim(0, 1, 0.1, 1.0));
 
-            // Write "hello": dash length = the stroke's own length, then slide the dash offset to zero.
-            double length = PathLength(SplashHello.Data) / SplashHello.StrokeThickness;
-            SplashHello.StrokeDashArray = new DoubleCollection { length, length };
-            SplashHello.StrokeDashOffset = length;
-            SplashHello.BeginAnimation(Shape.StrokeDashOffsetProperty, Anim(length, 0, 0.3, 1.9, new SineEase { EasingMode = EasingMode.EaseInOut }));
+            // Write "momentum" like a pen: dash length = the stroke's own length, then slide the offset to zero.
+            void Write(Path path, double start, double duration)
+            {
+                double len = PathLength(path.Data) / path.StrokeThickness;
+                path.StrokeDashArray = new DoubleCollection { len, len };
+                path.StrokeDashOffset = len;
+                path.BeginAnimation(Shape.StrokeDashOffsetProperty, Anim(len, 0, start, duration, new SineEase { EasingMode = EasingMode.EaseInOut }));
+            }
+            Write(SplashScript, 0.3, 2.2);
+            Write(SplashCross, 2.45, 0.25);
 
-            var soft = new CubicEase { EasingMode = EasingMode.EaseOut };
-            SplashBrand.BeginAnimation(OpacityProperty, Anim(0, 1, 2.1, 0.4, soft));
-
-            var fade = Anim(1, 0, 3.1, 0.35);
+            var fade = Anim(1, 0, 3.4, 0.4);
             fade.Completed += (_, _) => SplashLayer.Visibility = Visibility.Collapsed;
             SplashLayer.BeginAnimation(OpacityProperty, fade);
+            foreach (var c in behind) c.BeginAnimation(OpacityProperty, Anim(0, 1, 3.45, 0.45));
         }
 
-        /// <summary>Faint rows of greetings behind the centre word, kept clear of the middle.</summary>
+        private static readonly string[] Greetings =
+        {
+            "salut", "olá", "hola", "hej", "ciao", "ahoj", "hallo", "bonjour", "привет", "வணக்கம்", "नमस्ते", "こんにちは",
+            "안녕하세요", "merhaba", "hei", "xin chào", "γεια σας", "szia", "mabuhay", "habari", "hallå", "namaskar", "aloha", "salve",
+        };
+
+        /// <summary>Faint rows of greetings behind the wordmark, kept clear of the middle.</summary>
         private void BuildGreetings()
         {
             GreetingCanvas.Children.Clear();
@@ -80,7 +87,7 @@ namespace Momentum.Views
                 {
                     var tb = new TextBlock { Text = Greetings[i++ % Greetings.Length], FontFamily = font, FontSize = 40, Foreground = brush };
                     tb.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-                    bool nearCentre = Math.Abs(y + 30 - h / 2) < 150 && Math.Abs(x + tb.DesiredSize.Width / 2 - w / 2) < 320;
+                    bool nearCentre = Math.Abs(y + 30 - h / 2) < 150 && Math.Abs(x + tb.DesiredSize.Width / 2 - w / 2) < 380;
                     if (!nearCentre)
                     {
                         Canvas.SetLeft(tb, x);
@@ -117,6 +124,8 @@ namespace Momentum.Views
             var fade = new DoubleAnimation(SplashLayer.Opacity, 0, TimeSpan.FromSeconds(0.15));
             fade.Completed += (_, _) => SplashLayer.Visibility = Visibility.Collapsed;
             SplashLayer.BeginAnimation(OpacityProperty, fade);
+            foreach (var c in Root.Children.OfType<UIElement>().Where(c => c != SplashLayer))
+                c.BeginAnimation(OpacityProperty, new DoubleAnimation(1, TimeSpan.FromSeconds(0.2)));
         }
 
         // ---------- Accounts ----------
@@ -143,6 +152,7 @@ namespace Momentum.Views
             SetShellVisible(true);
             Login.DataContext = null;
             await shell.SyncLeetCodeAsync(quiet: true);
+            await shell.SyncMailAsync(quiet: true);
         }
 
         /// <summary>Hides the app chrome while signed out (bound elements keep their own visibility).</summary>
@@ -172,6 +182,12 @@ namespace Momentum.Views
 
         private void OnPreviewKeyDown(object sender, KeyEventArgs e)
         {
+            if (DataContext is ShellViewModel { HasConfirm: true } dlg && (e.Key is Key.Escape or Key.Enter))
+            {
+                dlg.Answer(e.Key == Key.Enter);
+                e.Handled = true;
+                return;
+            }
             if (Keyboard.Modifiers != ModifierKeys.Control) return;
             int index = e.Key switch
             {

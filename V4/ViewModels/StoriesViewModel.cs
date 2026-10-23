@@ -189,10 +189,10 @@ namespace Momentum.ViewModels
             Selected = card;
         }
 
-        private void Delete()
+        private async void Delete()
         {
             if (Selected == null) return;
-            if (MessageBox.Show($"Delete \"{Selected.DisplayTitle}\"?", "Momentum", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
+            if (!await Shell.ConfirmAsync("Are you sure?", $"Delete \"{Selected.DisplayTitle}\"?", "Continue", true)) return;
             Store.State.Stories.Remove(Selected.Model);
             Stories.Remove(Selected);
             Selected = Stories.FirstOrDefault();

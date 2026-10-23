@@ -32,6 +32,8 @@ namespace Momentum.Models
         public DayPlan? Plan { get; set; }
         public LeetCodeSnapshot? LeetCode { get; set; }
         public bool MigratedFromV3 { get; set; }
+        /// <summary>Message-IDs already processed by inbox sync, so re-syncs never double-count.</summary>
+        public HashSet<string> SeenMail { get; set; } = new();
     }
 
     public class Profile
@@ -48,6 +50,19 @@ namespace Momentum.Models
         public string PitchPresent { get; set; } = string.Empty;
         public string PitchPast { get; set; } = string.Empty;
         public string PitchFuture { get; set; } = string.Empty;
+
+        // Inbox sync (IMAP). The app password is DPAPI-encrypted for this Windows user.
+        public string MailAddress { get; set; } = string.Empty;
+        public string MailHost { get; set; } = string.Empty;
+        public string MailSecret { get; set; } = string.Empty;
+        public DateTime? MailLastSync { get; set; }
+        public int MailRulesVersion { get; set; }
+
+        // Google sign-in (read-only Gmail). Secret and refresh token are DPAPI-encrypted.
+        public string GoogleClientId { get; set; } = string.Empty;
+        public string GoogleClientSecret { get; set; } = string.Empty;
+        public string GoogleToken { get; set; } = string.Empty;
+        public string GoogleEmail { get; set; } = string.Empty;
     }
 
     public class SrsState
@@ -108,6 +123,33 @@ namespace Momentum.Models
         public string Notes { get; set; } = string.Empty;
         public string Url { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public List<MailEvent> Emails { get; set; } = new();
+        /// <summary>"Email" (from inbox), "Campus" (placement cell mail) or empty for manual entries.</summary>
+        public string Source { get; set; } = string.Empty;
+        /// <summary>Restoring from the archive restarts the no-response clock.</summary>
+        public DateTime? RestoredAt { get; set; }
+        /// <summary>Furthest stage reached before a rejection (e.g. HR / final for "rejected after the final interview").</summary>
+        public Stage? ReachedStage { get; set; }
+
+        /// <summary>Changes stage, remembering how far it got when it ends in a rejection.</summary>
+        public void MoveTo(Stage next)
+        {
+            if (next == Stage.Rejected && Stage != Stage.Rejected)
+                ReachedStage = Stage <= Stage.Wishlist ? Stage.Applied : ReachedStage is { } r && r > Stage ? r : Stage;
+            Stage = next;
+        }
+
+        /// <summary>The stage to show on the journey: current stage, or the furthest reached if rejected.</summary>
+        public Stage ProgressStage => Stage == Stage.Rejected ? ReachedStage ?? Stage.Applied : Stage;
+    }
+
+    /// <summary>A job email that was matched to an application.</summary>
+    public class MailEvent
+    {
+        public DateTime Date { get; set; }
+        public string Subject { get; set; } = string.Empty;
+        public string From { get; set; } = string.Empty;
+        public Stage? Stage { get; set; }
     }
 
     public class Story

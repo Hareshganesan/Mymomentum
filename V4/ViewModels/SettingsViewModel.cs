@@ -59,11 +59,11 @@ namespace Momentum.ViewModels
             Shell.ShowToast("Backup saved.");
         }
 
-        private void Import()
+        private async void Import()
         {
             var dlg = new OpenFileDialog { Filter = "Momentum backup (*.json)|*.json" };
             if (dlg.ShowDialog() != true) return;
-            if (MessageBox.Show("Replace all current progress with this backup?", "Momentum", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
+            if (!await Shell.ConfirmAsync("Are you sure?", "Replace all current progress with this backup?", "Continue", true)) return;
             try
             {
                 Store.Replace(StorageService.Import(dlg.FileName));
@@ -72,14 +72,13 @@ namespace Momentum.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Couldn't import: {ex.Message}", "Momentum");
+                Shell.ShowToast($"Couldn't import: {ex.Message}");
             }
         }
 
-        private void Reset()
+        private async void Reset()
         {
-            if (MessageBox.Show("Reset ALL progress (problems, cards, mocks, applications, stories)? Your profile and LeetCode link are kept. Export a backup first if unsure.",
-                    "Momentum", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
+            if (!await Shell.ConfirmAsync("Reset all progress?", "Problems, cards, mocks, applications and stories will be cleared. Your profile and LeetCode link are kept. Export a backup first if unsure.", "Reset", true)) return;
             Store.Replace(new AppState { Profile = P });
             Shell.ShowToast("Progress reset.");
             RaiseAll();
