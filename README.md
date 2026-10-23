@@ -17,7 +17,11 @@ A Windows desktop app for placement and interview preparation. Momentum looks at
 
 ## LeetCode sync
 
-Enter your LeetCode username in Settings. No password is needed. Momentum syncs when it opens: solved counts, streak, skill tags, the submission calendar and recent accepted problems. To import older solves as well, you can optionally paste your `LEETCODE_SESSION` cookie in Settings. It never leaves your PC.
+Enter your LeetCode username in Settings. No password is needed. Momentum syncs when it opens: solved counts, streak, skill tags, the submission calendar and recent accepted problems.
+
+To import your full solve history as well, click **Sign in with LeetCode** in Settings. LeetCode's own sign-in page opens inside the app; once you are signed in, Momentum keeps the session and closes the window. Your password goes only to LeetCode. Use your LeetCode username or email, or GitHub; Google blocks its sign-in inside apps. Pasting the `LEETCODE_SESSION` cookie by hand is still available as a fallback.
+
+For maximum privacy, use **Import from a file** instead. While signed in to LeetCode in your own browser, open `https://leetcode.com/api/problems/all/`, press Ctrl+A and Ctrl+C, and click **Paste copied list** in Settings (or save the page as HTML and import the file). Momentum never sees your password or session, and nothing is stored.
 
 ## Inbox job tracking
 
@@ -32,6 +36,7 @@ Two ways to connect:
 
 - All data stays on your computer in `%LOCALAPPDATA%\Momentum\users\<username>\`.
 - Account passwords are stored only as salted PBKDF2 hashes.
+- Resetting a forgotten password requires Windows Hello (your Windows PIN, fingerprint or face) or a recovery code you create in Settings. Recovery codes are stored only as hashes.
 - The Google client secret, Gmail token, mail app password and LeetCode cookie are encrypted with Windows DPAPI, so they can only be read by your Windows user on your PC.
 - Nothing is sent anywhere except to LeetCode and to your own mail provider.
 

@@ -44,6 +44,13 @@ namespace Momentum.Services
             catch { return string.Empty; }
         }
 
+        /// <summary>Reads a protected value, accepting older plain-text values saved before encryption.</summary>
+        public static string UnprotectOrPlain(string value)
+        {
+            var plain = Unprotect(value);
+            return plain.Length > 0 ? plain : value;
+        }
+
         public static string GuessHost(string address)
         {
             var domain = address.Split('@').LastOrDefault()?.Trim().ToLowerInvariant() ?? string.Empty;

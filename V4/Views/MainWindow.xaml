@@ -145,7 +145,7 @@
 
         <!-- ================= Login (covers everything until signed in) ================= -->
         <Grid x:Name="LoginLayer" Grid.RowSpan="2" Grid.ColumnSpan="2" Background="{DynamicResource Bg}" Visibility="Collapsed">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" WindowChrome.IsHitTestVisibleInChrome="True">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Panel.ZIndex="1" WindowChrome.IsHitTestVisibleInChrome="True">
                 <Button Style="{StaticResource CaptionButton}" Content="&#xE921;" Click="Minimize_Click"/>
                 <Button Style="{StaticResource CloseButton}" Content="&#xE8BB;" Click="Close_Click"/>
             </StackPanel>
@@ -158,7 +158,10 @@
                     DataContext="{Binding Confirm}">
                 <StackPanel>
                     <TextBlock Text="{Binding Title}" Style="{StaticResource H2}"/>
-                    <TextBlock Text="{Binding Message}" Style="{StaticResource Muted}" Margin="0,8,0,0"/>
+                    <!-- Read-only TextBox so the message (e.g. a recovery code) can be selected and copied -->
+                    <TextBox Text="{Binding Message, Mode=OneWay}" Style="{x:Null}" IsReadOnly="True" TextWrapping="Wrap" Background="Transparent" BorderThickness="0" Padding="0"
+                             FontSize="13" Foreground="{DynamicResource TextMuted}" CaretBrush="{DynamicResource TextMuted}" SelectionBrush="{DynamicResource Accent}"
+                             FontFamily="{Binding FontFamily, RelativeSource={RelativeSource AncestorType=Window}}" Margin="0,8,0,0"/>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
                         <Button Content="Cancel" Style="{StaticResource SecondaryButton}" Margin="0,0,8,0"
                                 Command="{Binding DataContext.ConfirmNoCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>

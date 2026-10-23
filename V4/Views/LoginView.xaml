@@ -17,7 +17,7 @@
 
                 <!-- Accounts on this PC -->
                 <ItemsControl ItemsSource="{Binding Accounts}" Margin="0,16,0,0"
-                              Visibility="{Binding IsCreating, Converter={StaticResource BoolToVis}, ConverterParameter=invert}">
+                              Visibility="{Binding NeedsConfirm, Converter={StaticResource BoolToVis}, ConverterParameter=invert}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
@@ -34,6 +34,12 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
+                <StackPanel Visibility="{Binding IsResetting, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="Recovery code" Style="{StaticResource Overline}" Margin="0,14,0,6"/>
+                    <PasswordBox x:Name="RecoveryBox" PasswordChanged="Recovery_Changed" KeyDown="Field_KeyDown"/>
+                    <TextBlock Style="{StaticResource Caption}" TextWrapping="Wrap" Margin="2,6,0,0"
+                               Text="Leave empty to confirm with Windows Hello (your Windows PIN, fingerprint or face)."/>
+                </StackPanel>
                 <StackPanel Visibility="{Binding IsCreating, Converter={StaticResource BoolToVis}}">
                     <TextBlock Text="Your name" Style="{StaticResource Overline}" Margin="0,18,0,6"/>
                     <TextBox Text="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}" Tag="Shown on your dashboard"/>
@@ -42,12 +48,16 @@
                 <TextBlock Text="Username" Style="{StaticResource Overline}" Margin="0,16,0,6"/>
                 <TextBox x:Name="UserBox" Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" Tag="e.g. haresh"/>
 
-                <TextBlock Text="Password" Style="{StaticResource Overline}" Margin="0,14,0,6"/>
+                <TextBlock Text="{Binding PasswordLabel}" Style="{StaticResource Overline}" Margin="0,14,0,6"/>
                 <PasswordBox x:Name="PasswordBox" PasswordChanged="Password_Changed" KeyDown="Field_KeyDown"/>
+                <Button Content="Forgot password?" Style="{StaticResource LinkButton}" Command="{Binding ForgotCommand}" HorizontalAlignment="Right"
+                        Margin="0,6,0,0" FontSize="12" FontWeight="Normal" Visibility="{Binding CanForget, Converter={StaticResource BoolToVis}}"/>
 
-                <StackPanel Visibility="{Binding IsCreating, Converter={StaticResource BoolToVis}}">
+                <StackPanel Visibility="{Binding NeedsConfirm, Converter={StaticResource BoolToVis}}">
                     <TextBlock Text="Confirm password" Style="{StaticResource Overline}" Margin="0,14,0,6"/>
                     <PasswordBox x:Name="ConfirmBox" PasswordChanged="Confirm_Changed" KeyDown="Field_KeyDown"/>
+                </StackPanel>
+                <StackPanel Visibility="{Binding IsCreating, Converter={StaticResource BoolToVis}}">
                     <TextBlock Text="LeetCode username (optional)" Style="{StaticResource Overline}" Margin="0,14,0,6"/>
                     <TextBox Text="{Binding LeetCode, UpdateSourceTrigger=PropertyChanged}" Tag="Auto-syncs your solved problems — no password"/>
                 </StackPanel>

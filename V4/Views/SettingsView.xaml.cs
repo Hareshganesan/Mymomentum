@@ -10,7 +10,12 @@ namespace Momentum.Views
         {
             InitializeComponent();
             // PasswordBox can't bind, so sync it by hand.
-            DataContextChanged += (_, _) => { if (DataContext is SettingsViewModel vm) SessionBox.Password = vm.LeetCodeSession; };
+            DataContextChanged += (_, _) =>
+            {
+                if (DataContext is not SettingsViewModel vm) return;
+                SessionBox.Password = vm.LeetCodeSession;
+                vm.SessionChanged += () => SessionBox.Password = vm.LeetCodeSession;
+            };
         }
 
         private void SessionBox_PasswordChanged(object sender, RoutedEventArgs e)

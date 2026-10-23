@@ -169,7 +169,13 @@ namespace Momentum.ViewModels
             SyncText = "Syncing…";
             try
             {
-                var result = await LeetCodeService.SyncAsync(profile.LeetCodeUsername, profile.LeetCodeSession);
+                var session = MailSyncService.UnprotectOrPlain(profile.LeetCodeSession);
+                if (session.Length > 0 && session == profile.LeetCodeSession)
+                {
+                    profile.LeetCodeSession = MailSyncService.Protect(session);   // encrypt cookies saved by older builds
+                    Store.ScheduleSave();
+                }
+                var result = await LeetCodeService.SyncAsync(profile.LeetCodeUsername, session);
                 if (!result.Success)
                 {
                     if (!quiet) ShowToast(result.Error);

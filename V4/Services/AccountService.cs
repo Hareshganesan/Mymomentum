@@ -11,6 +11,9 @@ namespace Momentum.Services
         public string DisplayName { get; set; } = string.Empty;
         public string Salt { get; set; } = string.Empty;
         public string Hash { get; set; } = string.Empty;
+        /// <summary>Hash of a one-time-shown recovery code that allows a password reset.</summary>
+        public string RecoverySalt { get; set; } = string.Empty;
+        public string RecoveryHash { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? LastLogin { get; set; }
     }
@@ -91,6 +94,46 @@ namespace Momentum.Services
             state.Profile.TargetDate ??= DateTime.Today.AddDays(60);
             state.Profile.Onboarded = true;
             StorageService.Save(state);
+            return null;
+        }
+
+        public static bool HasRecoveryCode(string username) => Find(Load(), username) is { RecoveryHash.Length: > 0 };
+
+        /// <summary>Creates a new recovery code (replacing any old one) and returns it; only its hash is stored.</summary>
+        public static string NewRecoveryCode(string username)
+        {
+            const string alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";   // no 0/O or 1/I
+            var chars = Enumerable.Range(0, 16).Select(_ => alphabet[RandomNumberGenerator.GetInt32(alphabet.Length)]).ToArray();
+            var code = string.Join("-", Enumerable.Range(0, 4).Select(i => new string(chars, i * 4, 4)));
+            var file = Load();
+            var account = Find(file, username) ?? throw new InvalidOperationException("No such account.");
+            var salt = RandomNumberGenerator.GetBytes(16);
+            account.RecoverySalt = Convert.ToBase64String(salt);
+            account.RecoveryHash = Convert.ToBase64String(HashPassword(NormalizeCode(code), salt));
+            Save(file);
+            return code;
+        }
+
+        public static bool VerifyRecoveryCode(string username, string code)
+        {
+            if (Find(Load(), username) is not { RecoveryHash.Length: > 0 } account) return false;
+            var actual = HashPassword(NormalizeCode(code), Convert.FromBase64String(account.RecoverySalt));
+            return CryptographicOperations.FixedTimeEquals(actual, Convert.FromBase64String(account.RecoveryHash));
+        }
+
+        private static string NormalizeCode(string code) => new(code.ToUpperInvariant().Where(char.IsLetterOrDigit).ToArray());
+
+        /// <summary>Sets a new password for a local account. Callers must verify the person first (Windows Hello or recovery code).
+        /// Progress is untouched (it isn't encrypted with the password).</summary>
+        public static string? ResetPassword(string username, string password)
+        {
+            var file = Load();
+            if (Find(file, username) is not { } account) return "No account with that username on this PC.";
+            if (password.Length < 6) return "Password needs at least 6 characters.";
+            var salt = RandomNumberGenerator.GetBytes(16);
+            account.Salt = Convert.ToBase64String(salt);
+            account.Hash = Convert.ToBase64String(HashPassword(password, salt));
+            Save(file);
             return null;
         }
 

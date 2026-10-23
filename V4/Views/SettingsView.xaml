@@ -62,6 +62,8 @@
                                 <TextBlock Style="{StaticResource Caption}" Margin="2,8,0,0">
                                     <Run Text="@"/><Run Text="{Binding Username, Mode=OneWay}"/><Run Text=" · local account on this PC"/>
                                 </TextBlock>
+                                <Button Content="{Binding RecoveryText}" Style="{StaticResource LinkButton}" Command="{Binding RecoveryCodeCommand}" HorizontalAlignment="Left"
+                                        Margin="2,8,0,0" FontSize="12" FontWeight="Normal" ToolTip="Lets you reset your password if you forget it"/>
                             </StackPanel>
                         </Grid>
                     </Border>
@@ -135,7 +137,40 @@
                             </Grid>
                             <TextBlock Text="{Binding SyncStatus}" Style="{StaticResource Caption}" Margin="2,10,0,0" TextWrapping="Wrap" TextTrimming="None"/>
 
-                            <ToggleButton x:Name="AdvancedToggle" Style="{StaticResource Chip}" Content="Import my full solve history…" HorizontalAlignment="Left" Margin="0,16,0,0"/>
+                            <TextBlock Text="Full history" Style="{StaticResource Overline}" Margin="0,18,0,6"/>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Style="{StaticResource SecondaryButton}" Command="{Binding ConnectLeetCodeCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE77B;" FontFamily="{StaticResource IconFont}" FontSize="12" VerticalAlignment="Center"/>
+                                        <TextBlock Margin="8,0,0,0">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Text" Value="Sign in with LeetCode"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsLeetCodeConnected}" Value="True"><Setter Property="Text" Value="Reconnect"/></DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Button>
+                                <Button Content="Disconnect" Style="{StaticResource LinkButton}" Command="{Binding DisconnectLeetCodeCommand}" Margin="14,0,0,0" VerticalAlignment="Center"
+                                        Visibility="{Binding IsLeetCodeConnected, Converter={StaticResource BoolToVis}}"/>
+                            </StackPanel>
+                            <TextBlock Text="{Binding ConnectStatus}" Style="{StaticResource Caption}" Margin="2,8,0,0" TextWrapping="Wrap" TextTrimming="None"/>
+                            <TextBlock Style="{StaticResource Caption}" Margin="2,4,0,0" TextWrapping="Wrap" TextTrimming="None"
+                                       Text="Use your LeetCode username/email or GitHub. Google sign-in is blocked by Google inside apps."/>
+
+                            <TextBlock Text="Most private: import from a file" Style="{StaticResource Overline}" Margin="0,18,0,6"/>
+                            <TextBlock Style="{StaticResource Caption}" TextWrapping="Wrap" TextTrimming="None" Margin="2,0,0,8"
+                                       Text="No login inside Momentum and nothing saved. While signed in to LeetCode in your own browser, open the problem list page, press Ctrl+A then Ctrl+C, and click Paste. (Or save the page with Ctrl+S as HTML Only and import the file.)"/>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="1. Open the page in my browser" Style="{StaticResource SecondaryButton}" Command="{Binding OpenSolvedPageCommand}"/>
+                                <Button Content="2. Paste copied list" Style="{StaticResource SecondaryButton}" Command="{Binding PasteSolvedCommand}" Margin="8,0,0,0"/>
+                                <Button Content="or import saved file" Style="{StaticResource LinkButton}" Command="{Binding ImportSolvedFileCommand}" Margin="14,0,0,0" VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <ToggleButton x:Name="AdvancedToggle" Style="{StaticResource Chip}" Content="Paste the cookie manually instead" HorizontalAlignment="Left" Margin="0,14,0,0"/>
                             <StackPanel Visibility="{Binding IsChecked, ElementName=AdvancedToggle, Converter={StaticResource BoolToVis}}" Margin="0,12,0,0">
                                 <TextBlock Text="LEETCODE_SESSION cookie" Style="{StaticResource Overline}" Margin="0,0,0,6"/>
                                 <PasswordBox x:Name="SessionBox" PasswordChanged="SessionBox_PasswordChanged"/>

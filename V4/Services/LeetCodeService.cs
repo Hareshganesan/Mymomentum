@@ -1,3 +1,4 @@
+using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -161,24 +162,62 @@ namespace Momentum.Services
                 using var response = await Http.SendAsync(request);
                 if (!response.IsSuccessStatusCode) return;
 
-                using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-                if (!doc.RootElement.TryGetProperty("stat_status_pairs", out var pairs)) return;
-
-                int found = 0;
-                foreach (var pair in pairs.EnumerateArray())
-                {
-                    if (!pair.TryGetProperty("status", out var status) || status.GetString() != "ac") continue;
-                    var slug = pair.GetProperty("stat").GetProperty("question__title_slug").GetString();
-                    if (string.IsNullOrWhiteSpace(slug)) continue;
-                    found++;
-                    if (!result.Solved.ContainsKey(slug)) result.Solved[slug] = null;
-                }
-                result.IsFullHistory = found > 0;
+                result.IsFullHistory = ReadSolvedList(await response.Content.ReadAsStringAsync(), result) > 0;
             }
             catch (Exception ex)
             {
                 StorageService.Log($"Full history sync failed: {ex.Message}");
             }
+        }
+
+        /// <summary>Adds accepted slugs from leetcode.com/api/problems/all/ JSON; returns how many were found.</summary>
+        private static int ReadSolvedList(string json, LeetCodeResult result)
+        {
+            using var doc = JsonDocument.Parse(json);
+            if (!doc.RootElement.TryGetProperty("stat_status_pairs", out var pairs)) return -1;
+
+            int found = 0;
+            foreach (var pair in pairs.EnumerateArray())
+            {
+                if (!pair.TryGetProperty("status", out var status) || status.ValueKind != JsonValueKind.String || status.GetString() != "ac") continue;
+                var slug = pair.GetProperty("stat").GetProperty("question__title_slug").GetString();
+                if (string.IsNullOrWhiteSpace(slug)) continue;
+                found++;
+                if (!result.Solved.ContainsKey(slug)) result.Solved[slug] = null;
+            }
+            return found;
+        }
+
+        /// <summary>
+        /// Reads a solved list the user saved from their own signed-in browser. No cookie or password ever reaches Momentum.
+        /// </summary>
+        public static LeetCodeResult ImportSolvedFile(string path)
+        {
+            try { return ImportSolvedText(File.ReadAllText(path)); }
+            catch (Exception ex) { return new LeetCodeResult { Error = $"Couldn't read that file: {ex.Message}" }; }
+        }
+
+        /// <summary>Accepts the raw JSON, or the page saved/copied as HTML (browsers wrap the JSON in a pre tag).</summary>
+        public static LeetCodeResult ImportSolvedText(string text)
+        {
+            var result = new LeetCodeResult();
+            try
+            {
+                var pre = System.Text.RegularExpressions.Regex.Match(text, @"<pre[^>]*>(.*?)</pre>", System.Text.RegularExpressions.RegexOptions.Singleline | System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                if (pre.Success) text = pre.Groups[1].Value;
+                int start = text.IndexOf('{'), end = text.LastIndexOf('}');
+                if (start < 0 || end <= start) { result.Error = "That isn't the LeetCode problem list. Open leetcode.com/api/problems/all/ while signed in."; return result; }
+                var json = System.Net.WebUtility.HtmlDecode(text[start..(end + 1)]);
+                var found = ReadSolvedList(json, result);
+                if (found < 0) result.Error = "That isn't the LeetCode problem list. Save the page from leetcode.com/api/problems/all/.";
+                else if (found == 0) result.Error = "No solved problems in that file. Make sure you were signed in to LeetCode when you saved it.";
+                else { result.Success = true; result.IsFullHistory = true; }
+            }
+            catch (Exception ex)
+            {
+                result.Error = $"Couldn't read that list: {ex.Message}";
+            }
+            return result;
         }
     }
 }
