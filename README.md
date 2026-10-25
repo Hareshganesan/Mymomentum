@@ -290,6 +290,7 @@ Mymomentum/
 │       └── problems_catalog.png
 ├── docs/                            # Deep-dive engineering specifications
 │   ├── ARCHITECTURE.md              # Layered architecture & MVVM patterns
+│   ├── ENGINEERING_DECISIONS.md     # Architecture Decision Records (ADRs) & tradeoffs
 │   ├── FAILURE_FORENSICS.md         # Diagnostic taxonomy & evaluation engine
 │   └── SECURITY_MODEL.md            # Subprocess isolation & security boundaries
 ├── src/
