@@ -1,0 +1,192 @@
+<Window x:Class="Momentum.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="clr-namespace:Momentum.Views"
+        Title="Momentum" Width="1440" Height="900" MinWidth="960" MinHeight="620"
+        WindowStartupLocation="CenterScreen" WindowStyle="None" ResizeMode="CanResize" Icon="/Assets/app_icon.ico"
+        FontFamily="{StaticResource UiFont}" Background="{DynamicResource Bg}"
+        Foreground="{DynamicResource Text}" UseLayoutRounding="True"
+        TextOptions.TextFormattingMode="Ideal" TextOptions.TextRenderingMode="ClearType" FontWeight="Normal">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="44" ResizeBorderThickness="6" GlassFrameThickness="0" CornerRadius="0" UseAeroCaptionButtons="False"/>
+    </WindowChrome.WindowChrome>
+
+    <Window.Resources>
+        <Style x:Key="CaptionButton" TargetType="Button" BasedOn="{StaticResource IconButton}">
+            <Setter Property="Width" Value="46"/>
+            <Setter Property="Height" Value="44"/>
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="Transparent">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource Hover}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="CloseButton" TargetType="Button" BasedOn="{StaticResource CaptionButton}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="Transparent">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#C42B1C"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid x:Name="Root">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="44"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="208"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ================= Title bar (draggable) ================= -->
+        <Border Grid.ColumnSpan="2" Background="{DynamicResource Sidebar}" BorderBrush="{DynamicResource Divider}" BorderThickness="0,0,0,1"/>
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
+            <ContentControl Content="{StaticResource LogoMark}" Focusable="False" Width="20" Height="20"/>
+            <TextBlock Text="Momentum" FontSize="13.5" FontWeight="Medium" Foreground="{DynamicResource Text}" VerticalAlignment="Center" Margin="9,0,0,0"/>
+        </StackPanel>
+
+        <StackPanel x:Name="TitleActions" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center"
+                    WindowChrome.IsHitTestVisibleInChrome="True">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,14,0" ToolTip="Consecutive days with practice (app + LeetCode)">
+                <Ellipse Width="6" Height="6" Fill="{DynamicResource Accent}" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding StreakText}" FontSize="12" Foreground="{DynamicResource TextMuted}" Margin="7,0,0,0" VerticalAlignment="Center"/>
+            </StackPanel>
+            <Border Width="1" Height="14" Background="{DynamicResource Border}" Margin="0,0,10,0"/>
+            <TextBlock Text="{Binding SyncText}" FontSize="12" Foreground="{DynamicResource TextFaint}" VerticalAlignment="Center" Margin="0,0,2,0"/>
+            <Button Style="{StaticResource IconButton}" Width="30" Height="30" FontSize="12" Content="&#xE895;" Command="{Binding SyncCommand}" ToolTip="Sync LeetCode now"/>
+            <Button Style="{StaticResource IconButton}" Width="30" Height="30" FontSize="12" Content="&#xE706;" Command="{Binding ToggleThemeCommand}" ToolTip="Light / dark"/>
+            <Button Style="{StaticResource IconButton}" Width="30" Height="30" FontSize="12" Content="&#xF3B1;" Command="{Binding SignOutCommand}" ToolTip="Sign out"/>
+            <Border Width="1" Height="14" Background="{DynamicResource Border}" Margin="8,0,0,0"/>
+            <Button Style="{StaticResource CaptionButton}" Content="&#xE921;" Click="Minimize_Click" ToolTip="Minimize"/>
+            <Button x:Name="MaxButton" Style="{StaticResource CaptionButton}" Content="&#xE922;" Click="Maximize_Click" ToolTip="Maximize"/>
+            <Button Style="{StaticResource CloseButton}" Content="&#xE8BB;" Click="Close_Click" ToolTip="Close"/>
+        </StackPanel>
+
+        <!-- ================= Navigation rail ================= -->
+        <Border x:Name="NavRail" Grid.Row="1" Background="{DynamicResource Sidebar}" BorderBrush="{DynamicResource Divider}" BorderThickness="0,0,1,0">
+            <DockPanel Margin="10,12,10,12">
+                <!-- Readiness: compact, links to the breakdown -->
+                <Button DockPanel.Dock="Bottom" Style="{StaticResource BaseButton}" Background="{DynamicResource Surface}" BorderBrush="{DynamicResource Border}"
+                        Padding="10,8" HorizontalContentAlignment="Stretch" Command="{Binding NavigateCommand}" CommandParameter="insights"
+                        ToolTip="Readiness — open the breakdown">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="Readiness" FontSize="11.5" Foreground="{DynamicResource TextFaint}"/>
+                            <TextBlock Text="{Binding ReadinessLevel}" FontSize="12.5" FontWeight="Medium" Foreground="{DynamicResource Text}" Margin="0,1,0,0"/>
+                        </StackPanel>
+                        <TextBlock Grid.Column="1" Text="{Binding Readiness, StringFormat={}{0:0}}" FontSize="18" FontWeight="Medium"
+                                   Typography.NumeralAlignment="Tabular" Foreground="{DynamicResource Text}" VerticalAlignment="Center"/>
+                    </Grid>
+                </Button>
+
+                <ListBox ItemsSource="{Binding Nav}" SelectedItem="{Binding SelectedNav, Mode=TwoWay}" Style="{StaticResource PlainList}"
+                         ItemContainerStyle="{StaticResource NavItem}" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="28"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding Glyph}" FontFamily="{StaticResource IconFont}" FontSize="15" Width="16" TextAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                           Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Label}" FontSize="13" VerticalAlignment="Center"
+                                           Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"/>
+                                <TextBlock Grid.Column="2" Text="{Binding Badge}" FontSize="11.5" FontWeight="Medium" Typography.NumeralAlignment="Tabular"
+                                           Foreground="{DynamicResource Accent}" VerticalAlignment="Center"
+                                           Visibility="{Binding Badge, Converter={StaticResource CountToVis}}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+        </Border>
+
+        <!-- ================= Page ================= -->
+        <Grid x:Name="PageHost" Grid.Row="1" Grid.Column="1" Focusable="False"/>
+
+        <!-- Notification -->
+        <Border Grid.Row="1" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,24"
+                Background="{DynamicResource Surface2}" BorderBrush="{DynamicResource BorderStrong}" BorderThickness="1"
+                CornerRadius="8" Padding="14,9" MaxWidth="560"
+                Visibility="{Binding IsToastVisible, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}" IsHitTestVisible="False">
+            <StackPanel Orientation="Horizontal">
+                <Ellipse Width="6" Height="6" Fill="{DynamicResource Accent}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <TextBlock Text="{Binding Toast}" Foreground="{DynamicResource Text}" FontSize="13" TextWrapping="Wrap"/>
+            </StackPanel>
+        </Border>
+
+        <!-- ================= Login (covers everything until signed in) ================= -->
+        <Grid x:Name="LoginLayer" Grid.RowSpan="2" Grid.ColumnSpan="2" Background="{DynamicResource Bg}" Visibility="Collapsed">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Panel.ZIndex="1" WindowChrome.IsHitTestVisibleInChrome="True">
+                <Button Style="{StaticResource CaptionButton}" Content="&#xE921;" Click="Minimize_Click"/>
+                <Button Style="{StaticResource CloseButton}" Content="&#xE8BB;" Click="Close_Click"/>
+            </StackPanel>
+            <views:LoginView x:Name="Login"/>
+        </Grid>
+
+        <!-- ================= Confirm dialog (themed, in-app) ================= -->
+        <Grid Grid.RowSpan="2" Grid.ColumnSpan="2" Background="#99000000" Visibility="{Binding HasConfirm, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}">
+            <Border Style="{StaticResource Card}" Width="420" Padding="22,20" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{DynamicResource Surface2}"
+                    DataContext="{Binding Confirm}">
+                <StackPanel>
+                    <TextBlock Text="{Binding Title}" Style="{StaticResource H2}"/>
+                    <!-- Read-only TextBox so the message (e.g. a recovery code) can be selected and copied -->
+                    <TextBox Text="{Binding Message, Mode=OneWay}" Style="{x:Null}" IsReadOnly="True" TextWrapping="Wrap" Background="Transparent" BorderThickness="0" Padding="0"
+                             FontSize="13" Foreground="{DynamicResource TextMuted}" CaretBrush="{DynamicResource TextMuted}" SelectionBrush="{DynamicResource Accent}"
+                             FontFamily="{Binding FontFamily, RelativeSource={RelativeSource AncestorType=Window}}" Margin="0,8,0,0"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+                        <Button Content="Cancel" Style="{StaticResource SecondaryButton}" Margin="0,0,8,0"
+                                Command="{Binding DataContext.ConfirmNoCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                        <Button Content="{Binding ConfirmText}" Style="{StaticResource PrimaryButton}" Visibility="{Binding IsNormal, Converter={StaticResource BoolToVis}}"
+                                Command="{Binding DataContext.ConfirmYesCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                        <Button Content="{Binding ConfirmText}" Style="{StaticResource BaseButton}" Background="{DynamicResource Danger}" BorderBrush="{DynamicResource Danger}"
+                                Foreground="{DynamicResource Bg}" Visibility="{Binding IsDanger, Converter={StaticResource BoolToVis}}"
+                                Command="{Binding DataContext.ConfirmYesCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- ================= Launch animation ("hello") ================= -->
+        <Grid x:Name="SplashLayer" Grid.RowSpan="2" Grid.ColumnSpan="2" Background="{DynamicResource Bg}" MouseDown="Splash_MouseDown" Cursor="Hand" ClipToBounds="True">
+            <Canvas x:Name="GreetingCanvas" Opacity="0"/>
+            <Viewbox Width="600" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Canvas Width="330" Height="104">
+                    <!-- Hand-drawn monoline script: "momentum" in one continuous stroke, plus the t's crossbar. -->
+                    <Path x:Name="SplashScript" Stroke="{DynamicResource Text}" StrokeThickness="4.4"
+                          StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Data="M4,88 C8,80 10,70 10,62 L10,90 C10,72 15,60 21,60 C27,60 29,66 29,74 L29,90 C29,72 34,60 40,60 C46,60 48,66 48,74 L48,86 C48,90 51,91 55,88 C59,74 67,60 77,60 C87,60 91,70 90,78 C89,86 83,91 76,91 C69,91 65,85 66,77 C67,68 74,61 82,61 C88,61 93,63 99,60 C102,60 103,62 103,66 L103,90 C103,72 108,60 114,60 C120,60 122,66 122,74 L122,90 C122,72 127,60 133,60 C139,60 141,66 141,74 L141,86 C141,90 144,91 148,88 C156,84 166,76 170,70 C173,64 171,59 165,59 C157,59 153,69 153,77 C153,86 159,91 167,91 C173,91 178,88 182,84 C185,78 187,70 187,62 L187,90 C187,72 192,60 198,60 C204,60 206,66 206,74 L206,86 C206,90 209,91 213,88 C217,80 222,64 224,40 L224,84 C224,89 227,91 231,91 C235,91 238,89 241,86 C243,78 245,70 245,62 L245,82 C245,88 249,91 254,91 C259,91 263,86 264,78 L264,62 L264,86 C264,90 267,91 271,88 C274,82 276,72 276,62 L276,90 C276,72 281,60 287,60 C293,60 295,66 295,74 L295,90 C295,72 300,60 306,60 C312,60 314,66 314,74 L314,86 C314,90 317,91 322,87"/>
+                    <Path x:Name="SplashCross" Stroke="{DynamicResource Text}" StrokeThickness="4.4" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                          Data="M214,53 L236,51"/>
+                </Canvas>
+            </Viewbox>
+        </Grid>
+    </Grid>
+</Window>

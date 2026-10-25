@@ -1,0 +1,607 @@
+<UserControl x:Class="Momentum.Views.AssessmentLabView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:core="clr-namespace:Momentum.Core"
+             xmlns:models="clr-namespace:Momentum.Models"
+             mc:Ignorable="d"
+             d:DesignHeight="950" d:DesignWidth="1440">
+
+    <UserControl.Resources>
+        <core:BoolToVisibilityConverter x:Key="BoolToVis"/>
+        <core:NullToVisibilityConverter x:Key="NullToVis"/>
+        <core:StringToVisibilityConverter x:Key="StringToVis"/>
+        <core:InverseBoolConverter x:Key="InverseBool"/>
+
+        <Style x:Key="MetricTile" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource Surface2}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource Border}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="Margin" Value="0,0,10,0"/>
+        </Style>
+
+        <Style x:Key="ExampleCard" TargetType="Border">
+            <Setter Property="Background" Value="#0E1014"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource Border}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+        </Style>
+
+        <Style x:Key="CodeEditorBoxStyle" TargetType="TextBox">
+            <Setter Property="VerticalContentAlignment" Value="Top"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="10,10,10,10"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="Transparent" BorderThickness="0">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          Focusable="False"
+                                          HorizontalScrollBarVisibility="Auto"
+                                          VerticalScrollBarVisibility="Auto"
+                                          Padding="{TemplateBinding Padding}"
+                                          VerticalAlignment="Stretch"
+                                          VerticalContentAlignment="Top"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="20,16,20,16">
+        <Grid.RowDefinitions>
+            <!-- TOP BAR: Title & Telemetry -->
+            <RowDefinition Height="Auto"/>
+            <!-- MAIN WORKSPACE -->
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- TOP BAR: Header & Assessment Telemetry -->
+        <Grid Grid.Row="0" Margin="0,0,0,14">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="Assessment Lab &amp; Failure Forensics" Style="{StaticResource H1}" FontSize="21" FontWeight="SemiBold"/>
+                    <Border Background="{DynamicResource AccentSoft}" BorderBrush="{DynamicResource AccentLine}" BorderThickness="1" CornerRadius="10" Padding="8,2" Margin="10,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="V6 Engine" FontSize="11" FontWeight="Medium" Foreground="{DynamicResource Accent}"/>
+                    </Border>
+                </StackPanel>
+                <TextBlock Text="Practical engineering placement assessments, deterministic test execution, and empirical failure analysis."
+                           Style="{StaticResource Muted}" FontSize="12.5" Margin="0,3,0,0"/>
+            </StackPanel>
+
+            <!-- Telemetry Metrics -->
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                <Border Style="{StaticResource MetricTile}">
+                    <StackPanel>
+                        <TextBlock Text="SOLVED" Style="{StaticResource Caption}" FontSize="10" FontWeight="SemiBold"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                            <TextBlock Text="{Binding SolvedCount}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource Text}"/>
+                            <TextBlock Text=" / " FontSize="16" Foreground="{DynamicResource TextMuted}"/>
+                            <TextBlock Text="{Binding TotalCount}" FontSize="16" Foreground="{DynamicResource TextMuted}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource MetricTile}">
+                    <StackPanel>
+                        <TextBlock Text="SUCCESS RATE" Style="{StaticResource Caption}" FontSize="10" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding SuccessRateText}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource Success}" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource MetricTile}">
+                    <StackPanel>
+                        <TextBlock Text="ATTEMPTS" Style="{StaticResource Caption}" FontSize="10" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding AttemptCount}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource Text}" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource MetricTile}" Margin="0">
+                    <StackPanel>
+                        <TextBlock Text="FREQUENT ERROR" Style="{StaticResource Caption}" FontSize="10" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding RepeatedErrorSummary}" FontSize="13" FontWeight="Medium" Foreground="{DynamicResource Warning}" Margin="0,3,0,0"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Grid>
+
+        <!-- MAIN SPLIT WORKSPACE: Problems (Left) & Editor / Forensics (Right) -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="440" MinWidth="340" MaxWidth="600"/>
+                <ColumnDefinition Width="12"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Resizable Splitter -->
+            <GridSplitter Grid.Column="1" Width="6" HorizontalAlignment="Center" VerticalAlignment="Stretch"
+                          Background="Transparent" ResizeBehavior="PreviousAndNext" ShowsPreview="False" Cursor="SizeWE"/>
+
+            <!-- LEFT PANE: Catalog & Structured Problem Specification -->
+            <Border Grid.Column="0" Background="{DynamicResource Surface}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="8">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <!-- Topic Filter Strip -->
+                        <RowDefinition Height="Auto"/>
+                        <!-- Problem Selection List -->
+                        <RowDefinition Height="165"/>
+                        <!-- Problem Title Header -->
+                        <RowDefinition Height="Auto"/>
+                        <!-- Problem Description (Structured & Formatted) -->
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Topic Filter -->
+                    <Border Grid.Row="0" Background="{DynamicResource Surface2}" Padding="12,8" BorderBrush="{DynamicResource Divider}" BorderThickness="0,0,0,1" CornerRadius="8,8,0,0">
+                        <DockPanel>
+                            <TextBlock Text="Assessments Catalog" FontWeight="SemiBold" FontSize="12.5" Foreground="{DynamicResource Text}" VerticalAlignment="Center"/>
+                            <ComboBox ItemsSource="{Binding Topics}" SelectedItem="{Binding SelectedTopicFilter}" HorizontalAlignment="Right" Width="175" Height="25" FontSize="11.5"/>
+                        </DockPanel>
+                    </Border>
+
+                    <!-- Problem Catalog List -->
+                    <ListBox Grid.Row="1" ItemsSource="{Binding FilteredQuestions}" SelectedItem="{Binding SelectedQuestion}"
+                             BorderThickness="0" Background="Transparent" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Padding" Value="10,7"/>
+                                <Setter Property="Margin" Value="4,2"/>
+                                <Setter Property="BorderThickness" Value="1"/>
+                                <Setter Property="BorderBrush" Value="Transparent"/>
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <Border x:Name="ItemBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource Hover}"/>
+                                                </Trigger>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource AccentSoft}"/>
+                                                    <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{DynamicResource AccentLine}"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="&#xE73E;" FontFamily="{StaticResource IconFont}" FontSize="11" Foreground="{DynamicResource Success}" Margin="0,0,5,0" VerticalAlignment="Center"
+                                                       Visibility="{Binding IsSolved, Converter={StaticResource BoolToVis}}"/>
+                                            <TextBlock Text="{Binding Title}" FontSize="12.5" FontWeight="Medium" Foreground="{DynamicResource Text}" TextTrimming="CharacterEllipsis"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                                            <TextBlock Text="{Binding Topic}" FontSize="11" Foreground="{DynamicResource TextMuted}"/>
+                                            <TextBlock Text=" • " FontSize="11" Foreground="{DynamicResource TextFaint}"/>
+                                            <TextBlock Text="{Binding EstimatedMinutes}" FontSize="11" Foreground="{DynamicResource TextFaint}"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                    <Border Grid.Column="1" VerticalAlignment="Center" CornerRadius="4" Padding="6,2" Background="{DynamicResource Surface2}" BorderBrush="{DynamicResource Border}" BorderThickness="1">
+                                        <TextBlock Text="{Binding Difficulty}" FontSize="10.5" FontWeight="SemiBold"
+                                                   Foreground="{Binding Difficulty, Converter={StaticResource DifficultyBrush}}"/>
+                                    </Border>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <!-- Problem Header -->
+                    <Border Grid.Row="2" Background="{DynamicResource Surface2}" Padding="14,10" BorderBrush="{DynamicResource Divider}" BorderThickness="0,1,0,1">
+                        <StackPanel>
+                            <TextBlock Text="{Binding SelectedQuestion.Title}" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource Text}" TextTrimming="CharacterEllipsis"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                                <Border CornerRadius="4" Padding="6,2" Background="{DynamicResource Surface}" BorderBrush="{DynamicResource Border}" BorderThickness="1" Margin="0,0,8,0">
+                                    <TextBlock Text="{Binding SelectedQuestion.Difficulty}" FontSize="11" FontWeight="SemiBold"
+                                               Foreground="{Binding SelectedQuestion.Difficulty, Converter={StaticResource DifficultyBrush}}"/>
+                                </Border>
+                                <Border CornerRadius="4" Padding="6,2" Background="{DynamicResource Surface}" BorderBrush="{DynamicResource Border}" BorderThickness="1" Margin="0,0,8,0">
+                                    <TextBlock Text="{Binding SelectedQuestion.Topic}" FontSize="11" Foreground="{DynamicResource TextMuted}"/>
+                                </Border>
+                                <Border CornerRadius="4" Padding="6,2" Background="{DynamicResource Surface}" BorderBrush="{DynamicResource Border}" BorderThickness="1">
+                                    <TextBlock Text="{Binding SelectedQuestion.EstimatedMinutes}" FontSize="11" Foreground="{DynamicResource TextFaint}"/>
+                                </Border>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Problem Specification (Structured Presentation - Fix for Screenshot 1) -->
+                    <ScrollViewer Grid.Row="3" Padding="16,12" VerticalScrollBarVisibility="Auto">
+                        <StackPanel>
+                            <!-- 1. PROBLEM STATEMENT -->
+                            <TextBlock Text="PROBLEM STATEMENT" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource Accent}" Margin="0,0,0,6"/>
+                            <TextBlock Text="{Binding SelectedQuestion.Summary}"
+                                       TextWrapping="Wrap" LineHeight="20" FontSize="13" Foreground="{DynamicResource Text}" Margin="0,0,0,14"/>
+
+                            <!-- 2. EXAMPLES SECTION -->
+                            <TextBlock Text="EXAMPLES" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource Accent}" Margin="0,4,0,8"/>
+                            <ItemsControl ItemsSource="{Binding SelectedQuestion.Examples}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Style="{StaticResource ExampleCard}">
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Number, StringFormat='Example {0}:'}" FontWeight="SemiBold" FontSize="12" Foreground="{DynamicResource Text}" Margin="0,0,0,4"/>
+                                                <!-- Input -->
+                                                <StackPanel Orientation="Horizontal" Margin="0,2,0,2">
+                                                    <TextBlock Text="Input: " FontWeight="SemiBold" FontSize="11.5" Foreground="{DynamicResource TextMuted}"/>
+                                                    <TextBlock Text="{Binding Input}" FontFamily="{StaticResource MonoFont}" FontSize="11.5" Foreground="{DynamicResource Accent}" TextWrapping="Wrap"/>
+                                                </StackPanel>
+                                                <!-- Output -->
+                                                <StackPanel Orientation="Horizontal" Margin="0,2,0,2">
+                                                    <TextBlock Text="Output: " FontWeight="SemiBold" FontSize="11.5" Foreground="{DynamicResource TextMuted}"/>
+                                                    <TextBlock Text="{Binding Output}" FontFamily="{StaticResource MonoFont}" FontSize="11.5" Foreground="{DynamicResource Success}" TextWrapping="Wrap"/>
+                                                </StackPanel>
+                                                <!-- Explanation -->
+                                                <StackPanel Orientation="Horizontal" Margin="0,2,0,0" Visibility="{Binding Explanation, Converter={StaticResource StringToVis}}">
+                                                    <TextBlock Text="Explanation: " FontWeight="SemiBold" FontSize="11.5" Foreground="{DynamicResource TextFaint}"/>
+                                                    <TextBlock Text="{Binding Explanation}" FontSize="11.5" Foreground="{DynamicResource TextFaint}" TextWrapping="Wrap"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <!-- 3. CONSTRAINTS SECTION -->
+                            <TextBlock Text="CONSTRAINTS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource Accent}" Margin="0,6,0,6"/>
+                            <ItemsControl ItemsSource="{Binding SelectedQuestion.Constraints}" Margin="0,0,0,14">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" Margin="0,3">
+                                            <TextBlock Text="• " Foreground="{DynamicResource TextMuted}" FontSize="12"/>
+                                            <Border Background="#14171C" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="4" Padding="6,1">
+                                                <TextBlock Text="{Binding}" FontFamily="{StaticResource MonoFont}" FontSize="11.5" Foreground="#D0D5DC"/>
+                                            </Border>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <!-- 4. HINTS EXPANDER -->
+                            <Border Margin="0,4,0,10" Background="{DynamicResource Surface2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="6" Padding="12">
+                                <StackPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Interview Strategy Hint" FontWeight="SemiBold" FontSize="12" Foreground="{DynamicResource Accent}" VerticalAlignment="Center"/>
+                                        <Button Command="{Binding ToggleHintCommand}" Style="{StaticResource LinkButton}" HorizontalAlignment="Right" FontSize="11.5">
+                                            <TextBlock Text="Toggle Hint"/>
+                                        </Button>
+                                    </DockPanel>
+                                    <TextBlock Text="{Binding SelectedQuestion.Hint}" Margin="0,8,0,0" FontSize="12" Foreground="{DynamicResource TextMuted}" TextWrapping="Wrap"
+                                               Visibility="{Binding ShowHint, Converter={StaticResource BoolToVis}}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- 5. OPTIMAL REFERENCE SOLUTION EXPANDER -->
+                            <Border Margin="0,0,0,14" Background="{DynamicResource Surface2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="6" Padding="12">
+                                <StackPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Optimal Reference Solution" FontWeight="SemiBold" FontSize="12" Foreground="{DynamicResource Success}" VerticalAlignment="Center"/>
+                                        <Button Command="{Binding ToggleReferenceCommand}" Style="{StaticResource LinkButton}" HorizontalAlignment="Right" FontSize="11.5">
+                                            <TextBlock Text="Toggle Reference"/>
+                                        </Button>
+                                    </DockPanel>
+                                    <TextBox Text="{Binding SelectedQuestion.ReferenceSolution, Mode=OneWay}"
+                                             Visibility="{Binding ShowReferenceSolution, Converter={StaticResource BoolToVis}}"
+                                             IsReadOnly="True" Margin="0,8,0,0" FontFamily="{StaticResource MonoFont}" FontSize="11.5"
+                                             Background="#0C0E11" Foreground="#C8D1DC" BorderBrush="{DynamicResource Border}" Padding="8" AcceptsReturn="True"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+
+            <!-- RIGHT PANE: IDE Code Editor & Forensics Lab -->
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <!-- Code Editor Section -->
+                    <RowDefinition Height="3*" MinHeight="260"/>
+                    <!-- Execution Status Banner -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Results & Forensics Split -->
+                    <RowDefinition Height="2*" MinHeight="200"/>
+                </Grid.RowDefinitions>
+
+                <!-- 1. PROFESSIONAL CODE EDITOR (Fix for Screenshot 3) -->
+                <Border Grid.Row="0" Background="{DynamicResource Surface}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="8">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <!-- Editor Header / Tab bar -->
+                            <RowDefinition Height="Auto"/>
+                            <!-- Code Canvas with Line Numbers Gutter -->
+                            <RowDefinition Height="*"/>
+                            <!-- Editor Status Bar Footer -->
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Top Toolbar / File Tab Header -->
+                        <Border Grid.Row="0" Background="{DynamicResource Surface2}" BorderBrush="{DynamicResource Divider}" BorderThickness="0,0,0,1" CornerRadius="8,8,0,0" Padding="12,8">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Left Tab: solution.py & function signature -->
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Border Background="#16181D" BorderBrush="{DynamicResource BorderStrong}" BorderThickness="1" CornerRadius="4,4,0,0" Padding="10,4" Margin="0,0,10,0">
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <TextBlock Text="&#xE756;" FontFamily="{StaticResource IconFont}" FontSize="11" Foreground="{DynamicResource Accent}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                            <TextBlock Text="solution.py" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Text}"/>
+                                        </StackPanel>
+                                    </Border>
+                                    <TextBlock Text="def " FontFamily="{StaticResource MonoFont}" FontSize="12.5" Foreground="{DynamicResource Accent}" FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding SelectedQuestion.FunctionName}" FontFamily="{StaticResource MonoFont}" FontSize="12.5" Foreground="{DynamicResource Text}" FontWeight="Bold"/>
+                                    <TextBlock Text="(...)  " FontFamily="{StaticResource MonoFont}" FontSize="12.5" Foreground="{DynamicResource TextMuted}"/>
+                                    <Border Background="#14281A" BorderBrush="{DynamicResource Success}" BorderThickness="1" CornerRadius="4" Padding="6,1" Margin="4,0,0,0" VerticalAlignment="Center">
+                                        <TextBlock Text="Python 3.13" FontSize="10.5" Foreground="{DynamicResource Success}" FontWeight="Medium"/>
+                                    </Border>
+                                </StackPanel>
+
+                                <!-- Right Actions -->
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Button Content="Reset Starter" Command="{Binding ResetStarterCodeCommand}" Style="{StaticResource GhostButton}" Margin="0,0,6,0" FontSize="11.5"/>
+                                    <Button Content="Copy Code" Command="{Binding CopyCodeCommand}" Style="{StaticResource GhostButton}" Margin="0,0,10,0" FontSize="11.5"/>
+                                    <Button Content="Run Sample Tests" Command="{Binding RunTestsCommand}" Style="{StaticResource SecondaryButton}" Margin="0,0,8,0" Padding="12,5" FontSize="12" ToolTip="Run against sample tests (Ctrl+Enter)"/>
+                                    <Button Content="Submit Assessment" Command="{Binding SubmitAssessmentCommand}" Style="{StaticResource PrimaryButton}" Padding="14,5" FontSize="12" ToolTip="Submit and evaluate full test suite (Ctrl+Shift+Enter)"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- Code Canvas with Line Numbers Gutter -->
+                        <Grid Grid.Row="1" Background="#0A0B0E">
+                            <Grid.ColumnDefinitions>
+                                <!-- Line Numbers Gutter -->
+                                <ColumnDefinition Width="Auto"/>
+                                <!-- Code Editor TextBox -->
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Line Numbers Margin -->
+                            <ScrollViewer x:Name="LineNumbersScrollViewer" Grid.Column="0"
+                                          VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled"
+                                          Background="#08090C" BorderBrush="{DynamicResource Divider}" BorderThickness="0,0,1,0"
+                                          Padding="10,10,8,10" Focusable="False">
+                                <TextBlock x:Name="LineNumbersText" Text="1"
+                                           FontFamily="{StaticResource MonoFont}" FontSize="13"
+                                           Foreground="#4A505C" TextAlignment="Right" MinWidth="26"/>
+                            </ScrollViewer>
+
+                            <!-- Code Editor TextBox -->
+                            <TextBox x:Name="CodeEditorTextBox" Grid.Column="1"
+                                     Style="{StaticResource CodeEditorBoxStyle}"
+                                     Text="{Binding UserCode, UpdateSourceTrigger=PropertyChanged}"
+                                     FontFamily="{StaticResource MonoFont}" FontSize="13"
+                                     Foreground="#E6EAF0" CaretBrush="{DynamicResource Accent}"
+                                     AcceptsReturn="True" AcceptsTab="True"
+                                     SpellCheck.IsEnabled="False"
+                                     TextChanged="OnCodeEditorTextChanged"
+                                     SelectionChanged="OnCodeEditorSelectionChanged"
+                                     PreviewKeyDown="OnCodeEditorPreviewKeyDown"/>
+                        </Grid>
+
+                        <!-- Editor Status Bar Footer -->
+                        <Border Grid.Row="2" Background="{DynamicResource Surface2}" BorderBrush="{DynamicResource Divider}" BorderThickness="0,1,0,0" CornerRadius="0,0,8,8" Padding="12,4">
+                            <DockPanel>
+                                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                                    <TextBlock x:Name="CaretPositionText" Text="Ln 1, Col 1" FontSize="11" Foreground="{DynamicResource TextMuted}" Margin="0,0,14,0"/>
+                                    <TextBlock x:Name="LineCountText" Text="1 lines" FontSize="11" Foreground="{DynamicResource TextFaint}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right">
+                                    <TextBlock Text="Spaces: 4" FontSize="11" Foreground="{DynamicResource TextFaint}" Margin="0,0,14,0"/>
+                                    <TextBlock Text="UTF-8" FontSize="11" Foreground="{DynamicResource TextFaint}" Margin="0,0,14,0"/>
+                                    <TextBlock Text="Python 3" FontSize="11" Foreground="{DynamicResource TextMuted}"/>
+                                </StackPanel>
+                            </DockPanel>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- Execution Progress / Status Banner -->
+                <Border Grid.Row="1" Background="{DynamicResource Surface2}" BorderBrush="{DynamicResource Border}" BorderThickness="1,0,1,1" Padding="14,6" Margin="0,4,0,0" CornerRadius="6">
+                    <DockPanel>
+                        <ProgressBar IsIndeterminate="{Binding IsRunning}" Width="100" Height="4" VerticalAlignment="Center" Margin="0,0,12,0"
+                                     Visibility="{Binding IsRunning, Converter={StaticResource BoolToVis}}" Foreground="{DynamicResource Accent}"/>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="&#xE73E;" FontFamily="{StaticResource IconFont}" FontSize="12" Foreground="{DynamicResource Success}" Margin="0,0,6,0" VerticalAlignment="Center"
+                                       Visibility="{Binding IsSuccess, Converter={StaticResource BoolToVis}}"/>
+                            <TextBlock Text="&#xE711;" FontFamily="{StaticResource IconFont}" FontSize="12" Foreground="{DynamicResource Danger}" Margin="0,0,6,0" VerticalAlignment="Center"
+                                       Visibility="{Binding IsFailure, Converter={StaticResource BoolToVis}}"/>
+                            <TextBlock Text="{Binding StatusMessage}" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource Text}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding LastReport.TotalExecutionMs, StringFormat='Wall-clock: {0}ms'}"
+                                   Visibility="{Binding LastReport, Converter={StaticResource NullToVis}}"
+                                   HorizontalAlignment="Right" FontSize="11.5" Foreground="{DynamicResource TextFaint}" VerticalAlignment="Center"/>
+                    </DockPanel>
+                </Border>
+
+                <!-- RESULTS & FORENSICS DRAWER -->
+                <Grid Grid.Row="2" Margin="0,8,0,0">
+                    <Grid.ColumnDefinitions>
+                        <!-- Test Results Matrix (Left) -->
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="10"/>
+                        <!-- Failure Forensics Card (Right) -->
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Test Cases Result Matrix (Fix for Screenshot 2) -->
+                    <Border Grid.Column="0" Background="{DynamicResource Surface}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="8">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <Border Grid.Row="0" Background="{DynamicResource Surface2}" Padding="12,8" BorderBrush="{DynamicResource Divider}" BorderThickness="0,0,0,1" CornerRadius="8,8,0,0">
+                                <DockPanel>
+                                    <TextBlock Text="Test Cases Evaluation" FontWeight="SemiBold" FontSize="12.5" Foreground="{DynamicResource Text}"/>
+                                    <TextBlock Text="{Binding TestResults.Count, StringFormat='{}{0} cases'}" HorizontalAlignment="Right" FontSize="11.5" Foreground="{DynamicResource TextFaint}"/>
+                                </DockPanel>
+                            </Border>
+
+                            <ListBox Grid.Row="1" ItemsSource="{Binding TestResults}" BorderThickness="0" Background="Transparent">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Margin="4,3" Padding="10,7" Background="{DynamicResource Surface2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="6">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <DockPanel Grid.Row="0">
+                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <!-- 1. NOT EVALUATED YET (Sample specification pending) -->
+                                                        <TextBlock Text="&#xE7C3;" FontFamily="{StaticResource IconFont}" FontSize="12" Foreground="{DynamicResource TextFaint}" Margin="0,0,7,0" VerticalAlignment="Center"
+                                                                   Visibility="{Binding IsPending, Converter={StaticResource BoolToVis}}"/>
+
+                                                        <!-- 2. EVALUATED AND PASSED (Crisp Checkmark) -->
+                                                        <TextBlock Text="&#xE73E;" FontFamily="{StaticResource IconFont}" FontSize="13" Foreground="{DynamicResource Success}" Margin="0,0,7,0" VerticalAlignment="Center"
+                                                                   Visibility="{Binding IsSuccess, Converter={StaticResource BoolToVis}}"/>
+
+                                                        <!-- 3. EVALUATED AND FAILED (Crisp Cross) -->
+                                                        <TextBlock Text="&#xE711;" FontFamily="{StaticResource IconFont}" FontSize="13" Foreground="{DynamicResource Danger}" Margin="0,0,7,0" VerticalAlignment="Center"
+                                                                   Visibility="{Binding IsFailure, Converter={StaticResource BoolToVis}}"/>
+
+                                                        <TextBlock Text="{Binding Index, StringFormat='Test #{0}'}" FontWeight="SemiBold" FontSize="12" Foreground="{DynamicResource Text}"/>
+
+                                                        <!-- Clean Edge Case Tag Badge -->
+                                                        <Border Background="{DynamicResource AccentSoft}" BorderBrush="{DynamicResource AccentLine}" BorderThickness="1" CornerRadius="4" Padding="5,1" Margin="6,0,0,0"
+                                                                Visibility="{Binding EdgeCaseTag, Converter={StaticResource StringToVis}}">
+                                                            <TextBlock Text="{Binding EdgeCaseTag}" FontSize="10" Foreground="{DynamicResource Accent}" FontWeight="Medium"/>
+                                                        </Border>
+
+                                                        <!-- Hidden Tag -->
+                                                        <Border Background="#1A1C22" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="4" Padding="5,1" Margin="6,0,0,0"
+                                                                Visibility="{Binding IsHidden, Converter={StaticResource BoolToVis}}">
+                                                            <TextBlock Text="Hidden Case" FontSize="10" Foreground="{DynamicResource TextFaint}"/>
+                                                        </Border>
+                                                    </StackPanel>
+
+                                                    <TextBlock Text="{Binding ExecutionTimeMs, StringFormat='{}{0}ms'}" FontSize="11" Foreground="{DynamicResource TextFaint}" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                               Visibility="{Binding IsEvaluated, Converter={StaticResource BoolToVis}}"/>
+                                                </DockPanel>
+
+                                                <!-- Test Detail Inputs / Outputs -->
+                                                <StackPanel Grid.Row="1" Margin="20,5,0,0">
+                                                    <TextBlock Text="{Binding InputDisplay, StringFormat='Input: {0}'}" FontSize="11" Foreground="{DynamicResource TextMuted}" FontFamily="{StaticResource MonoFont}"/>
+                                                    <TextBlock Text="{Binding ExpectedDisplay, StringFormat='Expected: {0}'}" FontSize="11" Foreground="{DynamicResource TextFaint}" FontFamily="{StaticResource MonoFont}"/>
+                                                    <TextBlock Text="{Binding ActualDisplay, StringFormat='Observed: {0}'}" FontSize="11" Foreground="{DynamicResource Danger}" FontFamily="{StaticResource MonoFont}"
+                                                               Visibility="{Binding IsFailure, Converter={StaticResource BoolToVis}}"/>
+                                                    <TextBlock Text="{Binding ErrorMessage, StringFormat='Exception: {0}'}" FontSize="11" Foreground="{DynamicResource Danger}" TextWrapping="Wrap"
+                                                               Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVis}}"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Grid>
+                    </Border>
+
+                    <!-- THE SIGNATURE FEATURE: FAILURE FORENSICS CARD (Fix for Screenshot 3) -->
+                    <Border Grid.Column="2" Background="{DynamicResource Surface}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="8">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <Border Grid.Row="0" Background="{DynamicResource Surface2}" Padding="12,8" BorderBrush="{DynamicResource Divider}" BorderThickness="0,0,0,1" CornerRadius="8,8,0,0">
+                                <DockPanel>
+                                    <TextBlock Text="Failure Forensics &amp; Diagnostic Triage" FontWeight="SemiBold" FontSize="12.5" Foreground="{DynamicResource Text}"/>
+                                    <!-- Taxonomy Badge -->
+                                    <Border Background="{DynamicResource AccentSoft}" CornerRadius="4" Padding="6,1" HorizontalAlignment="Right"
+                                            Visibility="{Binding Diagnostic, Converter={StaticResource NullToVis}}">
+                                        <TextBlock Text="{Binding Diagnostic.CategoryDisplayName}" FontSize="10.5" Foreground="{DynamicResource Accent}" FontWeight="Medium"/>
+                                    </Border>
+                                </DockPanel>
+                            </Border>
+
+                            <ScrollViewer Grid.Row="1" Padding="14,12" VerticalScrollBarVisibility="Auto">
+                                <StackPanel>
+                                    <!-- CASE 1: ALL TESTS PASSED (Success Verified) -->
+                                    <Border Background="{DynamicResource SuccessSoft}" BorderBrush="{DynamicResource Success}" BorderThickness="1" CornerRadius="6" Padding="14" Margin="0,0,0,10"
+                                            Visibility="{Binding IsSuccess, Converter={StaticResource BoolToVis}}">
+                                        <StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                                <TextBlock Text="&#xE73E;" FontFamily="{StaticResource IconFont}" FontSize="14" Foreground="{DynamicResource Success}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                                <TextBlock Text="Assessment Benchmark Verified" FontWeight="SemiBold" FontSize="13.5" Foreground="{DynamicResource Success}" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding Diagnostic.ObservedFact}" FontSize="12" Foreground="{DynamicResource Text}" TextWrapping="Wrap" Margin="0,0,0,6"/>
+                                            <TextBlock Text="{Binding Diagnostic.ConceptInsight}" FontSize="11.5" Foreground="{DynamicResource TextMuted}" TextWrapping="Wrap" Margin="0,0,0,8"/>
+                                            <Border Background="#162E1E" BorderBrush="{DynamicResource Success}" BorderThickness="1" CornerRadius="4" Padding="8,4" HorizontalAlignment="Left">
+                                                <TextBlock Text="Ready for next placement assessment" FontSize="11" Foreground="{DynamicResource Success}" FontWeight="Medium"/>
+                                            </Border>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- CASE 2: FAILURE DIAGNOSTIC ACTIVE (Only when IsFailure == true) -->
+                                    <StackPanel Visibility="{Binding IsFailure, Converter={StaticResource BoolToVis}}">
+                                        <!-- Observed Fact Card -->
+                                        <Border Background="{DynamicResource DangerSoft}" BorderBrush="{DynamicResource Danger}" BorderThickness="1" CornerRadius="6" Padding="12" Margin="0,0,0,10">
+                                            <StackPanel>
+                                                <TextBlock Text="1. Observed Empirical Fact" FontWeight="SemiBold" FontSize="11.5" Foreground="{DynamicResource Danger}"/>
+                                                <TextBlock Text="{Binding Diagnostic.ObservedFact}" FontSize="12" Foreground="{DynamicResource Text}" Margin="0,4,0,0" TextWrapping="Wrap"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Concept Insight Card -->
+                                        <Border Background="{DynamicResource Surface2}" BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="6" Padding="12" Margin="0,0,0,10">
+                                            <StackPanel>
+                                                <TextBlock Text="2. Underlying CS Invariant &amp; Candidate Causes" FontWeight="SemiBold" FontSize="11.5" Foreground="{DynamicResource Accent}"/>
+                                                <TextBlock Text="{Binding Diagnostic.ConceptInsight}" FontSize="12" Foreground="{DynamicResource TextMuted}" Margin="0,4,0,0" TextWrapping="Wrap"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Actionable Recommendation Card -->
+                                        <Border Background="{DynamicResource Surface2}" BorderBrush="{DynamicResource AccentLine}" BorderThickness="1" CornerRadius="6" Padding="12">
+                                            <StackPanel>
+                                                <TextBlock Text="3. Targeted Actionable Recommendation" FontWeight="SemiBold" FontSize="11.5" Foreground="{DynamicResource Accent}"/>
+                                                <TextBlock Text="{Binding Diagnostic.ActionableRecommendation}" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource Text}" Margin="0,4,0,0" TextWrapping="Wrap"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+
+                                    <!-- CASE 3: NO TESTS RUN YET (Clean Initial State) -->
+                                    <StackPanel Visibility="{Binding LastReport, Converter={StaticResource NullToVis}, ConverterParameter='invert'}" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,30,0,0">
+                                        <TextBlock Text="&#xE9CE;" FontFamily="{StaticResource IconFont}" FontSize="28" Foreground="{DynamicResource TextFaint}" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                                        <TextBlock Text="Diagnostic Lab Ready" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TextMuted}" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="Click 'Run Sample Tests' or 'Submit Assessment' to execute your code against test cases and trigger live forensic analysis."
+                                                   Style="{StaticResource Muted}" TextAlignment="Center" FontSize="11.5" Margin="0,4,0,0" MaxWidth="300"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

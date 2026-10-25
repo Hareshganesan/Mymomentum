@@ -1,32 +1,42 @@
-# .NET build artifacts
-**/bin/
-**/obj/
-**/publish/
+# .NET Build Outputs
+bin/
+obj/
+publish/
+*.exe
+*.dll
+*.pdb
 
-# Visual Studio / VS Code cache
+# Local Distribution and Legacy Working Folders (Preserved Locally)
+V5/
+V5_exe/
+V6/
+V6_exe/
+V6.Tests/
+V3_exe/
+V4_exe/
+dist/
+Legacy_Backup/
+
+# IDE and Editor Cache
 .vs/
+.vscode/
 *.user
 *.suo
 *.userosscache
 *.sln.docstates
-.vscode/
 
-# Temporary / backup binaries
-*.bak
-*_old.exe
-*_temp.*
-
-# User local data & personal progress state
+# Local Application Data & Secrets (Never Commit)
 **/placement_data.json
 **/placement_data.json.bak
+**/momentum.json
+**/momentum.json.bak
+**/accounts.json
 **/data/
+*.log
+*.bak
+*.tmp
 
-# OS metadata
+# Operating System Metadata
 Thumbs.db
 Desktop.ini
 .DS_Store
-
-# Per-account app data and secrets (never commit)
-**/momentum.json
-**/accounts.json
-*.pdb

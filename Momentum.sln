@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{12B29C23-9A5D-424B-A2FD-7EE634420D07}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Momentum", "src\Momentum\Momentum.csproj", "{B12D1062-B415-489A-B932-7FE021D257D5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Momentum.Tests", "src\Momentum.Tests\Momentum.Tests.csproj", "{B691DD78-2A51-4452-8E9A-5ACBE2B0AB6A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B12D1062-B415-489A-B932-7FE021D257D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B12D1062-B415-489A-B932-7FE021D257D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B12D1062-B415-489A-B932-7FE021D257D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B12D1062-B415-489A-B932-7FE021D257D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B691DD78-2A51-4452-8E9A-5ACBE2B0AB6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B691DD78-2A51-4452-8E9A-5ACBE2B0AB6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B691DD78-2A51-4452-8E9A-5ACBE2B0AB6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B691DD78-2A51-4452-8E9A-5ACBE2B0AB6A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B12D1062-B415-489A-B932-7FE021D257D5} = {12B29C23-9A5D-424B-A2FD-7EE634420D07}
+		{B691DD78-2A51-4452-8E9A-5ACBE2B0AB6A} = {12B29C23-9A5D-424B-A2FD-7EE634420D07}
+	EndGlobalSection
+EndGlobal
