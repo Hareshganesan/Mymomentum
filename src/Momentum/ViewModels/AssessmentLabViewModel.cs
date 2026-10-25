@@ -280,7 +280,7 @@ namespace Momentum.ViewModels
             }
         }
 
-        private async Task RunAssessmentAsync(bool runAllTests)
+        public async Task RunAssessmentAsync(bool runAllTests)
         {
             if (SelectedQuestion == null || IsRunning) return;
 

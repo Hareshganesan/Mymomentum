@@ -30,8 +30,11 @@ Traditional practice platforms provide binary verdicts: `Wrong Answer` or `Accep
 ### Placement Assessment Lab & Failure Forensics
 ![Assessment Lab & Failure Forensics](assets/screenshots/assessment_lab_editor.png)
 
-### Placement Drive Kanban Pipeline
-![Placement Drive Pipeline](assets/screenshots/pipeline_kanban.png)
+### Interactive Python Visual Tutor & Live Execution Simulator
+![Interactive Visual Tutor](assets/screenshots/visual_tutor.png)
+
+### Curated DSA Roadmap & Spaced Repetition Catalog
+![Curated Problems Catalog](assets/screenshots/problems_catalog.png)
 
 ---
 

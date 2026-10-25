@@ -11,6 +11,8 @@ namespace Momentum.Views
 {
     public partial class MainWindow : Window
     {
+        public static bool IsCaptureMode { get; set; }
+
         public MainWindow()
         {
             InitializeComponent();
@@ -24,7 +26,7 @@ namespace Momentum.Views
 
             if (AccountService.TryResume()) EnterApp();
             else ShowLogin();
-            Loaded += (_, _) => PlaySplash();
+            Loaded += (_, _) => { if (!IsCaptureMode) PlaySplash(); };
         }
 
         // ---------- Launch animation ----------
@@ -188,6 +190,14 @@ namespace Momentum.Views
                 view.DataContext = page;
                 view.Visibility = Visibility.Visible;
             }
+        }
+
+        public void EnterForCapture()
+        {
+            IsCaptureMode = true;
+            SplashLayer.Visibility = Visibility.Collapsed;
+            LoginLayer.Visibility = Visibility.Collapsed;
+            EnterApp();
         }
 
         private async void EnterApp()
