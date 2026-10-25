@@ -1,9 +1,5 @@
 @echo off
 echo Starting Momentum...
-if exist "%~dp0V6_exe\Momentum.exe" (
-    start "" "%~dp0V6_exe\Momentum.exe"
-    exit
-)
 if exist "%~dp0src\Momentum\bin\Release\net8.0-windows10.0.19041.0\Momentum.exe" (
     start "" "%~dp0src\Momentum\bin\Release\net8.0-windows10.0.19041.0\Momentum.exe"
     exit

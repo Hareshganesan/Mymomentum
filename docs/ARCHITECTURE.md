@@ -39,7 +39,7 @@ Momentum is engineered as an offline-first, high-performance desktop preparation
 │                                     │                                  │
 │                                     ▼                                  │
 │   ┌─────────────────────────────────────────────────────────────────┐  │
-│   │               Local-First Persistence (JSON + DPAPI)            │  │
+│   │               Local-First JSON State Persistence                │  │
 │   │   - Atomic temp + rolling .bak file writes                      │  │
 │   │   - Zero cloud telemetry; complete offline operation            │  │
 │   └─────────────────────────────────────────────────────────────────┘  │
@@ -49,7 +49,7 @@ Momentum is engineered as an offline-first, high-performance desktop preparation
 ┌────────────────────────────────────────────────────────────────────────┐
 │                     Out-of-Process Python Runner                       │
 │   - Python 3.8+ system discovery                                       │
-│   - Strict memory & environment scrubbing                              │
+│   - Environment-variable filtering & bounded stream capture            │
 │   - In-place mutation detection via deep-copy snapshots                │
 │   - Canonical JSON comparison with float epsilon (1e-6)                │
 │   - Enforced 3000ms wall-clock timeout with process tree termination   │

@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/badge/License-All%20Rights%20Reserved-red.svg)](LICENSE)
 [![Architecture](https://img.shields.io/badge/Architecture-MVVM%20%7C%20Local--First-orange.svg)]()
 
-> **A high-performance Windows desktop application engineered for final-year engineering students preparing for technical placement assessments and software engineering interviews.**  
+> **A Windows desktop application engineered for final-year engineering students preparing for technical placement assessments and software engineering interviews.**  
 > Featuring an evidence-based **Failure Forensics** engine that diagnoses execution failures into underlying computer science invariants rather than generic "Wrong Answer" errors.
 
 ---
@@ -28,11 +28,11 @@ Traditional practice platforms provide binary verdicts: `Wrong Answer` or `Accep
 ## 2. Application Screenshots
 
 ### Agentic Era Assessment: AI Fluency & Code Supervision Mode
-> *Simulating next-generation technical hiring (e.g. HackerRank Chakra & Plan Mode). Candidates supervise, audit, and patch plausible AI-generated implementations containing latent boundary bugs.*
+> *Simulating next-generation technical hiring (e.g. HackerRank Chakra & Plan Mode). Candidates supervise, audit, and patch simulated AI drafts designed to reproduce common LLM implementation patterns and latent boundary flaws.*
 ![AI Fluency & Code Supervision Assessment](assets/screenshots/ai_fluency_audit.png)
 
 ### Standard Placement Assessment Lab & Failure Forensics
-> *Deterministic local Python 3 execution with sub-millisecond AST and runtime telemetry, public/hidden test suites, and empirical diagnostic triage.*
+> *Deterministic local Python 3 execution with wall-clock runtime telemetry, public/hidden test suites, and empirical diagnostic triage.*
 ![Assessment Lab & Failure Forensics](assets/screenshots/assessment_lab_editor.png)
 
 ### Interactive Python Visual Tutor & Live Execution Simulator
@@ -72,7 +72,7 @@ Momentum is built using a clean, layered MVVM architecture on .NET 8 WPF with an
 │                                     │                                  │
 │                                     ▼                                  │
 │   ┌─────────────────────────────────────────────────────────────────┐  │
-│   │               Local-First Persistence (JSON + DPAPI)            │  │
+│   │               Local-First JSON State Persistence                │  │
 │   │   - Atomic temp + rolling .bak file writes                      │  │
 │   │   - Zero cloud telemetry; complete offline operation            │  │
 │   └─────────────────────────────────────────────────────────────────┘  │
@@ -82,7 +82,7 @@ Momentum is built using a clean, layered MVVM architecture on .NET 8 WPF with an
 ┌────────────────────────────────────────────────────────────────────────┐
 │                     Out-of-Process Python Runner                       │
 │   - Python 3.8+ system discovery                                       │
-│   - Strict memory & environment scrubbing                              │
+│   - Environment-variable filtering & bounded stream capture            │
 │   - In-place mutation detection via deep-copy snapshots                │
 │   - Canonical JSON comparison with float epsilon (1e-6)                │
 │   - Enforced 3000ms wall-clock timeout with process tree termination   │
@@ -93,8 +93,8 @@ Momentum is built using a clean, layered MVVM architecture on .NET 8 WPF with an
 - **Framework**: .NET 8.0 (C# 12)
 - **UI Architecture**: WPF (Windows Presentation Foundation) with MVVM pattern
 - **Execution Engine**: Out-of-process subprocess runner for Python 3.8+
-- **Serialization**: `System.Text.Json` with custom polymorphic converters
-- **Credential Storage**: Windows Data Protection API (DPAPI)
+- **Serialization**: `System.Text.Json` with atomic temporary file writes and rolling `.bak` backups
+- **Credential Storage**: Windows Data Protection API (DPAPI) used specifically for mail sync secrets in `MailSyncService`
 - **Embedded Browser**: Microsoft Edge WebView2
 
 ---
@@ -107,7 +107,7 @@ The Failure Forensics Engine evaluates empirical execution traces, AST compilati
 |---|---|---|---|
 | **SyntaxError** | Python parser fails `compile()` with line and offset | Grammatical rules and indentation boundaries must be satisfied prior to bytecode generation | Inspect highlighted line for missing colons (`:`), unmatched parentheses, or tab/space mixture |
 | **TimeLimitExceeded** | Wall-clock execution exceeds 3,000ms threshold | Non-advancing while-loops, unbounded recursion, or quadratic $O(N^2)$ algorithmic time complexity | Verify while-loop advancement conditions and base-case termination |
-| **EmptyInputOrBoundary** | `IndexError` on empty collection (`[]`, `""`) | Production data pipelines regularly receive empty batches; functions must guard against index access on empty structures | Add an early guard clause `if not arr: return ...` at the top of the function |
+| **EmptyInputOrBoundary** | `IndexError` on empty collection (`[]`, `""`) | Algorithmic functions must guard against index access on empty structures (`[]` or `""`) before accessing elements | Add an early guard clause `if not arr: return ...` at the top of the function |
 | **Sequence Index Out of Range** | `IndexError` on non-empty sequence | Loop or pointer boundary exceeded valid index range `[0, len-1]` | Inspect loop inequality (`< len(arr)` vs `<= len(arr)`) and boundary pointer updates |
 | **Dictionary Key Not Found** | `KeyError` during mapping lookup | Direct indexing `dict[key]` raises KeyError if the key does not exist | Use `dict.get(key, default)` or verify presence with `if key in dict:` |
 | **Zero Division Fault** | `ZeroDivisionError` during arithmetic | Denominator evaluated to zero, often from zero-length collections or matching pointers | Add a guard clause verifying denominators are non-zero before division |
@@ -118,7 +118,7 @@ The Failure Forensics Engine evaluates empirical execution traces, AST compilati
 | **ValueMismatch** | Algorithm produces correct types but diverges from canonical output | Algorithmic logic failure or untested edge case (e.g. duplicates, negatives, sorted order) | Trace logic step-by-step against sample input to isolate deviation |
 
 ### Hidden Test Case Protection
-To preserve placement assessment realism, hidden test inputs and expected outputs are **never leaked** in the UI or diagnostics. If a candidate fails a hidden test, the Failure Forensics engine still identifies the category and provides conceptual advice while protecting the raw test data.
+To preserve placement assessment realism, hidden test inputs and expected outputs are **withheld from candidate-facing UI and diagnostic messages, as verified by the automated test suite**. If a candidate fails a hidden test, the Failure Forensics engine identifies the failure category and provides conceptual guidance without exposing the underlying test data.
 
 ---
 
@@ -157,13 +157,17 @@ Momentum is designed specifically around this new industry standard:
 ```
 
 ### Key AI Fluency Capabilities:
-1. **Plausible Synthetic Drafts with Latent Flaws**: Each problem includes an authentic AI-generated solution that compiles cleanly and passes basic cases, but conceals an insidious architectural or edge-case flaw:
+1. **Curated AI-Style Drafts with Seeded Latent Flaws**: Each challenge includes a simulated AI draft designed to reproduce common LLM implementation patterns and edge-case oversights that compile cleanly and pass sample cases, but fail on deeper invariant checks:
    - *Dictionary Key Overwrites*: Dict comprehensions wiping duplicate keys (`{num: i for i, num in enumerate(nums)}` failing on `[3, 3]`).
    - *Frequency Blindness*: Using `set()` equality for anagram checks, missing count mismatches (`"aab"` vs `"abb"`).
    - *Non-Advancing Half-Open Intervals*: Binary search range updates (`left = mid`) triggering infinite loop timeouts.
    - *In-Place Mutation*: Calling `list.sort()` directly on caller arguments, corrupting upstream caller invariants.
-2. **AI Stated Assumptions vs. Reality**: The UI exposes the simulated AI rationale (e.g. *"Precomputed dictionary for clean O(N) lookup"*) alongside the empirical failure triage, training candidates to question AI assumptions.
-3. **AI Fluency Telemetry & Progress**: Tracks audited questions and computes an objective AI Fluency score alongside standard OA metrics.
+2. **Explicit Separation of Evidence and Hypotheses**:
+   - **Seeded Defect**: The underlying flaw intentionally structured into the simulated draft.
+   - **Empirical Output**: The concrete test failure recorded by the runner (e.g. `returned [] for input [[3, 3], 6]`).
+   - **Diagnostic Hypothesis**: The Failure Forensics engine's explanation of the probable CS invariant violation, guiding the candidate without revealing the answer.
+3. **AI Stated Assumptions vs. Reality**: The UI exposes the simulated AI rationale (e.g. *"Precomputed dictionary for clean O(N) lookup"*) alongside the empirical failure triage, training candidates to question AI assumptions.
+4. **AI Fluency Telemetry & Progress**: Tracks audited questions and computes an objective AI Fluency score alongside standard OA metrics.
 
 ---
 
@@ -192,13 +196,13 @@ Executing user-supplied Python code carries inherent security implications. Mome
 1. **Zero Main-Process Execution**: Untrusted Python code is **never** executed inside the main WPF application process or CLR runtime. Execution occurs in a spawned OS worker subprocess.
 2. **Standard Output Redirection & Quarantined Protocol**: The execution harness intercepts `sys.stdout` using in-memory streams during code execution. User print statements cannot corrupt the JSON IPC protocol or cause stream desynchronization.
 3. **Bounded Buffers (Memory Exhaustion Protection)**: Both standard output and standard error event readers enforce strict 64 KB per-channel capture limits, preventing Denial-of-Service (DoS) buffer bloating from print flooding.
-4. **Environment Variable Scrubbing**: Prior to spawning `python.exe`, sensitive environment variables (`MOMENTUM_DATA_DIR`, `APPDATA`, `LOCALAPPDATA`, `USERPROFILE`) are purged from the child process environment block.
+4. **Environment Variable Filtering**: Prior to spawning `python.exe`, sensitive environment variables (`MOMENTUM_DATA_DIR`, `APPDATA`, `LOCALAPPDATA`, `USERPROFILE`) are omitted from the child process environment block.
 5. **Enforced Wall-Clock Timeout & Process Tree Termination**: Execution is bounded by a strict wall-clock timer (default 3,000ms). If an execution exceeds this budget or if the user cancels execution, `process.Kill(entireProcessTree: true)` terminates the runner and any child processes.
 6. **Ephemeral Working Directory Isolation**: Every evaluation executes inside a uniquely generated temporary directory (`Path.GetTempPath() \ MomentumAssessmentLab \ <guid>`), which is cleaned up immediately in a `finally` block.
 
 ### Absent Protections & Security Limitations (Honest Recruiter Defense):
 1. **No Kernel / Hyper-V Containerization**: Subprocesses run under the standard Windows Access Token of the interactive user. The process has the same NTFS file read/write permissions as the candidate.
-2. **Environment Variable Clearing is NOT Disk Isolation**: Removing `%APPDATA%` prevents convenient environment variable lookup, but does *not* prevent code from accessing paths via `os.path.expanduser("~")` or absolute disk paths accessible to the user account.
+2. **Environment Variable Filtering is NOT File System Isolation**: Removing `%APPDATA%` prevents convenient environment variable lookup, but does *not* prevent code from accessing paths via `os.path.expanduser("~")` or absolute disk paths accessible to the current Windows user account.
 3. **No Network Socket Firewalling**: If Python code imports `socket` or `urllib`, outbound connections are not blocked at the OS layer.
 4. **No CPU / Memory Quotas**: While execution is strictly bounded in time (3,000ms), a script can peg 100% of a single CPU core during that window before process tree termination occurs.
 
