@@ -2,7 +2,7 @@
 
 [![Platform](https://img.shields.io/badge/Platform-.NET%208.0%20WPF-512bd4.svg)](https://dotnet.microsoft.com/)
 [![Language](https://img.shields.io/badge/Language-C%23%2012%20%7C%20Python%203.8%2B-blue.svg)]()
-[![Tests](https://img.shields.io/badge/Tests-15%20Passing%20(100%25)-success.svg)]()
+[![Tests](https://img.shields.io/badge/Tests-18%20Passing%20(100%25)-success.svg)]()
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Architecture](https://img.shields.io/badge/Architecture-MVVM%20%7C%20Local--First-orange.svg)]()
 
@@ -27,7 +27,12 @@ Traditional practice platforms provide binary verdicts: `Wrong Answer` or `Accep
 
 ## 2. Application Screenshots
 
-### Placement Assessment Lab & Failure Forensics
+### Agentic Era Assessment: AI Fluency & Code Supervision Mode
+> *Simulating next-generation technical hiring (e.g. HackerRank Chakra & Plan Mode). Candidates supervise, audit, and patch plausible AI-generated implementations containing latent boundary bugs.*
+![AI Fluency & Code Supervision Assessment](assets/screenshots/ai_fluency_audit.png)
+
+### Standard Placement Assessment Lab & Failure Forensics
+> *Deterministic local Python 3 execution with sub-millisecond AST and runtime telemetry, public/hidden test suites, and empirical diagnostic triage.*
 ![Assessment Lab & Failure Forensics](assets/screenshots/assessment_lab_editor.png)
 
 ### Interactive Python Visual Tutor & Live Execution Simulator
@@ -117,7 +122,52 @@ To preserve placement assessment realism, hidden test inputs and expected output
 
 ---
 
-## 5. Curated Assessment Catalog
+## 5. Built for the Agentic Era: AI Fluency & Code Supervision
+
+Technical assessment and hiring platforms (pioneered by **HackerRank's Chakra AI Interviewer** and **Agentic Era Assessments**) are undergoing a profound paradigm shift: **software engineering interviews no longer measure raw keystroke speed or boilerplate generation; they measure a candidate's ability to supervise, audit, and rigorously verify AI-generated code.**
+
+When engineers use AI coding agents (Copilot, Cursor, Devin), the highest-leverage skill is **AI Fluency**: detecting subtle edge-case traps, latent state mutations, and invariant violations in code that looks plausible at first glance.
+
+Momentum is designed specifically around this new industry standard:
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│               The Agentic Era Assessment Supervision Flow              │
+│                                                                        │
+│   ┌───────────────────────────┐         ┌───────────────────────────┐  │
+│   │   AI Assistant Prompt     │────────►│   Plausible Code Draft    │  │
+│   │   "Implement Two Sum in   │         │   (Syntactically valid,   │  │
+│   │    Python with O(1) hash" │         │    passes basic tests)    │  │
+│   └───────────────────────────┘         └─────────────┬─────────────┘  │
+│                                                       │                │
+│                                                       ▼                │
+│   ┌───────────────────────────┐         ┌───────────────────────────┐  │
+│   │   Empirical Forensics     │◄────────│   Latent Invariant Bug    │  │
+│   │   - Input: [[3, 3], 6]    │ (Crash/ │   (Dict comprehension     │  │
+│   │   - Output: [] (loss)     │  Fail)  │    overwrites duplicates) │  │
+│   └─────────────┬─────────────┘         └───────────────────────────┘  │
+│                 │                                                      │
+│                 ▼                                                      │
+│   ┌───────────────────────────┐         ┌───────────────────────────┐  │
+│   │   Human Code Audit        │────────►│   Deterministic Patch     │  │
+│   │   Candidate identifies    │ (Verify)│   Single-pass check       │  │
+│   │   lost index 0 invariant  │         │   100% hidden tests pass  │  │
+│   └───────────────────────────┘         └───────────────────────────┘  │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+### Key AI Fluency Capabilities:
+1. **Plausible Synthetic Drafts with Latent Flaws**: Each problem includes an authentic AI-generated solution that compiles cleanly and passes basic cases, but conceals an insidious architectural or edge-case flaw:
+   - *Dictionary Key Overwrites*: Dict comprehensions wiping duplicate keys (`{num: i for i, num in enumerate(nums)}` failing on `[3, 3]`).
+   - *Frequency Blindness*: Using `set()` equality for anagram checks, missing count mismatches (`"aab"` vs `"abb"`).
+   - *Non-Advancing Half-Open Intervals*: Binary search range updates (`left = mid`) triggering infinite loop timeouts.
+   - *In-Place Mutation*: Calling `list.sort()` directly on caller arguments, corrupting upstream caller invariants.
+2. **AI Stated Assumptions vs. Reality**: The UI exposes the simulated AI rationale (e.g. *"Precomputed dictionary for clean O(N) lookup"*) alongside the empirical failure triage, training candidates to question AI assumptions.
+3. **AI Fluency Telemetry & Progress**: Tracks audited questions and computes an objective AI Fluency score alongside standard OA metrics.
+
+---
+
+## 6. Curated Assessment Catalog
 
 Momentum includes 10 thoroughly validated placement problems across core screening topics:
 
@@ -134,7 +184,7 @@ Momentum includes 10 thoroughly validated placement problems across core screeni
 
 ---
 
-## 6. Execution Security & Process Isolation (Honest Technical Assessment)
+## 7. Execution Security & Process Isolation (Honest Technical Assessment)
 
 Executing user-supplied Python code carries inherent security implications. Momentum applies the following defense-in-depth principles while documenting absent protections with complete technical honesty:
 
@@ -154,7 +204,7 @@ Executing user-supplied Python code carries inherent security implications. Mome
 
 ---
 
-## 7. Automated Test Suite
+## 8. Automated Test Suite
 
 A dedicated integration test suite (`src/Momentum.Tests`) verifies the entire pipeline deterministically without external network dependencies:
 
@@ -163,7 +213,7 @@ A dedicated integration test suite (`src/Momentum.Tests`) verifies the entire pi
 dotnet run --project src/Momentum.Tests/Momentum.Tests.csproj
 ```
 
-### Verified Test Cases (15/15 Passing):
+### Verified Test Cases (18/18 Passing):
 - **Test 1**: Python 3.x Environment Discovery on Windows
 - **Test 2**: AppState V6 Backward Compatibility & Deserialization
 - **Test 3**: Assessment Catalog Integrity (10 questions, test cases, reference solutions)
@@ -179,10 +229,13 @@ dotnet run --project src/Momentum.Tests/Momentum.Tests.csproj
 - **Test 13**: Harness: Output Buffer Bounding under Heavy Print Flood (64KB cap)
 - **Test 14**: Harness: Process Tree Cancellation Termination (Immediate kill on token cancel)
 - **Test 15**: Persistence: AppState Round-Trip with Lab State (Code & attempts reload)
+- **Test 16**: AI Fluency: Draft Integrity & Prompt Simulation Catalog (All 10 AI drafts populated)
+- **Test 17**: AI Fluency: Raw AI Drafts Fail Latent Invariant Checks (Verified failure before patch)
+- **Test 18**: Persistence: AI Fluency Lab State Serialization Round-Trip (Audit code preserved)
 
 ---
 
-## 8. How to Build & Run
+## 9. How to Build & Run
 
 ### Prerequisites
 - **OS**: Windows 10 / 11 (64-bit)
@@ -207,7 +260,7 @@ dotnet restore Momentum.sln
 # Build the complete solution in Release mode
 dotnet build Momentum.sln -c Release
 
-# Run the 15 automated integration tests
+# Run the 18 automated integration tests
 dotnet run --project src/Momentum.Tests/Momentum.Tests.csproj -c Release
 
 # Run the desktop application
@@ -216,7 +269,7 @@ dotnet run --project src/Momentum/Momentum.csproj -c Release
 
 ---
 
-## 9. Repository Structure
+## 10. Repository Structure
 
 ```
 Mymomentum/
@@ -227,8 +280,10 @@ Mymomentum/
 │   ├── app_icon.ico
 │   ├── app_icon.png
 │   └── screenshots/
+│       ├── ai_fluency_audit.png
 │       ├── assessment_lab_editor.png
-│       └── pipeline_kanban.png
+│       ├── visual_tutor.png
+│       └── problems_catalog.png
 ├── docs/                            # Deep-dive engineering specifications
 │   ├── ARCHITECTURE.md              # Layered architecture & MVVM patterns
 │   ├── FAILURE_FORENSICS.md         # Diagnostic taxonomy & evaluation engine
@@ -257,7 +312,7 @@ Mymomentum/
 
 ---
 
-## 10. Legacy Versions Note
+## 11. Legacy Versions Note
 
 Historical development snapshots (V2 through V4.5) are permanently preserved in Git history and tagged under `legacy-v4.5`. You can inspect legacy versions at any time using:
 ```powershell

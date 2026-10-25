@@ -296,6 +296,75 @@ namespace Momentum.Tests
                 }
             });
 
+            // Test 16: AI Fluency - Draft Catalog & Traps Integrity
+            RunTest("AI Fluency: Draft Integrity & Prompt Simulation Catalog", () =>
+            {
+                var questions = AssessmentCatalog.Questions;
+                foreach (var q in questions)
+                {
+                    AssertTrue(q.HasAiDraft, $"Question '{q.Title}' has an AI draft");
+                    AssertTrue(!string.IsNullOrWhiteSpace(q.AiDraftCode), $"Question '{q.Title}' has non-empty AiDraftCode");
+                    AssertTrue(!string.IsNullOrWhiteSpace(q.AiStatedAssumption), $"Question '{q.Title}' has stated assumption");
+                    AssertTrue(!string.IsNullOrWhiteSpace(q.AiFlawExplanation), $"Question '{q.Title}' explains latent flaw");
+                    AssertTrue(!string.IsNullOrWhiteSpace(q.AiPromptSimulation), $"Question '{q.Title}' includes prompt simulation");
+                }
+            });
+
+            // Test 17: AI Fluency - Raw AI Drafts Contain Real Latent Edge Flaws
+            await RunTestAsync("AI Fluency: Raw AI Drafts Fail Latent Invariant Checks", async () =>
+            {
+                int flawCount = 0;
+                foreach (var q in AssessmentCatalog.Questions)
+                {
+                    var report = await harness.ExecuteAssessmentAsync(q, q.AiDraftCode, timeoutMs: 2500);
+                    // Raw AI draft should fail at least one test case due to subtle hallucination/trap
+                    if (!report.Success)
+                    {
+                        flawCount++;
+                        var diag = FailureForensicsEngine.Diagnose(q, q.AiDraftCode, report);
+                        AssertTrue(diag.Category != FailureTaxonomy.None, $"Question '{q.Title}' latent flaw diagnosed as {diag.CategoryDisplayName}");
+                    }
+                }
+                AssertTrue(flawCount == AssessmentCatalog.Questions.Count, 
+                    $"All {AssessmentCatalog.Questions.Count} AI drafts must fail at least one edge case initially. Caught: {flawCount}/{AssessmentCatalog.Questions.Count}");
+            });
+
+            // Test 18: Persistence - AI Fluency Lab State Round-Trip
+            RunTest("Persistence: AI Fluency Lab State Serialization Round-Trip", () =>
+            {
+                var tempDir = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "MomentumAiState_" + Guid.NewGuid().ToString("N"));
+                System.IO.Directory.CreateDirectory(tempDir);
+                var testFile = System.IO.Path.Combine(tempDir, "state.json");
+                try
+                {
+                    var state = new AppState();
+                    state.Lab.AuditedQuestionIds.Add("two-sum");
+                    state.Lab.SavedAuditCode["two-sum"] = "# Audited fix\ndef two_sum(nums, target): return []";
+                    state.Lab.Attempts.Add(new AssessmentAttempt
+                    {
+                        QuestionId = "two-sum",
+                        IsAiAuditAttempt = true,
+                        AllPassed = true,
+                        TestsPassed = 5,
+                        TotalTests = 5
+                    });
+
+                    var json = JsonSerializer.Serialize(state, StorageService.JsonOptions);
+                    System.IO.File.WriteAllText(testFile, json);
+
+                    var loaded = JsonSerializer.Deserialize<AppState>(System.IO.File.ReadAllText(testFile), StorageService.JsonOptions);
+                    AssertTrue(loaded != null, "Loaded state must not be null");
+                    AssertTrue(loaded!.Lab.AuditedQuestionIds.Contains("two-sum"), "AuditedQuestionIds persisted");
+                    AssertTrue(loaded.Lab.SavedAuditCode["two-sum"].Contains("Audited fix"), "SavedAuditCode persisted");
+                    AssertTrue(loaded.Lab.Attempts.Count == 1 && loaded.Lab.Attempts[0].IsAiAuditAttempt, "IsAiAuditAttempt preserved");
+                }
+                finally
+                {
+                    if (System.IO.Directory.Exists(tempDir))
+                        System.IO.Directory.Delete(tempDir, true);
+                }
+            });
+
             // Summary
             Console.WriteLine();
             Console.WriteLine("===============================================================");

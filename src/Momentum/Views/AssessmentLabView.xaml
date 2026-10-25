@@ -77,13 +77,35 @@
                     <Border Background="{DynamicResource AccentSoft}" BorderBrush="{DynamicResource AccentLine}" BorderThickness="1" CornerRadius="10" Padding="8,2" Margin="10,0,0,0" VerticalAlignment="Center">
                         <TextBlock Text="V6 Engine" FontSize="11" FontWeight="Medium" Foreground="{DynamicResource Accent}"/>
                     </Border>
+                    <Border Background="#2A182E" BorderBrush="#8855FF" BorderThickness="1" CornerRadius="10" Padding="8,2" Margin="6,0,0,0" VerticalAlignment="Center"
+                            Visibility="{Binding IsAiFluencyMode, Converter={StaticResource BoolToVis}}">
+                        <TextBlock Text="Agentic Era" FontSize="11" FontWeight="Medium" Foreground="#BB88FF"/>
+                    </Border>
                 </StackPanel>
                 <TextBlock Text="Practical engineering placement assessments, deterministic test execution, and empirical failure analysis."
                            Style="{StaticResource Muted}" FontSize="12.5" Margin="0,3,0,0"/>
+
+                <!-- Mode Switcher: Standard OA vs AI Fluency (Agentic Era) -->
+                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                    <RadioButton Content="Standard OA Mode" IsChecked="{Binding IsStandardMode, Mode=TwoWay}"
+                                 Command="{Binding SelectStandardModeCommand}" Style="{StaticResource Segment}"
+                                 Padding="12,5" FontSize="11.5" FontWeight="Medium"/>
+                    <RadioButton Content="⚡ AI Fluency &amp; Code Audit (Agentic Era)" IsChecked="{Binding IsAiFluencyMode, Mode=TwoWay}"
+                                 Command="{Binding SelectAiFluencyModeCommand}" Style="{StaticResource Segment}"
+                                 Padding="12,5" FontSize="11.5" FontWeight="Medium"/>
+                </StackPanel>
             </StackPanel>
 
             <!-- Telemetry Metrics -->
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                <Border Style="{StaticResource MetricTile}"
+                        Visibility="{Binding IsAiFluencyMode, Converter={StaticResource BoolToVis}}">
+                    <StackPanel>
+                        <TextBlock Text="AI FLUENCY" Style="{StaticResource Caption}" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource Accent}"/>
+                        <TextBlock Text="{Binding AiFluencyScoreText}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource Accent}" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </Border>
+
                 <Border Style="{StaticResource MetricTile}">
                     <StackPanel>
                         <TextBlock Text="SOLVED" Style="{StaticResource Caption}" FontSize="10" FontWeight="SemiBold"/>
@@ -121,7 +143,7 @@
         <!-- MAIN SPLIT WORKSPACE: Problems (Left) & Editor / Forensics (Right) -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="440" MinWidth="340" MaxWidth="600"/>
+                <ColumnDefinition Width="410" MinWidth="340" MaxWidth="600"/>
                 <ColumnDefinition Width="12"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
@@ -148,12 +170,12 @@
                     <Border Grid.Row="0" Background="{DynamicResource Surface2}" Padding="12,8" BorderBrush="{DynamicResource Divider}" BorderThickness="0,0,0,1" CornerRadius="8,8,0,0">
                         <DockPanel>
                             <TextBlock Text="Assessments Catalog" FontWeight="SemiBold" FontSize="12.5" Foreground="{DynamicResource Text}" VerticalAlignment="Center"/>
-                            <ComboBox ItemsSource="{Binding Topics}" SelectedItem="{Binding SelectedTopicFilter}" HorizontalAlignment="Right" Width="175" Height="25" FontSize="11.5"/>
+                            <ComboBox x:Name="TopicComboBox" ItemsSource="{Binding Topics}" SelectedItem="{Binding SelectedTopicFilter}" HorizontalAlignment="Right" Width="175" Height="25" FontSize="11.5"/>
                         </DockPanel>
                     </Border>
 
                     <!-- Problem Catalog List -->
-                    <ListBox Grid.Row="1" ItemsSource="{Binding FilteredQuestions}" SelectedItem="{Binding SelectedQuestion}"
+                    <ListBox x:Name="CatalogListBox" Grid.Row="1" ItemsSource="{Binding FilteredQuestions}" SelectedItem="{Binding SelectedQuestion}"
                              BorderThickness="0" Background="Transparent" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="ListBoxItem">
@@ -333,6 +355,8 @@
                         <Grid.RowDefinitions>
                             <!-- Editor Header / Tab bar -->
                             <RowDefinition Height="Auto"/>
+                            <!-- AI Code Supervision Banner (Agentic Era Challenge) -->
+                            <RowDefinition Height="Auto"/>
                             <!-- Code Canvas with Line Numbers Gutter -->
                             <RowDefinition Height="*"/>
                             <!-- Editor Status Bar Footer -->
@@ -352,29 +376,49 @@
                                     <Border Background="#16181D" BorderBrush="{DynamicResource BorderStrong}" BorderThickness="1" CornerRadius="4,4,0,0" Padding="10,4" Margin="0,0,10,0">
                                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                             <TextBlock Text="&#xE756;" FontFamily="{StaticResource IconFont}" FontSize="11" Foreground="{DynamicResource Accent}" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                                            <TextBlock Text="solution.py" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Text}"/>
+                                            <TextBlock Text="{Binding EditorTabTitle}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Accent}"/>
                                         </StackPanel>
                                     </Border>
-                                    <TextBlock Text="def " FontFamily="{StaticResource MonoFont}" FontSize="12.5" Foreground="{DynamicResource Accent}" FontWeight="Bold"/>
-                                    <TextBlock Text="{Binding SelectedQuestion.FunctionName}" FontFamily="{StaticResource MonoFont}" FontSize="12.5" Foreground="{DynamicResource Text}" FontWeight="Bold"/>
-                                    <TextBlock Text="(...)  " FontFamily="{StaticResource MonoFont}" FontSize="12.5" Foreground="{DynamicResource TextMuted}"/>
-                                    <Border Background="#14281A" BorderBrush="{DynamicResource Success}" BorderThickness="1" CornerRadius="4" Padding="6,1" Margin="4,0,0,0" VerticalAlignment="Center">
-                                        <TextBlock Text="Python 3.13" FontSize="10.5" Foreground="{DynamicResource Success}" FontWeight="Medium"/>
-                                    </Border>
+                                    <TextBlock FontFamily="{StaticResource MonoFont}" FontSize="12" VerticalAlignment="Center" Margin="4,0,0,0">
+                                        <Run Text="def " Foreground="{DynamicResource Accent}" FontWeight="Bold"/><Run Text="{Binding CurrentFunctionName, Mode=OneWay}" Foreground="{DynamicResource Text}" FontWeight="Bold"/><Run Text="(...)  " Foreground="{DynamicResource TextMuted}"/>
+                                    </TextBlock>
                                 </StackPanel>
 
                                 <!-- Right Actions -->
                                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Button Content="Reset Starter" Command="{Binding ResetStarterCodeCommand}" Style="{StaticResource GhostButton}" Margin="0,0,6,0" FontSize="11.5"/>
-                                    <Button Content="Copy Code" Command="{Binding CopyCodeCommand}" Style="{StaticResource GhostButton}" Margin="0,0,10,0" FontSize="11.5"/>
-                                    <Button Content="Run Sample Tests" Command="{Binding RunTestsCommand}" Style="{StaticResource SecondaryButton}" Margin="0,0,8,0" Padding="12,5" FontSize="12" ToolTip="Run against sample tests (Ctrl+Enter)"/>
-                                    <Button Content="Submit Assessment" Command="{Binding SubmitAssessmentCommand}" Style="{StaticResource PrimaryButton}" Padding="14,5" FontSize="12" ToolTip="Submit and evaluate full test suite (Ctrl+Shift+Enter)"/>
+                                    <Button Content="{Binding ResetButtonText}" Command="{Binding ResetStarterCodeCommand}" Style="{StaticResource GhostButton}" Margin="0,0,6,0" FontSize="11.5" ToolTip="Reset code"/>
+                                    <Button Content="Copy" Command="{Binding CopyCodeCommand}" Style="{StaticResource GhostButton}" Margin="0,0,10,0" FontSize="11.5" ToolTip="Copy code to clipboard"/>
+                                    <Button Content="Run Tests" Command="{Binding RunTestsCommand}" Style="{StaticResource SecondaryButton}" Margin="0,0,8,0" Padding="12,5" FontSize="12" ToolTip="Run against sample tests (Ctrl+Enter)"/>
+                                    <Button Content="Submit" Command="{Binding SubmitAssessmentCommand}" Style="{StaticResource PrimaryButton}" Padding="14,5" FontSize="12" ToolTip="Submit and evaluate full test suite (Ctrl+Shift+Enter)"/>
                                 </StackPanel>
                             </Grid>
                         </Border>
 
+                        <!-- AI Code Supervision Banner (Agentic Era Challenge) -->
+                        <Border Grid.Row="1" Background="#101520" BorderBrush="{DynamicResource AccentLine}" BorderThickness="0,0,0,1" Padding="14,8"
+                                Visibility="{Binding IsAiFluencyMode, Converter={StaticResource BoolToVis}}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
+                                        <TextBlock Text="&#xE7BE;" FontFamily="{StaticResource IconFont}" FontSize="12" Foreground="{DynamicResource Accent}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Agentic Era Challenge: AI Code Supervision" FontWeight="SemiBold" FontSize="11.5" Foreground="{DynamicResource Accent}"/>
+                                        <TextBlock Text=" • " Foreground="{DynamicResource TextFaint}" FontSize="11.5"/>
+                                        <TextBlock Text="{Binding CurrentAiPrompt, StringFormat='Prompt: &quot;{0}&quot;'}" FontSize="11" Foreground="{DynamicResource TextFaint}" TextTrimming="CharacterEllipsis"/>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding CurrentAiAssumption, StringFormat='AI Assistant Rationale: &quot;{0}&quot;'}" FontSize="11" Foreground="{DynamicResource TextMuted}" TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+                                <Border Grid.Column="1" Background="{DynamicResource DangerSoft}" BorderBrush="{DynamicResource Danger}" BorderThickness="1" CornerRadius="4" Padding="7,2" VerticalAlignment="Center">
+                                    <TextBlock Text="Plausible AI Draft • Edge-Case Flaw Inside" FontSize="10" Foreground="{DynamicResource Danger}" FontWeight="Medium"/>
+                                </Border>
+                            </Grid>
+                        </Border>
+
                         <!-- Code Canvas with Line Numbers Gutter -->
-                        <Grid Grid.Row="1" Background="#0A0B0E">
+                        <Grid Grid.Row="2" Background="#0A0B0E">
                             <Grid.ColumnDefinitions>
                                 <!-- Line Numbers Gutter -->
                                 <ColumnDefinition Width="Auto"/>
@@ -406,7 +450,7 @@
                         </Grid>
 
                         <!-- Editor Status Bar Footer -->
-                        <Border Grid.Row="2" Background="{DynamicResource Surface2}" BorderBrush="{DynamicResource Divider}" BorderThickness="0,1,0,0" CornerRadius="0,0,8,8" Padding="12,4">
+                        <Border Grid.Row="3" Background="{DynamicResource Surface2}" BorderBrush="{DynamicResource Divider}" BorderThickness="0,1,0,0" CornerRadius="0,0,8,8" Padding="12,4">
                             <DockPanel>
                                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
                                     <TextBlock x:Name="CaretPositionText" Text="Ln 1, Col 1" FontSize="11" Foreground="{DynamicResource TextMuted}" Margin="0,0,14,0"/>

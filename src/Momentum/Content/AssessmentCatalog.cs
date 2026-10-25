@@ -49,6 +49,19 @@ You may assume that each input has **at most one valid answer**, and you may not
 ",
                 Hint = "Use a hash table to store `{value: index}` of elements you have already inspected. For each number, check if `target - num` already exists in your table in O(1) time.",
                 ConceptExplanation = "One-pass hash table reduces time complexity from O(n^2) brute force to O(n) time and O(n) space.",
+                AiPromptSimulation = "Implement Two Sum in Python with O(N) lookup time.",
+                AiStatedAssumption = "I pre-indexed all numbers into a dictionary comprehension for O(1) lookups.",
+                AiFlawExplanation = "Dictionary comprehension overwrites duplicate keys (e.g. [3, 3] target 6), and returns [i, i] reusing the same element.",
+                AiDraftCode = @"def two_sum(nums: list[int], target: int) -> list[int]:
+    # AI Assistant Draft (Agentic Era Challenge)
+    # Pre-index all elements in a single dictionary comprehension for O(1) lookup
+    val_to_idx = {num: i for i, num in enumerate(nums)}
+    for i, num in enumerate(nums):
+        diff = target - num
+        if diff in val_to_idx:
+            return [i, val_to_idx[diff]]
+    return []
+",
                 TestCases = new()
                 {
                     new AssessmentTestCase
@@ -153,6 +166,18 @@ For this problem:
 ",
                 Hint = "Filter each string with `ch.lower()` for `ch in text if ch.isalnum()`. Compare character frequency counts using a dictionary or Python's `collections.Counter`.",
                 ConceptExplanation = "Comparing character frequencies with a dictionary ensures O(n) linear scan time while handling unicode/ascii gracefully.",
+                AiPromptSimulation = "Check if string t is an anagram of s, ignoring case and non-alphanumeric chars.",
+                AiStatedAssumption = "I cleaned the strings and verified character set equivalence.",
+                AiFlawExplanation = "Using set equality ignores character frequency counts (e.g., 'aab' vs 'abb' have identical sets {'a', 'b'}).",
+                AiDraftCode = @"def is_anagram(s: str, t: str) -> bool:
+    # AI Assistant Draft (Agentic Era Challenge)
+    clean_s = [c.lower() for c in s if c.isalnum()]
+    clean_t = [c.lower() for c in t if c.isalnum()]
+    if len(clean_s) != len(clean_t):
+        return False
+    # Flaw: set comparison fails on unequal character counts
+    return set(clean_s) == set(clean_t)
+",
                 TestCases = new()
                 {
                     new AssessmentTestCase
@@ -195,8 +220,17 @@ For this problem:
                         InputJson = "[\"aa\", \"a\"]",
                         ExpectedOutputJson = "false",
                         IsHidden = true,
+                        EdgeCaseTag = "Length Mismatch",
+                        Description = "Different lengths"
+                    },
+                    new AssessmentTestCase
+                    {
+                        Index = 5,
+                        InputJson = "[\"aab\", \"abb\"]",
+                        ExpectedOutputJson = "false",
+                        IsHidden = true,
                         EdgeCaseTag = "Frequency Mismatch",
-                        Description = "Same characters but differing counts"
+                        Description = "Same characters and length but differing frequency counts"
                     }
                 }
             },
@@ -251,6 +285,22 @@ def word_frequency_analysis(text: str, stop_words: list[str]) -> list[list]:
 ",
                 Hint = "Use `re.findall(r'[a-zA-Z0-9]+', text.lower())` to extract words cleanly. Use a set for `stop_words` for O(1) lookup. Sort with `key=lambda x: (-x[1], x[0])`.",
                 ConceptExplanation = "Demonstrates composite key sorting (`(-count, word)`) and robust regex tokenization for data pipelines.",
+                AiPromptSimulation = "Count non-stopword frequencies and return [word, count] sorted by count desc then word asc.",
+                AiStatedAssumption = "I split on space and stripped peripheral punctuation.",
+                AiFlawExplanation = "Using split(' ') fails on hyphenated words like 'data-driven' and internal punctuation.",
+                AiDraftCode = @"def word_frequency_analysis(text: str, stop_words: list[str]) -> list[list]:
+    # AI Assistant Draft (Agentic Era Challenge)
+    if not text:
+        return []
+    stops = set(stop_words)
+    # Flaw: split(' ') preserves hyphenated tokens and fails punctuation boundaries
+    words = [w.strip('.!,').lower() for w in text.split(' ') if w]
+    counts = {}
+    for w in words:
+        if w not in stops and w:
+            counts[w] = counts.get(w, 0) + 1
+    return sorted([[k, v] for k, v in counts.items()], key=lambda x: (-x[1], x[0]))
+",
                 TestCases = new()
                 {
                     new AssessmentTestCase
@@ -344,6 +394,24 @@ The resulting intervals must be returned in **ascending order** by start time.
 ",
                 Hint = "Sort intervals by their start time first. Then iterate through them: if the current interval starts before or at the end of the previous one, extend the previous interval's end to `max(last.end, current.end)`.",
                 ConceptExplanation = "Sorting by the start boundary reduces a multi-dimensional comparison problem into a single linear sweep in O(n log n) time.",
+                AiPromptSimulation = "Merge overlapping intervals in a list of [start, end] pairs.",
+                AiStatedAssumption = "I sorted intervals by start and merged adjacent intervals where start < last_end.",
+                AiFlawExplanation = "Using strict inequality '<' instead of '<=' fails touching boundary intervals like [[1, 4], [4, 5]].",
+                AiDraftCode = @"def merge_intervals(intervals: list[list[int]]) -> list[list[int]]:
+    # AI Assistant Draft (Agentic Era Challenge)
+    if not intervals:
+        return []
+    sorted_inv = sorted(intervals, key=lambda x: x[0])
+    merged = [sorted_inv[0]]
+    for current in sorted_inv[1:]:
+        last = merged[-1]
+        # Flaw: strict inequality fails touching boundaries [1, 4] and [4, 5]
+        if current[0] < last[1]:
+            last[1] = max(last[1], current[1])
+        else:
+            merged.append(current)
+    return merged
+",
                 TestCases = new()
                 {
                     new AssessmentTestCase
@@ -429,6 +497,15 @@ Return a string of the words in reverse order concatenated by a single space.
 ",
                 Hint = "In Python, `s.split()` without arguments automatically handles consecutive whitespaces and trims leading/trailing spaces. Reverse the resulting list and join with a space.",
                 ConceptExplanation = "String parsing and two-pointer reversal: handles irregular whitespace normalization in O(n) time.",
+                AiPromptSimulation = "Reverse words in a sentence with trimmed single space separation.",
+                AiStatedAssumption = "I stripped ends, split by ' ', and joined in reverse.",
+                AiFlawExplanation = "Using split(' ') with explicit delimiter preserves internal empty tokens on multiple consecutive spaces.",
+                AiDraftCode = @"def reverse_words(s: str) -> str:
+    # AI Assistant Draft (Agentic Era Challenge)
+    # Flaw: split(' ') preserves empty string tokens on multiple spaces
+    words = s.strip().split("" "")
+    return "" "".join(words[::-1])
+",
                 TestCases = new()
                 {
                     new AssessmentTestCase
@@ -533,6 +610,31 @@ You must write an algorithm with **O(log n)** runtime complexity.
 ",
                 Hint = "At least one half (left to mid, or mid to right) is always normally sorted! Check whether the target falls within the sorted half; if it does, discard the other half.",
                 ConceptExplanation = "Modified binary search: by determining which subarray half is monotonic, we maintain the O(log n) invariant even around rotational discontinuities.",
+                AiPromptSimulation = "Search for target in a rotated sorted array in O(log N) time.",
+                AiStatedAssumption = "I divided the search space based on whether the left half is strictly sorted.",
+                AiFlawExplanation = "Used nums[left] < nums[mid] instead of <=, breaking binary search when left == mid on 2-element arrays (e.g. [3, 1]).",
+                AiDraftCode = @"def search_rotated(nums: list[int], target: int) -> int:
+    # AI Assistant Draft (Agentic Era Challenge)
+    if not nums:
+        return -1
+    left, right = 0, len(nums) - 1
+    while left <= right:
+        mid = (left + right) // 2
+        if nums[mid] == target:
+            return mid
+        # Flaw: strict inequality fails when left == mid (e.g., 2-element arrays [3, 1])
+        if nums[left] < nums[mid]:
+            if nums[left] <= target < nums[mid]:
+                right = mid - 1
+            else:
+                left = mid + 1
+        else:
+            if nums[mid] < target <= nums[right]:
+                left = mid + 1
+            else:
+                right = mid - 1
+    return -1
+",
                 TestCases = new()
                 {
                     new AssessmentTestCase
@@ -585,6 +687,15 @@ You must write an algorithm with **O(log n)** runtime complexity.
                         ExpectedOutputJson = "3",
                         IsHidden = true,
                         Description = "Unrotated sorted array"
+                    },
+                    new AssessmentTestCase
+                    {
+                        Index = 6,
+                        InputJson = "[[3, 1], 1]",
+                        ExpectedOutputJson = "1",
+                        IsHidden = true,
+                        EdgeCaseTag = "Two-Element Rotation",
+                        Description = "Two-element rotated array checking boundary condition"
                     }
                 }
             },
@@ -629,6 +740,22 @@ A **substring** is a contiguous non-empty sequence of characters within a string
 ",
                 Hint = "Use the sliding window technique with two pointers (`start` and `end`). Keep a dictionary recording each character's latest seen index. When a duplicate is seen at or after `start`, jump `start` past that index.",
                 ConceptExplanation = "Sliding window with hash lookup avoids nested loops and scans the string in a single linear O(n) pass.",
+                AiPromptSimulation = "Find length of longest contiguous substring without repeating characters in O(N).",
+                AiStatedAssumption = "I maintained a sliding window and set start to char_index[ch] + 1 whenever a duplicate is found.",
+                AiFlawExplanation = "Fails to check char_index[ch] >= start, so the start pointer jumps backwards when seeing characters last seen before the active window.",
+                AiDraftCode = @"def length_of_longest_substring(s: str) -> int:
+    # AI Assistant Draft (Agentic Era Challenge)
+    char_index = {}
+    max_len = 0
+    start = 0
+    for end, ch in enumerate(s):
+        # Flaw: moves start backwards if duplicate was before current start window
+        if ch in char_index:
+            start = char_index[ch] + 1
+        char_index[ch] = end
+        max_len = max(max_len, end - start + 1)
+    return max_len
+",
                 TestCases = new()
                 {
                     new AssessmentTestCase
@@ -729,6 +856,25 @@ Implement a function `flatten_and_clean(data: dict) -> dict`:
 ",
                 Hint = "Use a recursive helper that carries a `prefix: str`. If a value is a dictionary, recurse with `f'{prefix}.{key}'`. Otherwise, if `value is not None and value != ''`, add it to the final dictionary.",
                 ConceptExplanation = "Tree traversal and path aggregation: tests recursive state propagation and strict null/empty predicate filtering.",
+                AiPromptSimulation = "Recursively flatten nested dictionary with dot notation and strip None or empty string values.",
+                AiStatedAssumption = "I used a recursive helper; for boolean checks I checked 'if not value' to discard empty/null values.",
+                AiFlawExplanation = "Using 'if not value' incorrectly drops valid numeric 0 and boolean False values because they are falsy in Python.",
+                AiDraftCode = @"def flatten_and_clean(data: dict) -> dict:
+    # AI Assistant Draft (Agentic Era Challenge)
+    result = {}
+    def recurse(current, prefix):
+        for key, value in current.items():
+            full_key = f""{prefix}.{key}"" if prefix else key
+            if isinstance(value, dict):
+                recurse(value, full_key)
+            else:
+                # Flaw: 'if not value' incorrectly drops valid 0 and False values
+                if not value:
+                    continue
+                result[full_key] = value
+    recurse(data, """")
+    return result
+",
                 TestCases = new()
                 {
                     new AssessmentTestCase
@@ -848,6 +994,31 @@ Fix the implementation so it passes all test cases efficiently in **O(log n)** t
 ",
                 Hint = "Use two clean binary searches with `left <= right`. When `nums[mid] == target`, record `ans = mid` and continue searching: move `right = mid - 1` to find the first occurrence, or `left = mid + 1` to find the last occurrence.",
                 ConceptExplanation = "Standard binary search boundary stabilization: recording the candidate match and tightening bounds avoids off-by-one termination bugs.",
+                AiPromptSimulation = "Find first and last position of target in sorted array in O(log N) time.",
+                AiStatedAssumption = "I implemented dual binary search with half-open interval left < right.",
+                AiFlawExplanation = "Half-open interval updates (high = mid without -1) causes infinite loops or off-by-one boundary misses on edge occurrences.",
+                AiDraftCode = @"def find_first_and_last(nums: list[int], target: int) -> list[int]:
+    # AI Assistant Draft (Agentic Era Challenge)
+    if not nums:
+        return [-1, -1]
+    def find_bound(is_first: bool) -> int:
+        left, right = 0, len(nums) - 1
+        ans = -1
+        while left <= right:
+            mid = (left + right) // 2
+            if nums[mid] == target:
+                ans = mid
+                if is_first:
+                    right = mid  # Flaw: does not decrement, causes infinite loop when left == mid
+                else:
+                    left = mid   # Flaw: does not increment, causes infinite loop when left == mid
+            elif nums[mid] < target:
+                left = mid + 1
+            else:
+                right = mid - 1
+        return ans
+    return [find_bound(True), find_bound(False)]
+",
                 TestCases = new()
                 {
                     new AssessmentTestCase
@@ -951,6 +1122,24 @@ An input string is valid if:
 ",
                 Hint = "Maintain a LIFO stack of open bracket characters. When a closing bracket is encountered, verify the stack is non-empty and the top element matches the closing bracket's pair.",
                 ConceptExplanation = "Stack LIFO semantics naturally model nested grammar rules and balanced parenthesis validation.",
+                AiPromptSimulation = "Check if bracket string contains properly matched and balanced open/close pairs.",
+                AiStatedAssumption = "I maintained a stack of openers and popped when a matching closer was encountered.",
+                AiFlawExplanation = "Calls stack.pop() without checking if stack is empty, crashing with IndexError when closing brackets appear first (e.g. '][').",
+                AiDraftCode = @"def is_valid_brackets(s: str) -> bool:
+    # AI Assistant Draft (Agentic Era Challenge)
+    matching = {')': '(', '}': '{', ']': '['}
+    openers = set(matching.values())
+    stack = []
+    for ch in s:
+        if ch in openers:
+            stack.append(ch)
+        elif ch in matching:
+            # Flaw: pops without guard checking if stack is empty
+            top = stack.pop()
+            if top != matching[ch]:
+                return False
+    return len(stack) == 0
+",
                 TestCases = new()
                 {
                     new AssessmentTestCase

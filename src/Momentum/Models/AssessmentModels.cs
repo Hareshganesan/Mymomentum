@@ -22,6 +22,8 @@ namespace Momentum.Models
         public List<AssessmentAttempt> Attempts { get; set; } = new();
         public HashSet<string> SolvedQuestionIds { get; set; } = new();
         public Dictionary<string, string> SavedCode { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+        public HashSet<string> AuditedQuestionIds { get; set; } = new();
+        public Dictionary<string, string> SavedAuditCode { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     }
 
     public class AssessmentAttempt
@@ -36,6 +38,7 @@ namespace Momentum.Models
         public long ExecutionTimeMs { get; set; }
         public FailureTaxonomy FailureCategory { get; set; } = FailureTaxonomy.None;
         public string? DiagnosticSummary { get; set; }
+        public bool IsAiAuditAttempt { get; set; }
     }
 
     public class AssessmentQuestion
@@ -55,6 +58,13 @@ namespace Momentum.Models
         public string Hint { get; set; } = string.Empty;
         public string ConceptExplanation { get; set; } = string.Empty;
         public bool IsSolved { get; set; }
+        public bool IsAudited { get; set; }
+
+        public string AiDraftCode { get; set; } = string.Empty;
+        public string AiStatedAssumption { get; set; } = string.Empty;
+        public string AiFlawExplanation { get; set; } = string.Empty;
+        public string AiPromptSimulation { get; set; } = string.Empty;
+        public bool HasAiDraft => !string.IsNullOrWhiteSpace(AiDraftCode);
 
         public string Description
         {

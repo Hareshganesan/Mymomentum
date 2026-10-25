@@ -10,18 +10,118 @@ namespace Momentum.Views
 {
     public partial class AssessmentLabView : UserControl
     {
+        private AssessmentLabViewModel? _subscribedVm;
+        private bool _isSyncingText;
+
         public AssessmentLabView()
         {
             InitializeComponent();
             Loaded += AssessmentLabView_Loaded;
+            Unloaded += AssessmentLabView_Unloaded;
+            DataContextChanged += AssessmentLabView_DataContextChanged;
+        }
+
+        private void AssessmentLabView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (_subscribedVm != null)
+            {
+                _subscribedVm.PropertyChanged -= OnViewModelPropertyChanged;
+                _subscribedVm = null;
+            }
+
+            if (e.NewValue is AssessmentLabViewModel vm)
+            {
+                _subscribedVm = vm;
+                _subscribedVm.PropertyChanged += OnViewModelPropertyChanged;
+                SyncFromViewModel(vm);
+            }
+        }
+
+        private void AssessmentLabView_Unloaded(object sender, RoutedEventArgs e)
+        {
+            if (_subscribedVm != null)
+            {
+                _subscribedVm.PropertyChanged -= OnViewModelPropertyChanged;
+                _subscribedVm = null;
+            }
+        }
+
+        private void OnViewModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (DataContext is AssessmentLabViewModel vm)
+            {
+                SyncFromViewModel(vm);
+            }
+        }
+
+        private void SyncFromViewModel(AssessmentLabViewModel vm)
+        {
+            if (Content is FrameworkElement rootGrid && rootGrid.DataContext != vm)
+            {
+                rootGrid.DataContext = vm;
+            }
+
+            if (TopicComboBox != null)
+            {
+                if (TopicComboBox.ItemsSource == null || !ReferenceEquals(TopicComboBox.ItemsSource, vm.Topics))
+                {
+                    TopicComboBox.ItemsSource = vm.Topics;
+                }
+                if (!Equals(TopicComboBox.SelectedItem, vm.SelectedTopicFilter))
+                {
+                    TopicComboBox.SelectedItem = vm.SelectedTopicFilter;
+                }
+            }
+
+            if (CatalogListBox != null)
+            {
+                if (CatalogListBox.ItemsSource == null || !ReferenceEquals(CatalogListBox.ItemsSource, vm.FilteredQuestions))
+                {
+                    CatalogListBox.ItemsSource = vm.FilteredQuestions;
+                }
+                if (!Equals(CatalogListBox.SelectedItem, vm.SelectedQuestion))
+                {
+                    CatalogListBox.SelectedItem = vm.SelectedQuestion;
+                }
+            }
+
+            if (CodeEditorTextBox != null)
+            {
+                var targetText = vm.UserCode ?? string.Empty;
+                if (CodeEditorTextBox.Text != targetText)
+                {
+                    _isSyncingText = true;
+                    try
+                    {
+                        CodeEditorTextBox.Text = targetText;
+                        UpdateLineNumbers();
+                        UpdateCaretStatus();
+                    }
+                    finally
+                    {
+                        _isSyncingText = false;
+                    }
+                }
+            }
         }
 
         private void AssessmentLabView_Loaded(object sender, RoutedEventArgs e)
         {
+            if (DataContext is AssessmentLabViewModel vm)
+            {
+                if (_subscribedVm != vm)
+                {
+                    if (_subscribedVm != null) _subscribedVm.PropertyChanged -= OnViewModelPropertyChanged;
+                    _subscribedVm = vm;
+                    _subscribedVm.PropertyChanged += OnViewModelPropertyChanged;
+                }
+                SyncFromViewModel(vm);
+            }
             UpdateLineNumbers();
             UpdateCaretStatus();
 
             // Hook scroll synchronization between CodeEditorTextBox and LineNumbersScrollViewer
+            CodeEditorTextBox.RemoveHandler(ScrollViewer.ScrollChangedEvent, new ScrollChangedEventHandler(OnEditorScrollChanged));
             CodeEditorTextBox.AddHandler(ScrollViewer.ScrollChangedEvent, new ScrollChangedEventHandler(OnEditorScrollChanged));
         }
 
@@ -37,6 +137,10 @@ namespace Momentum.Views
         {
             UpdateLineNumbers();
             UpdateCaretStatus();
+            if (!_isSyncingText && DataContext is AssessmentLabViewModel vm && vm.UserCode != CodeEditorTextBox.Text)
+            {
+                vm.UserCode = CodeEditorTextBox.Text;
+            }
         }
 
         private void OnCodeEditorSelectionChanged(object sender, RoutedEventArgs e)

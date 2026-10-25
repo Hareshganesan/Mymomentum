@@ -59,21 +59,40 @@ namespace Momentum
                 }
                 if (repoRoot == null) repoRoot = @"E:\MyMomentum_Stable\Mymomentum";
 
-                // 1. ASSESSMENT LAB (Flagship V6 Feature)
+                // 1. ASSESSMENT LAB (Standard OA Mode)
                 shell.Navigate("lab");
+                DoEvents();
                 await Task.Delay(1200);
+                DoEvents();
                 var labVm = (AssessmentLabViewModel)shell.CurrentPage!;
-                var twoSum = labVm.AllQuestions.FirstOrDefault(q => q.Id == "two-sum") ?? labVm.AllQuestions.First();
+                var twoSum = labVm.AllQuestions.FirstOrDefault(q => q.Id == "two-sum-target") ?? labVm.AllQuestions.First();
                 labVm.SelectQuestion(twoSum);
                 labVm.UserCode = twoSum.ReferenceSolution;
                 await labVm.RunAssessmentAsync(runAllTests: true);
                 await Task.Delay(1500);
                 window.UpdateLayout();
+                DoEvents();
 
                 SaveBitmap(window.Root, Path.Combine(repoRoot, "assets", "screenshots", "assessment_lab_editor.png"));
                 SaveBitmap(window.Root, Path.Combine(repoRoot, "src", "Momentum", "Assets", "Screenshots", "assessment_lab_editor.png"));
 
-                // 2. TRAINING COACH / PYTHON VISUAL TUTOR
+                // 2. AI FLUENCY & CODE AUDIT MODE (Agentic Era Assessment)
+                labVm.IsAiFluencyMode = true;
+                labVm.SelectQuestion(twoSum);
+                labVm.UserCode = twoSum.AiDraftCode;
+                DoEvents();
+                await Task.Delay(500);
+                DoEvents();
+                // Run assessment on the raw AI draft to display real failure forensics and AI supervision banner
+                await labVm.RunAssessmentAsync(runAllTests: true);
+                await Task.Delay(1500);
+                window.UpdateLayout();
+                DoEvents();
+
+                SaveBitmap(window.Root, Path.Combine(repoRoot, "assets", "screenshots", "ai_fluency_audit.png"));
+                SaveBitmap(window.Root, Path.Combine(repoRoot, "src", "Momentum", "Assets", "Screenshots", "ai_fluency_audit.png"));
+
+                // 3. TRAINING COACH / PYTHON VISUAL TUTOR
                 shell.Navigate("training");
                 await Task.Delay(1200);
                 var trainingVm = (TrainingViewModel)shell.CurrentPage!;
@@ -93,6 +112,9 @@ namespace Momentum
                 shell.Navigate("problems");
                 await Task.Delay(1200);
                 window.UpdateLayout();
+
+                SaveBitmap(window.Root, Path.Combine(repoRoot, "assets", "screenshots", "problems_catalog.png"));
+                SaveBitmap(window.Root, Path.Combine(repoRoot, "src", "Momentum", "Assets", "Screenshots", "problems_catalog.png"));
 
                 SaveBitmap(window.Root, Path.Combine(repoRoot, "assets", "screenshots", "problems_catalog.png"));
                 SaveBitmap(window.Root, Path.Combine(repoRoot, "src", "Momentum", "Assets", "Screenshots", "problems_catalog.png"));
@@ -126,6 +148,19 @@ namespace Momentum
             encoder.Frames.Add(BitmapFrame.Create(rtb));
             using var stream = File.Create(destination);
             encoder.Save(stream);
+        }
+
+        private static void DoEvents()
+        {
+            var frame = new System.Windows.Threading.DispatcherFrame();
+            System.Windows.Threading.Dispatcher.CurrentDispatcher.BeginInvoke(
+                System.Windows.Threading.DispatcherPriority.Background,
+                new System.Windows.Threading.DispatcherOperationCallback(exitFrame =>
+                {
+                    ((System.Windows.Threading.DispatcherFrame)exitFrame!).Continue = false;
+                    return null;
+                }), frame);
+            System.Windows.Threading.Dispatcher.PushFrame(frame);
         }
 
         public static void ApplyTheme(bool dark)

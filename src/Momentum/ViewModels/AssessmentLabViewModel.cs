@@ -22,6 +22,7 @@ namespace Momentum.ViewModels
         private string _selectedTopicFilter = "All";
         private string _userCode = string.Empty;
         private bool _isRunning;
+        private bool _isAiFluencyMode;
         private string _statusMessage = "Ready";
         private AssessmentRunReport? _lastReport;
         private FailureDiagnostic? _diagnostic;
@@ -44,6 +45,8 @@ namespace Momentum.ViewModels
             RunTestsCommand = new RelayCommand(async () => await RunAssessmentAsync(runAllTests: false), () => !IsRunning && SelectedQuestion != null);
             SubmitAssessmentCommand = new RelayCommand(async () => await RunAssessmentAsync(runAllTests: true), () => !IsRunning && SelectedQuestion != null);
             ResetStarterCodeCommand = new RelayCommand(ResetStarterCode, () => !IsRunning && SelectedQuestion != null);
+            SelectStandardModeCommand = new RelayCommand(() => IsAiFluencyMode = false);
+            SelectAiFluencyModeCommand = new RelayCommand(() => IsAiFluencyMode = true);
             ToggleHintCommand = new RelayCommand(() => ShowHint = !ShowHint);
             ToggleReferenceCommand = new RelayCommand(() => ShowReferenceSolution = !ShowReferenceSolution);
             CopyCodeCommand = new RelayCommand(() =>
@@ -62,6 +65,44 @@ namespace Momentum.ViewModels
             RefreshLabTelemetry();
         }
 
+        public ICommand SelectStandardModeCommand { get; }
+        public ICommand SelectAiFluencyModeCommand { get; }
+
+        public bool IsAiFluencyMode
+        {
+            get => _isAiFluencyMode;
+            set
+            {
+                if (Set(ref _isAiFluencyMode, value))
+                {
+                    OnPropertyChanged(nameof(IsStandardMode));
+                    OnPropertyChanged(nameof(ModeBadgeText));
+                    OnPropertyChanged(nameof(EditorTabTitle));
+                    OnPropertyChanged(nameof(ResetButtonText));
+                    OnModeChanged();
+                }
+            }
+        }
+
+        public bool IsStandardMode
+        {
+            get => !_isAiFluencyMode;
+            set
+            {
+                if (value)
+                {
+                    IsAiFluencyMode = false;
+                }
+            }
+        }
+        public string ModeBadgeText => _isAiFluencyMode ? "AI Fluency & Code Audit" : "Standard OA Mode";
+        public string EditorTabTitle => _isAiFluencyMode ? "ai_draft.py" : "solution.py";
+        public string ResetButtonText => "Reset";
+
+        public int AuditedCount => Store.State.Lab.AuditedQuestionIds.Count;
+        public string AiAuditSummary => $"{AuditedCount} / {AllQuestions.Count} AI Audits Verified";
+        public string AiFluencyScoreText => AllQuestions.Count == 0 ? "0%" : $"{Math.Round((double)AuditedCount / AllQuestions.Count * 100, 0)}%";
+
         public List<AssessmentQuestion> AllQuestions { get; }
         public List<string> Topics { get; }
         public ObservableCollection<AssessmentQuestion> FilteredQuestions { get; }
@@ -72,11 +113,31 @@ namespace Momentum.ViewModels
             get => _selectedQuestion;
             set
             {
+                if (value == null) return;
                 if (Set(ref _selectedQuestion, value))
                 {
+                    OnPropertyChanged(nameof(CurrentFunctionName));
+                    OnPropertyChanged(nameof(CurrentAiPrompt));
+                    OnPropertyChanged(nameof(CurrentAiAssumption));
                     OnSelectedQuestionChanged();
                 }
             }
+        }
+
+        public string CurrentFunctionName
+        {
+            get => SelectedQuestion?.FunctionName ?? "solution";
+            set { }
+        }
+        public string CurrentAiPrompt
+        {
+            get => SelectedQuestion?.AiPromptSimulation ?? string.Empty;
+            set { }
+        }
+        public string CurrentAiAssumption
+        {
+            get => SelectedQuestion?.AiStatedAssumption ?? string.Empty;
+            set { }
         }
 
         public string SelectedTopicFilter
@@ -84,7 +145,8 @@ namespace Momentum.ViewModels
             get => _selectedTopicFilter;
             set
             {
-                if (Set(ref _selectedTopicFilter, value))
+                var val = string.IsNullOrWhiteSpace(value) ? "All" : value;
+                if (Set(ref _selectedTopicFilter, val))
                 {
                     ApplyFilter();
                 }
@@ -101,7 +163,10 @@ namespace Momentum.ViewModels
                     // Auto-save code for this question
                     if (SelectedQuestion != null)
                     {
-                        Store.State.Lab.SavedCode[SelectedQuestion.Id] = value;
+                        if (IsAiFluencyMode)
+                            Store.State.Lab.SavedAuditCode[SelectedQuestion.Id] = value;
+                        else
+                            Store.State.Lab.SavedCode[SelectedQuestion.Id] = value;
                         Store.ScheduleSave();
                     }
                 }
@@ -220,14 +285,20 @@ namespace Momentum.ViewModels
                 return;
             }
 
-            // Restore saved user code or load starter code
-            if (Store.State.Lab.SavedCode.TryGetValue(SelectedQuestion.Id, out var saved) && !string.IsNullOrWhiteSpace(saved))
+            // Restore saved user code or load appropriate template
+            if (IsAiFluencyMode)
             {
-                UserCode = saved;
+                if (Store.State.Lab.SavedAuditCode.TryGetValue(SelectedQuestion.Id, out var savedAudit) && !string.IsNullOrWhiteSpace(savedAudit))
+                    UserCode = savedAudit;
+                else
+                    UserCode = SelectedQuestion.AiDraftCode;
             }
             else
             {
-                UserCode = SelectedQuestion.StarterCode;
+                if (Store.State.Lab.SavedCode.TryGetValue(SelectedQuestion.Id, out var saved) && !string.IsNullOrWhiteSpace(saved))
+                    UserCode = saved;
+                else
+                    UserCode = SelectedQuestion.StarterCode;
             }
 
             TestResults.Clear();
@@ -235,7 +306,7 @@ namespace Momentum.ViewModels
             LastReport = null;
             ShowHint = false;
             ShowReferenceSolution = false;
-            StatusMessage = "Ready";
+            StatusMessage = IsAiFluencyMode ? "AI Draft loaded. Audit the code to locate the subtle bug, then run evaluation." : "Ready";
 
             // Pre-populate public test cases
             foreach (var tc in SelectedQuestion.TestCases.Where(t => !t.IsHidden))
@@ -252,31 +323,96 @@ namespace Momentum.ViewModels
                     ActualDisplay = string.Empty
                 });
             }
+
+            OnPropertyChanged(nameof(UserCode));
+            OnPropertyChanged(nameof(CurrentFunctionName));
+            OnPropertyChanged(nameof(CurrentAiPrompt));
+            OnPropertyChanged(nameof(CurrentAiAssumption));
+        }
+
+        private void OnModeChanged()
+        {
+            if (SelectedQuestion == null) return;
+
+            if (_isAiFluencyMode)
+            {
+                if (Store.State.Lab.SavedAuditCode.TryGetValue(SelectedQuestion.Id, out var savedAudit) && !string.IsNullOrWhiteSpace(savedAudit))
+                    UserCode = savedAudit;
+                else
+                    UserCode = SelectedQuestion.AiDraftCode;
+
+                StatusMessage = "AI draft loaded. Audit code, identify subtle flaws, and run tests.";
+            }
+            else
+            {
+                if (Store.State.Lab.SavedCode.TryGetValue(SelectedQuestion.Id, out var saved) && !string.IsNullOrWhiteSpace(saved))
+                    UserCode = saved;
+                else
+                    UserCode = SelectedQuestion.StarterCode;
+
+                StatusMessage = "Starter template loaded. Write and test your implementation.";
+            }
+
+            TestResults.Clear();
+            Diagnostic = null;
+            LastReport = null;
+            ShowHint = false;
+            ShowReferenceSolution = false;
+
+            foreach (var tc in SelectedQuestion.TestCases.Where(t => !t.IsHidden))
+            {
+                TestResults.Add(new AssessmentTestResult
+                {
+                    Index = tc.Index,
+                    Passed = false,
+                    IsEvaluated = false,
+                    IsHidden = false,
+                    EdgeCaseTag = !string.IsNullOrWhiteSpace(tc.EdgeCaseTag) ? tc.EdgeCaseTag : null,
+                    InputDisplay = tc.InputJson,
+                    ExpectedDisplay = tc.ExpectedOutputJson,
+                    ActualDisplay = string.Empty
+                });
+            }
+
+            OnPropertyChanged(nameof(UserCode));
+            OnPropertyChanged(nameof(CurrentFunctionName));
+            OnPropertyChanged(nameof(CurrentAiPrompt));
+            OnPropertyChanged(nameof(CurrentAiAssumption));
         }
 
         private void ResetStarterCode()
         {
             if (SelectedQuestion == null) return;
-            UserCode = SelectedQuestion.StarterCode;
-            Store.State.Lab.SavedCode[SelectedQuestion.Id] = SelectedQuestion.StarterCode;
-            Shell.ShowToast("Reset code to initial template.");
+            if (IsAiFluencyMode)
+            {
+                UserCode = SelectedQuestion.AiDraftCode;
+                Store.State.Lab.SavedAuditCode[SelectedQuestion.Id] = SelectedQuestion.AiDraftCode;
+                Shell.ShowToast("Reset code to initial AI Assistant draft.");
+            }
+            else
+            {
+                UserCode = SelectedQuestion.StarterCode;
+                Store.State.Lab.SavedCode[SelectedQuestion.Id] = SelectedQuestion.StarterCode;
+                Shell.ShowToast("Reset code to initial template.");
+            }
         }
 
         private void ApplyFilter()
         {
+            var filter = string.IsNullOrWhiteSpace(SelectedTopicFilter) ? "All" : SelectedTopicFilter;
             FilteredQuestions.Clear();
-            var matches = string.Equals(SelectedTopicFilter, "All", StringComparison.OrdinalIgnoreCase)
+            var matches = string.Equals(filter, "All", StringComparison.OrdinalIgnoreCase)
                 ? AllQuestions
-                : AllQuestions.Where(q => string.Equals(q.Topic, SelectedTopicFilter, StringComparison.OrdinalIgnoreCase));
+                : AllQuestions.Where(q => string.Equals(q.Topic, filter, StringComparison.OrdinalIgnoreCase));
 
             foreach (var m in matches)
             {
                 FilteredQuestions.Add(m);
             }
 
-            if (SelectedQuestion != null && !FilteredQuestions.Contains(SelectedQuestion))
+            if (SelectedQuestion == null || !FilteredQuestions.Contains(SelectedQuestion))
             {
-                SelectQuestion(FilteredQuestions.FirstOrDefault());
+                SelectQuestion(FilteredQuestions.FirstOrDefault() ?? AllQuestions.FirstOrDefault());
             }
         }
 
@@ -331,17 +467,27 @@ namespace Momentum.ViewModels
                     TotalTests = report.TestResults.Count,
                     ExecutionTimeMs = report.TotalExecutionMs,
                     FailureCategory = diag.Category,
-                    DiagnosticSummary = diag.ObservedFact
+                    DiagnosticSummary = diag.ObservedFact,
+                    IsAiAuditAttempt = IsAiFluencyMode
                 };
 
                 Store.State.Lab.Attempts.Add(attempt);
 
                 if (report.Success && runAllTests)
                 {
-                    Store.State.Lab.SolvedQuestionIds.Add(SelectedQuestion.Id);
+                    if (IsAiFluencyMode)
+                    {
+                        Store.State.Lab.AuditedQuestionIds.Add(SelectedQuestion.Id);
+                        StatusMessage = $"100% Passed ({report.TestResults.Count}/{report.TestResults.Count} tests) in {report.TotalExecutionMs}ms - AI Flaw Successfully Patched!";
+                        Shell.ShowToast($"✨ AI Flaw Patched: {SelectedQuestion.Title}!");
+                    }
+                    else
+                    {
+                        Store.State.Lab.SolvedQuestionIds.Add(SelectedQuestion.Id);
+                        StatusMessage = $"100% Passed ({report.TestResults.Count}/{report.TestResults.Count} tests) in {report.TotalExecutionMs}ms";
+                        Shell.ShowToast($"Solved: {SelectedQuestion.Title}!");
+                    }
                     Store.ScheduleSave();
-                    StatusMessage = $"100% Passed ({report.TestResults.Count}/{report.TestResults.Count} tests) in {report.TotalExecutionMs}ms";
-                    Shell.ShowToast($"Solved: {SelectedQuestion.Title}!");
                 }
                 else if (report.Success)
                 {
@@ -349,7 +495,9 @@ namespace Momentum.ViewModels
                 }
                 else
                 {
-                    StatusMessage = $"Assessment Failed: {diag.CategoryDisplayName}";
+                    StatusMessage = IsAiFluencyMode
+                        ? $"AI Draft Flaw Detected: {diag.CategoryDisplayName}. Audit and patch the code."
+                        : $"Assessment Failed: {diag.CategoryDisplayName}";
                 }
 
                 Store.ScheduleSave();
@@ -379,7 +527,12 @@ namespace Momentum.ViewModels
             foreach (var q in AllQuestions)
             {
                 q.IsSolved = lab.SolvedQuestionIds.Contains(q.Id);
+                q.IsAudited = lab.AuditedQuestionIds.Contains(q.Id);
             }
+
+            OnPropertyChanged(nameof(AuditedCount));
+            OnPropertyChanged(nameof(AiAuditSummary));
+            OnPropertyChanged(nameof(AiFluencyScoreText));
 
             if (AttemptCount > 0)
             {
