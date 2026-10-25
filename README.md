@@ -3,7 +3,7 @@
 [![Platform](https://img.shields.io/badge/Platform-.NET%208.0%20WPF-512bd4.svg)](https://dotnet.microsoft.com/)
 [![Language](https://img.shields.io/badge/Language-C%23%2012%20%7C%20Python%203.8%2B-blue.svg)]()
 [![Tests](https://img.shields.io/badge/Tests-18%20Passing%20(100%25)-success.svg)]()
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-All%20Rights%20Reserved-red.svg)](LICENSE)
 [![Architecture](https://img.shields.io/badge/Architecture-MVVM%20%7C%20Local--First-orange.svg)]()
 
 > **A high-performance Windows desktop application engineered for final-year engineering students preparing for technical placement assessments and software engineering interviews.**  
@@ -304,7 +304,7 @@ Mymomentum/
 │       ├── Momentum.Tests.csproj
 │       └── Program.cs
 ├── .gitignore                       # Standard .NET / Windows exclusion rules
-├── LICENSE                          # MIT License
+├── LICENSE                          # Proprietary / All Rights Reserved (Source-Available)
 ├── Momentum.sln                     # Visual Studio / dotnet solution
 ├── README.md                        # Flagship repository documentation
 └── Run_Momentum.bat                 # One-click native launcher script
